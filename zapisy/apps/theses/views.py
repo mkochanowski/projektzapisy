@@ -41,11 +41,13 @@ class ThesisTypeFilter(Enum):
     MASTERS = 3
     ENGINEERS = 4
     BACHELORS = 5
-    ISIM = 6
-    AVAILABLE_MASTERS = 7
-    AVAILABLE_ENGINEERS = 8
-    AVAILABLE_BACHELORS = 9
-    AVAILABLE_ISIM = 10
+    BACHELORS_OR_ENGINEERS = 6
+    ISIM = 7
+    AVAILABLE_MASTERS = 8
+    AVAILABLE_ENGINEERS = 9
+    AVAILABLE_BACHELORS = 10
+    AVAILABLE_BACHELORS_OR_ENGINEERS = 11
+    AVAILABLE_ISIM = 12
 
     DEFAULT = EVERYTHING
 
@@ -182,6 +184,7 @@ ENGINEERS_KINDS = (k.value for k in (
 BACHELORS_KINDS = (k.value for k in(
     ThesisKind.BACHELORS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
 ))
+BACHELORS_OR_ENGINEERS_KINDS = tuple(set(ENGINEERS_KINDS + BACHELORS_KINDS))
 ISIM_KINDS = (k.value for k in (
     ThesisKind.ISIM, ThesisKind.BACHELORS_ENGINEERS_ISIM
 ))
@@ -201,6 +204,8 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
         return qs.filter(kind__in=ENGINEERS_KINDS)
     elif thesis_type == ThesisTypeFilter.BACHELORS:
         return qs.filter(kind__in=BACHELORS_KINDS)
+    elif thesis_type == ThesisTypeFilter.BACHELORS_OR_ENGINEERS:
+        return qs.filter(kind__in=BACHELORS_OR_ENGINEERS_KINDS)
     elif thesis_type == ThesisTypeFilter.ISIM:
         return qs.filter(kind__in=ISIM_KINDS)
     elif thesis_type == ThesisTypeFilter.AVAILABLE_MASTERS:
@@ -209,6 +214,8 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
         return available_thesis_filter(qs.filter(kind__in=ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS:
         return available_thesis_filter(qs.filter(kind__in=BACHELORS_KINDS))
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS_OR_ENGINEERS:
+        return available_thesis_filter(qs.filter(kind__in=BACHELORS_OR_ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_ISIM:
         return available_thesis_filter(qs.filter(kind__in=ISIM_KINDS))
     # Should never get here
