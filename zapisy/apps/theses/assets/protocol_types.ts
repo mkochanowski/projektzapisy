@@ -7,8 +7,9 @@ export const enum ThesisKind {
 	Masters = 0,
 	Engineers = 1,
 	Bachelors = 2,
-	BachelorsEngineers = 3,
-	Isim = 4,
+	Isim = 3,
+	BachelorsEngineers = 4,
+	BachelorsEngineersIsim = 5,
 }
 
 /**
@@ -20,8 +21,9 @@ export function thesisKindToString(kind: ThesisKind): string {
 		case ThesisKind.Masters: return "mgr";
 		case ThesisKind.Engineers: return "inż";
 		case ThesisKind.Bachelors: return "lic";
-		case ThesisKind.BachelorsEngineers: return "lic+inż";
 		case ThesisKind.Isim: return "ISIM";
+		case ThesisKind.BachelorsEngineers: return "lic+inż";
+		case ThesisKind.BachelorsEngineersIsim: return "lic+inż+ISIM";
 	}
 }
 
@@ -70,11 +72,13 @@ export const enum ThesisTypeFilter {
 	Masters,
 	Engineers,
 	Bachelors,
-	BachelorsISIM,
+	BachelorsOrEngineers,
+	ISIM,
 	AvailableMasters,
 	AvailableEngineers,
 	AvailableBachelors,
-	AvailableBachelorsISIM,
+	AvailableBachelorsOrEngineers,
+	AvailableISIM,
 
 	Default = Current,
 }
@@ -91,10 +95,12 @@ export function thesisTypeFilterToString(type: ThesisTypeFilter) {
 		case ThesisTypeFilter.Masters: return "Magisterskie";
 		case ThesisTypeFilter.Engineers: return "Inżynierskie";
 		case ThesisTypeFilter.Bachelors: return "Licencjackie";
-		case ThesisTypeFilter.BachelorsISIM: return "Licencjackie ISIM";
-		case ThesisTypeFilter.AvailableMasters: return "Magisterskie - dostępne";
-		case ThesisTypeFilter.AvailableEngineers: return "Inżynierskie - dostępne";
-		case ThesisTypeFilter.AvailableBachelors: return "Licencjackie - dostępne";
-		case ThesisTypeFilter.AvailableBachelorsISIM: return "Licencjackie ISIM - dostępne";
+		case ThesisTypeFilter.BachelorsOrEngineers: return "Licencjackie lub inżynierskie";
+		case ThesisTypeFilter.ISIM: return "ISIM";
+		case ThesisTypeFilter.AvailableMasters: return "Magisterskie – dostępne";
+		case ThesisTypeFilter.AvailableEngineers: return "Inżynierskie – dostępne";
+		case ThesisTypeFilter.AvailableBachelors: return "Licencjackie – dostępne";
+		case ThesisTypeFilter.AvailableBachelorsOrEngineers: return "Licencjackie lub inżynierskie – dostępne";
+		case ThesisTypeFilter.AvailableISIM: return "ISIM – dostępne";
 	}
 }

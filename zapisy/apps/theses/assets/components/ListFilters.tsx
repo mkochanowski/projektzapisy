@@ -17,11 +17,13 @@ const typeFilters = [
 	ThesisTypeFilter.Masters,
 	ThesisTypeFilter.Engineers,
 	ThesisTypeFilter.Bachelors,
-	ThesisTypeFilter.BachelorsISIM,
+	ThesisTypeFilter.BachelorsOrEngineers,
+	ThesisTypeFilter.ISIM,
 	ThesisTypeFilter.AvailableMasters,
 	ThesisTypeFilter.AvailableEngineers,
 	ThesisTypeFilter.AvailableBachelors,
-	ThesisTypeFilter.AvailableBachelorsISIM,
+	ThesisTypeFilter.AvailableBachelorsOrEngineers,
+	ThesisTypeFilter.AvailableISIM,
 ].map(type => ({ val: type, displayName: thesisTypeFilterToString(type) }));
 
 type Props = {

@@ -19,12 +19,11 @@ export type ThesisInJson = {
 	advisor?: number;
 	auxiliary_advisor?: number;
 	kind: ThesisKind;
-	reserved: boolean;
+	reserved_until: string | null;
 	description: string;
 	status: ThesisStatus;
 	student?: PersonInJson;
 	student_2?: PersonInJson;
-	added_date: string;
 	modified_date: string;
 };
 
@@ -48,12 +47,11 @@ export function deserializeThesis(json: ThesisInJson) {
 	result.advisor = json.advisor ? Users.getEmployeeById(json.advisor) : null;
 	result.auxiliaryAdvisor = json.auxiliary_advisor ? Users.getEmployeeById(json.auxiliary_advisor) : null;
 	result.kind = json.kind;
-	result.reserved = json.reserved;
+	result.reservedUntil = json.reserved_until ? moment(json.reserved_until) : null;
 	result.description = json.description;
 	result.status = json.status;
 	result.student = json.student ? deserializeStudent(json.student) : null;
 	result.secondStudent = json.student_2 ? deserializeStudent(json.student_2) : null;
-	result.addedDate = moment(json.added_date);
 	result.modifiedDate = moment(json.modified_date);
 	return result;
 }

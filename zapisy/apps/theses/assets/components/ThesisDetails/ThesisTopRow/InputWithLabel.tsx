@@ -9,6 +9,7 @@ export const enum InputType {
 type Props = {
 	labelText: string;
 	inputText: string;
+	inputWidth?: number;
 	inputType: InputType,
 };
 
@@ -27,6 +28,7 @@ export const InputWithLabel = React.memo(function(props: Props) {
 				<input
 					type={"text"}
 					value={props.inputText}
+					style={{ width: props.inputWidth != null ? props.inputWidth : "auto" }}
 					readOnly={props.inputType === InputType.ReadOnly}
 					disabled={props.inputType === InputType.Disabled}
 				/>

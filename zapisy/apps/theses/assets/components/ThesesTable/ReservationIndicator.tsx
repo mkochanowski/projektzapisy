@@ -14,7 +14,7 @@ export function ReservationIndicator(props: TableCellProps): JSX.Element {
 	const thesis: Thesis = props.rowData;
 	return <Centered><input
 		type={"checkbox"}
-		checked={thesis.reserved}
+		checked={!!thesis.reservedUntil}
 		style={{ cursor: "default" }}
 		disabled
 	/></Centered>;

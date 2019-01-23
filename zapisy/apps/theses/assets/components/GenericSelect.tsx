@@ -20,6 +20,7 @@ type Props<T> = {
 	/** Optional label, will be displayed to the left by default */
 	label?: string;
 	/** Optional styles */
+	inputCss?: React.CSSProperties;
 	labelCss?: React.CSSProperties;
 	enabled?: boolean;
 };
@@ -37,6 +38,9 @@ export class GenericSelect<T> extends React.PureComponent<Props<T>> {
 		}
 		if (this.props.label) {
 			Object.assign(styles, { marginLeft: "5px" });
+		}
+		if (this.props.inputCss) {
+			Object.assign(styles, this.props.inputCss);
 		}
 		return <div>
 				<span style={this.props.labelCss || {}}>{this.props.label || ""}</span>

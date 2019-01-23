@@ -20,6 +20,8 @@ type Props = {
 	enabled: boolean;
 };
 
+const STATUS_FIELD_WIDTH = 190;
+
 /**
  * Shows the thesis status in a <select> field if modification
  * is allowed or a read-only text input otherwise
@@ -30,10 +32,12 @@ export const ThesisStatusIndicator = React.memo(function(props: Props) {
 		{...props}
 		optionInfo={statusSelectInfos}
 		label={LABEL_TEXT}
+		inputCss={{ width: STATUS_FIELD_WIDTH }}
 	/>
 	: <InputWithLabel
 		labelText={LABEL_TEXT}
 		inputText={thesisStatusToString(props.value)}
 		inputType={InputType.ReadOnly}
+		inputWidth={STATUS_FIELD_WIDTH}
 	/>;
 });

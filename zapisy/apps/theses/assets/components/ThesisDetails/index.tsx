@@ -103,8 +103,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 			<ThesisTopRow
 				mode={this.props.mode}
 				thesis={thesis}
-				onReservationChanged={this.onReservationChanged}
-				onDateChanged={this.onDateUpdatedChanged}
+				onReservedUntilChanged={this.onReservedUntilChanged}
 				onStatusChanged={this.onStatusChanged}
 			/>
 			<ThesisMiddleForm
@@ -155,12 +154,8 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		);
 	}
 
-	private onReservationChanged = (newValue: boolean): void => {
-		this.updateThesisState({ reserved: { $set: newValue } });
-	}
-
-	private onDateUpdatedChanged = (newDate: Moment): void => {
-		this.updateThesisState({ modifiedDate: { $set: newDate } });
+	private onReservedUntilChanged = (newDate: Moment): void => {
+		this.updateThesisState({ reservedUntil: { $set: newDate } });
 	}
 
 	private onStatusChanged = (newStatus: ThesisStatus): void => {

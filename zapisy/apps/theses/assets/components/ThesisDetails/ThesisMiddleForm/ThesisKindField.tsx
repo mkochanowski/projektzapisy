@@ -9,11 +9,12 @@ import { ReadOnlyInput } from "./ReadOnlyInput";
 import { ThesisKind, thesisKindToString } from "../../../protocol_types";
 
 const kindSelectInfos = [
+	ThesisKind.Masters,
+	ThesisKind.Engineers,
 	ThesisKind.Bachelors,
 	ThesisKind.Isim,
-	ThesisKind.Engineers,
 	ThesisKind.BachelorsEngineers,
-	ThesisKind.Masters,
+	ThesisKind.BachelorsEngineersIsim,
 ].map(kind => ({ val: kind, displayName: thesisKindToString(kind) }));
 
 export type ThesisKindSelectProps = {

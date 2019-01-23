@@ -1,6 +1,6 @@
 import * as React from "react";
-
 import styled from "styled-components";
+
 import { PersonType } from "../../../backend_callers";
 import { PersonField } from "./PersonField";
 import { ThesisKindField } from "./ThesisKindField";
@@ -12,6 +12,7 @@ import { ThesisKind } from "../../../protocol_types";
 
 const MidFormTable = styled.table`
 	width: 100%;
+	margin-bottom: 25px;
 
 	td {
 		border-left: 4px solid transparent;

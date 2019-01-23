@@ -4,8 +4,10 @@
 import * as moment from "moment";
 import { Employee, Student, Person } from "./users";
 import { ThesisKind, ThesisStatus } from "./protocol_types";
+import { nullableValuesEqual } from "./utils";
 
 export const MAX_THESIS_TITLE_LEN = 300;
+export const MAX_RESERVATION_YEARS = 10;
 
 /**
  * Native representation of a thesis
@@ -16,12 +18,11 @@ export class Thesis {
 	public advisor: Employee | null;
 	public auxiliaryAdvisor: Employee | null;
 	public kind: ThesisKind;
-	public reserved: boolean;
+	public reservedUntil: moment.Moment | null;
 	public description: string;
 	public status: ThesisStatus;
 	public student: Student | null;
 	public secondStudent: Student | null;
-	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
 
 	/** Construct a new thesis object with default values */
@@ -31,12 +32,11 @@ export class Thesis {
 		this.advisor = null;
 		this.auxiliaryAdvisor = null;
 		this.kind = ThesisKind.Bachelors;
-		this.reserved = false;
+		this.reservedUntil = null;
 		this.description = "";
 		this.status = ThesisStatus.BeingEvaluated;
 		this.student = null;
 		this.secondStudent = null;
-		this.addedDate = moment();
 		this.modifiedDate = moment();
 	}
 
@@ -70,21 +70,26 @@ export class Thesis {
 		return (
 			this.title === other.title &&
 			this.description === other.description &&
-			this.personValuesEqual(this.advisor, other.advisor) &&
-			this.personValuesEqual(this.auxiliaryAdvisor, other.auxiliaryAdvisor) &&
-			this.personValuesEqual(this.student, other.student) &&
-			this.personValuesEqual(this.secondStudent, other.secondStudent) &&
+			nullableValuesEqual(this.advisor, other.advisor, personCompare) &&
+			nullableValuesEqual(this.auxiliaryAdvisor, other.auxiliaryAdvisor, personCompare) &&
+			nullableValuesEqual(this.student, other.student, personCompare) &&
+			nullableValuesEqual(this.secondStudent, other.secondStudent, personCompare) &&
 			this.kind === other.kind &&
-			this.reserved === other.reserved &&
+			this.isReservationDateSame(other.reservedUntil) &&
 			this.status === other.status &&
 			this.modifiedDate.isSame(other.modifiedDate)
 		);
 	}
 
-	private personValuesEqual(p1: Person | null, p2: Person | null): boolean {
-		return (
-			p1 === null && p2 === null ||
-			p1 !== null && p2 !== null && p1.isEqual(p2)
-		);
+	public isReservationDateSame(otherDate: moment.Moment | null) {
+		return nullableValuesEqual(this.reservedUntil, otherDate, (d1, d2) => d1.isSame(d2));
 	}
+
+	public getMaxReservationDate() {
+		return moment().add(MAX_RESERVATION_YEARS, "years");
+	}
+}
+
+function personCompare(p1: Person, p2: Person) {
+	return p1.isEqual(p2);
 }

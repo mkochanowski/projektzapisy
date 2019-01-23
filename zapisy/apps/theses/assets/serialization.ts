@@ -5,6 +5,7 @@
 import { ThesisKind, ThesisStatus } from "./protocol_types";
 import { Thesis, MAX_THESIS_TITLE_LEN } from "./thesis";
 import { Person } from "./users";
+import { formatDate } from "./utils";
 
 /**
  * The representation of a new thesis object sent to the backend
@@ -14,7 +15,7 @@ type ThesisAddOutSerialized = {
 	advisor?: number | null;
 	auxiliary_advisor?: number | null;
 	kind?: ThesisKind;
-	reserved?: boolean;
+	reservedUntil?: string | null;
 	description?: string;
 	status?: ThesisStatus;
 	student?: number | null;
@@ -37,7 +38,6 @@ export function serializeNewThesis(thesis: Thesis): ThesisAddOutSerialized {
 	const result: ThesisAddOutSerialized = {
 		title: thesis.title,
 		kind: thesis.kind,
-		reserved: thesis.reserved,
 		description: thesis.description,
 		status: thesis.status,
 	};
@@ -52,6 +52,9 @@ export function serializeNewThesis(thesis: Thesis): ThesisAddOutSerialized {
 	}
 	if (thesis.secondStudent) {
 		result.student_2 = toPersonDispatch(thesis.secondStudent);
+	}
+	if (thesis.reservedUntil) {
+		result.reservedUntil = thesis.reservedUntil.toISOString();
 	}
 	return result;
 }
@@ -102,8 +105,8 @@ export function serializeThesisDiff(orig: Thesis, mod: Thesis): ThesisModOutSeri
 	if (orig.kind !== mod.kind) {
 		result.kind = mod.kind;
 	}
-	if (orig.reserved !== mod.reserved) {
-		result.reserved = mod.reserved;
+	if (!orig.isReservationDateSame(mod.reservedUntil)) {
+		result.reservedUntil = mod.reservedUntil ? formatDate(mod.reservedUntil) : null;
 	}
 	if (orig.description !== mod.description) {
 		result.description = mod.description;
