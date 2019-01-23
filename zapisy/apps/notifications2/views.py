@@ -1,13 +1,21 @@
-from apps.notifications2.forms import NotificationForm
-from apps.notifications2.models import NotificationPreferences2
 from datetime import datetime
+
 from django.shortcuts import render
+from django.contrib import messages
+
+from apps.users.models import BaseUser
+from apps.notifications2.forms import PreferencesFormStudent, PreferencesFormTeacher
+from apps.notifications2.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
 from apps.notifications2.repositories import get_notifications_repository
 from apps.notifications2.utils import render_description
-from django.contrib import messages
+
+from libs.ajax_messages import AjaxFailureMessage
 
 
 def index(request):
+    if not request.user.is_authenticated:
+        return AjaxFailureMessage.auto_render(
+            'NotAuthenticated', 'Nie jesteś zalogowany.', request)
 
     repo = get_notifications_repository()
 
@@ -22,27 +30,33 @@ def index(request):
 
 
 def FormView(request):
-    if request.method == "POST":
-        try:
-            item = NotificationPreferences2.objects.get(user=request.user)
-            form = NotificationForm(request.POST, instance=item)
-        except NotificationPreferences2.DoesNotExist:
-            form = NotificationForm(request.POST)
+    if not request.user.is_authenticated:
+        return AjaxFailureMessage.auto_render(
+            'NotAuthenticated', 'Nie jesteś zalogowany.', request)
 
+    if request.method == "POST":
+        form = create_form(request)
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
-            args = {'form': form}
-            return render(request, 'notifications2/pref.html', args)
+            return render(request, 'notifications2/pref.html', {'form': form})
         else:
             messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
     else:
-        try:
-            item = NotificationPreferences2.objects.get(user=request.user)
-            form = NotificationForm(instance=item)
-        except NotificationPreferences2.DoesNotExist:
-            form = NotificationForm()
+        form = create_form(request)
 
-    args = {'form': form}
-    return render(request, 'notifications2/pref.html', args)
+    return render(request, 'notifications2/pref.html', {'form': form})
+
+
+def create_form(request):
+    if BaseUser.is_employee(request.user):
+        instance, created = NotificationPreferencesTeacher.objects.get_or_create(user=request.user)
+        if request.method == 'POST':
+            return PreferencesFormTeacher(request.POST, instance=instance)
+        return PreferencesFormTeacher(instance=instance)
+
+    instance, created = NotificationPreferencesStudent.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        return PreferencesFormStudent(request.POST, instance=instance)
+    return PreferencesFormStudent(instance=instance)

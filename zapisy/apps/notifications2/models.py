@@ -1,9 +1,10 @@
 from typing import List
+
 from django.db import models
+from django.contrib.auth.models import User
 
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.records.models import Record, Queue
-from django.contrib.auth.models import User
 
 
 def get_all_users_in_course_groups(course_groups: List[Group]):
@@ -15,8 +16,13 @@ def get_all_users_in_course_groups(course_groups: List[Group]):
     return {element.student.user for element in queues} | {element.student.user for element in records}
 
 
-class NotificationPreferences2(models.Model):
+class NotificationPreferencesStudent(models.Model):
     user = models.ForeignKey(User, verbose_name='użytkownik', on_delete=models.CASCADE)
-    add_to_group = models.BooleanField(default=True, verbose_name='Dodano do grupy')
-    add_new_group = models.BooleanField(default=True, verbose_name='Dodano nową grupe')
-    classroom_change = models.BooleanField(default=True, verbose_name='Zmieniono sale')
+    pulled_from_queue = models.BooleanField(default=True, verbose_name='Dodano do grupy')
+    added_new_group = models.BooleanField(default=True, verbose_name='Dodano nową grupe')
+    teacher_has_been_changed = models.BooleanField(default=True, verbose_name='Prowadzący zmieniony')
+
+
+class NotificationPreferencesTeacher(models.Model):
+    user = models.ForeignKey(User, verbose_name='użytkownik', on_delete=models.CASCADE)
+    assigned_to_new_group_as_teacher = models.BooleanField(default=True, verbose_name='Przydzielono do grupy')
