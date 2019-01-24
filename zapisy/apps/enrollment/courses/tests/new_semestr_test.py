@@ -211,7 +211,6 @@ class NewSemestrTestCase(TestCase):
         # cls.add_new_students()
         # cls.import_ects()
         # cls.open_records()
-        # cls.generate_t0()
         
     def prepare_course_entities_for_voting(cls):
         cls.client.post(
@@ -241,3 +240,142 @@ class NewSemestrTestCase(TestCase):
                 'for_voting': [1,2,3,4,5,6,7,8,9,10]
             },
             follow=True)
+
+    def import_winter_schedule(self):
+        courses = {}
+        for course in Course.objects.filter(semester=self.next_winter_semester):
+            courses[course.entity.name] = course.id
+
+        employees = {
+            '{} {}'.format(
+                empl.user.first_name,
+                empl.user.last_name): empl.id for empl in self.employees}
+
+        Classroom.objects.create(number='5', type='1')
+        Classroom.objects.create(number='7', type='3')
+        Classroom.objects.create(number='25', type='0')
+        Classroom.objects.create(number='103', type='1')
+        Classroom.objects.create(number='104', type='1')
+        Classroom.objects.create(number='105', type='1')
+        Classroom.objects.create(number='108', type='3')
+        Classroom.objects.create(number='119', type='0')
+        Classroom.objects.create(number='139', type='1')
+
+        test_schedule = '''
+
+ Course 1
+  pn  16-18  (cwiczenia) Employee 4, sala 103
+  wt  14-16  (cwiczenia) Employee 2, sala 139
+  sr  8-10   (wyklad) Employee 1, sala 25
+  sr  12-14  (cwiczenia) Employee 1, sala 139
+  czw 8-10   (cwiczenia) Employee 3, sala 105
+  czw 14-16  (repetytorium) Employee 2, sala 104
+
+ Course 2
+  pn  10-12  (cwicz+pracownia) Employee 5, sale 105,108
+  wt  14-16  (cwicz+pracownia) Employee 3, sale 5,108
+  wt  16-18  (wyklad) Employee 2, sala 119
+  czw 16-18  (cwicz+pracownia) Employee 5, sale 5,7
+
+ Course 3
+  czw 12-14  (seminarium) Employee 4, sala 119
+
+'''
+
+        test_schedule_path = settings.BASE_DIR + '/test_schedule.txt'
+        with open(test_schedule_path, 'w') as file:
+            file.write(test_schedule)
+        scheduleimport_run_test(
+            test_schedule_path,
+            courses,
+            employees,
+            self.next_winter_semester.id)
+
+        os.remove(test_schedule_path)
+
+        groups = Group.objects.all()
+        self.assertEqual(
+            groups.filter(course__entity__name='Course 1').count(),
+            6)
+        self.assertEqual(
+            groups.filter(course__entity__name='Course 2').count(),
+            4)
+        self.assertEqual(
+            groups.filter(course__entity__name='Course 3').count(),
+            1)
+
+        terms = Term.objects.select_related('group').all()
+        self.assertEqual(
+            terms.filter(
+                group__course__entity__name='Course 1',
+                group__teacher__user__first_name='Employee',
+                group__teacher__user__last_name='4',
+                group__type=2,
+                classrooms__number__in=[103],
+                dayOfWeek=1,
+                start_time=time(hour=16),
+                end_time=time(hour=18)).count(),
+            1)
+
+    def start_winter_semester(self):
+        self.current_semester.semester_beginning = date.today() - relativedelta(
+            days=3)
+        self.current_semester.records_ects_limit_abolition = date.today() - relativedelta(
+            days=2)
+        self.current_semester.semester_ending = date.today() - relativedelta(
+            days=1)
+        self.current_semester.save()
+
+        self.next_winter_semester.semester_beginning = date.today()
+        self.next_winter_semester.records_ects_limit_abolition = date.today() + relativedelta(
+            days=11)
+        self.next_winter_semester.semester_ending = date.today() + relativedelta(
+            months=3)
+        self.next_winter_semester.save()
+
+    def add_new_students(self):
+        number_of_students = Student.objects.all().count()
+        self.new_students = []
+        students, _ = UserGroup.objects.get_or_create(name='students')
+        for i in range(1, 6):
+            user = User.objects.create_user(
+                username='student{}'.format(i + number_of_students), password=self.password)
+            students.user_set.add(user)
+            student = Student.objects.create(
+                user=user,
+                matricula=str(i + number_of_students))
+            self.new_students.append(student)
+        students.save()
+
+    def import_ects(self):
+        students_ects = {
+            self.student1: {'I': 179},
+            self.student2: {'I': 185, 'II': 55},
+            self.student3: {'I': 64},
+            self.student4: {'I': 190, 'II': 80}
+        }
+
+        test_ectsimport = ''
+        for student, points in students_ects.items():
+            for deg, ects in points.items():
+                test_ectsimport += '{} {} T {} stopnia\n'.format(student.matricula, ects, deg)
+
+        test_ectsimport_path = settings.BASE_DIR + '/test_ectsimport.txt'
+        with open(test_ectsimport_path, 'w') as file:
+            file.write(test_ectsimport)
+
+        ectsimport_run_test(test_ectsimport_path)
+
+        os.remove(test_ectsimport_path)
+
+        for student in Student.objects.all():
+            if student in students_ects:
+                ects_sum = sum(students_ects[student].values())
+                self.assertEqual(ects_sum, student.ects)
+
+    def open_records(self):
+        self.next_winter_semester.records_opening = datetime.today().replace(
+            hour=00, minute=00)
+        self.next_winter_semester.records_closing = self.next_winter_semester.records_opening + \
+                                                    relativedelta(days=10)
+        self.next_winter_semester.save()
