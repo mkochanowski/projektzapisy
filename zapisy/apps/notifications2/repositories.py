@@ -28,37 +28,16 @@ class NotificationsRepository(ABC):
         pass
 
     @abstractmethod
+    def mark_as_sent(self, user: User, notification: Notification) -> None:
+        pass
+
+    @abstractmethod
     def save(self, user: User, notification: Notification) -> None:
         pass
 
     @abstractmethod
     def remove_all_older_than(self, user: User, until: datetime) -> int:
         pass
-
-
-class FakeNotificationsRepository(NotificationsRepository):
-
-    def __init__(self):
-        self.notifications = [
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'aaa'}),
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'bbb'}),
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'ccc'}),
-        ]
-
-    def get_count_for_user(self, user: User) -> int:
-        return 3
-
-    def get_all_for_user(self, user: User) -> List[Notification]:
-        return self.notifications
-
-    def get_unsent_for_user(self, user: User) -> List[Notification]:
-        return self.notifications
-
-    def save(self, user: User, notification: Notification) -> None:
-        pass
-
-    def remove_all_older_than(self, user: User, until: datetime) -> int:
-        return 0
 
 
 class RedisNotificationsRepository(NotificationsRepository):
@@ -90,6 +69,14 @@ class RedisNotificationsRepository(NotificationsRepository):
         return list(map(
             self.serializer.deserialize,
             self.redis_client.smembers(self._generate_unsent_key_for_user(user))))
+
+    def mark_as_sent(self, user: User, notification: Notification) -> None:
+        serialized = self.serializer.serialize(notification)
+
+        self.redis_client.srem(
+            self._generate_unsent_key_for_user(user), serialized)
+        self.redis_client.sadd(
+            self._generate_sent_key_for_user(user), serialized)
 
     def save(self, user: User, notification: Notification) -> None:
         self.redis_client.sadd(

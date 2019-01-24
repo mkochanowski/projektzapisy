@@ -1,6 +1,9 @@
 import os
 import logging
 import environ
+import sys
+
+TESTING = 'test' in sys.argv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -61,6 +64,9 @@ RQ_QUEUES = {
         'DB': 0,
     },
 }
+
+if TESTING:
+    RQ_QUEUES['dispatch-notifications']['ASYNC'] = False
 
 # mass-mail account
 # You can test sending with:
