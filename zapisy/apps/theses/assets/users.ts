@@ -13,7 +13,7 @@ export class Person {
 	}
 
 	public isEqual = (other: Person): boolean => {
-		return this.id === other.id;
+		return other instanceof this.constructor && this.id === other.id;
 	}
 }
 

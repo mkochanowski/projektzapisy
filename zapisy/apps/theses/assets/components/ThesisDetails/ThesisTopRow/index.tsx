@@ -7,7 +7,7 @@ import { Moment } from "moment";
 
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 import { ThesisWorkMode } from "../../../app_types";
-import { canChangeStatus, canModifyThesis } from "../../../permissions";
+import { canModifyThesis } from "../../../permissions";
 import { Thesis } from "../../../thesis";
 import { ThesisStatus } from "../../../protocol_types";
 import { ThesisReservationIndicator } from "./ThesisReservationIndicator";
@@ -61,8 +61,8 @@ export class ThesisTopRow extends React.PureComponent<Props> {
 			<ElementWrapper>
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
-				value={thesis.status}
-				enabled={!readOnly && canChangeStatus()}
+				thesis={thesis}
+				enabled={!readOnly}
 			/>
 			</ElementWrapper>
 		</TopRowContainer>;

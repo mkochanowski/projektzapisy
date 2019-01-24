@@ -20,6 +20,22 @@ function isOwnerOfThesis(thesis: Thesis): boolean {
 	return !!thesis.advisor && thesis.advisor.isEqual(Users.currentUser.person);
 }
 
+const EMPLOYEE_DELETABLE_STATUSES = [
+	ThesisStatus.BeingEvaluated, ThesisStatus.ReturnedForCorrections,
+];
+
+/**
+ * Determine if the currently logged in user has permission to delete the specified thesis
+ * @param thesis The thesis to be checked for deletion rights
+ */
+export function canDeleteThesis(thesis: Thesis) {
+	return (
+		Users.isUserAdmin() ||
+		Users.isUserMemberOfBoard() && !thesis.isArchived() ||
+		Users.isUserEmployee() && EMPLOYEE_DELETABLE_STATUSES.includes(thesis.status)
+	);
+}
+
 /**
  * Determine if the current user is permitted to make any changes to the specified thesis
  * @param thesis The thesis
@@ -49,10 +65,16 @@ export function canChangeTitle(thesis: Thesis) {
 }
 
 /**
- * Determine if a user of the specified type can modify an existing thesis' status
+ * Determine if a user of the specified
+ * type can change an existing thesis' status to the specified new status
  */
-export function canChangeStatus() {
-	return Users.isUserStaff();
+export function canChangeStatusTo(thesis: Thesis, newStatus: ThesisStatus) {
+	const oldStatus = thesis.status;
+	return (
+		Users.isUserStaff() ||
+		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Defended ||
+		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Accepted
+	);
 }
 
 /**

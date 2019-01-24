@@ -27,6 +27,7 @@ import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
 import { LoadingIndicator } from "./LoadingIndicator";
+import { confirmationDialog } from "./helpers";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -170,6 +171,7 @@ class ThesesAppInternal extends React.Component<Props, State> {
 			hasTitleError={this.state.hasTitleError}
 			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}
+			onDeletionRequested={this.onDelete}
 			onThesisModified={this.onThesisModified}
 		/>;
 	}
@@ -212,23 +214,11 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	 */
 	private confirmDiscardChanges() {
 		if (ThesisEditing.hasUnsavedChanges) {
-			return new Promise((resolve) => {
-				const title = ThesisEditing.thesis!.modified.title;
-				const msg = buildUnsavedConfirmation(title);
-				confirmAlert({
-					title: "",
-					message: msg,
-					buttons: [
-						{
-							label: "Tak, porzuć",
-							onClick: () => resolve(true),
-						},
-						{
-							label: "Nie, wróć",
-							onClick: () => resolve(false),
-						}
-					],
-				});
+			const title = ThesisEditing.thesis!.modified.title;
+			return confirmationDialog({
+				message: buildUnsavedConfirmation(title),
+				yesText: "Tak, porzuć",
+				noText: "Nie, wróć",
 			});
 		}
 		return Promise.resolve(true);
@@ -257,6 +247,14 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		ThesisEditing.resetModifiedThesis();
 	}
 
+	private onDelete = async () => {
+		try {
+			await ThesisEditing.delete();
+		} catch (err) {
+			errorWithActionName("usunąć", err);
+		}
+	}
+
 	private onSave = async () => {
 		try {
 			const oldWorkMode = AppMode.workMode;
@@ -279,25 +277,29 @@ class ThesesAppInternal extends React.Component<Props, State> {
 			(this.props as any).alert.error("Tytuł pracy nie może być pusty");
 			this.setState({ hasTitleError: true });
 		} else {
-			const msg = (
-				`Nie udało się zapisać pracy (${err}). ` +
-				"Odśwież stronę/sprawdź połączenie sieciowe i spróbuj jeszcze raz. " +
-				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
-			);
-			// This isn't a confirmation message, but that component can also
-			// be used for modal alerts
-			confirmAlert({
-				title: "Błąd",
-				message: msg,
-				buttons: [{ label: "OK" }],
-			});
+			errorWithActionName("zapisać", err);
 		}
 	}
 }
 
+function errorWithActionName(actionName: string, err: Error) {
+	const msg = (
+		`Nie udało się ${actionName} pracy (${err}). ` +
+		"Odśwież stronę/sprawdź połączenie sieciowe i spróbuj jeszcze raz. " +
+		"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
+	);
+	// This isn't a confirmation message, but that component can also
+	// be used for modal alerts
+	confirmAlert({
+		title: "Błąd",
+		message: msg,
+		buttons: [{ label: "OK" }],
+	});
+}
+
 function buildUnsavedConfirmation(title: string) {
 	return title.trim()
-		? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
+		? `Czy porzucić niezapisane zmiany w pracy „${title}”?`
 		: "Czy porzucić niezapisane zmiany w edytowanej pracy?";
 }
 

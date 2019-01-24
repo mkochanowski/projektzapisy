@@ -3,19 +3,24 @@ import * as React from "react";
 import { GenericSelect } from "../../GenericSelect";
 import { InputWithLabel, InputType } from "./InputWithLabel";
 import { ThesisStatus, thesisStatusToString } from "../../../protocol_types";
+import { Thesis } from "../../../thesis";
+import { canChangeStatusTo } from "../../../permissions";
 
 const LABEL_TEXT = "Status";
-
-const statusSelectInfos = [
+const ALL_STATUSES = [
 	ThesisStatus.BeingEvaluated,
 	ThesisStatus.Accepted,
 	ThesisStatus.InProgress,
 	ThesisStatus.Defended,
 	ThesisStatus.ReturnedForCorrections,
-].map(kind => ({ val: kind, displayName: thesisStatusToString(kind) }));
+];
+
+const statusSelectInfos = ALL_STATUSES.map(
+	kind => ({ val: kind, displayName: thesisStatusToString(kind) })
+);
 
 type Props = {
-	value: ThesisStatus;
+	thesis: Thesis;
 	onChange: (val: ThesisStatus) => void;
 	enabled: boolean;
 };
@@ -27,17 +32,25 @@ const STATUS_FIELD_WIDTH = 190;
  * is allowed or a read-only text input otherwise
  */
 export const ThesisStatusIndicator = React.memo(function(props: Props) {
-	return props.enabled
-	? <GenericSelect<ThesisStatus>
-		{...props}
+	const disabledValues = ALL_STATUSES.filter(status => (
+		!canChangeStatusTo(props.thesis, status)
+	));
+	if (!props.enabled || disabledValues.length === ALL_STATUSES.length) {
+		// If no status can be set by the current user, there's no point
+		// showing it as a <select> field
+		return <InputWithLabel
+			labelText={LABEL_TEXT}
+			inputText={thesisStatusToString(props.thesis.status)}
+			inputType={InputType.ReadOnly}
+			inputWidth={STATUS_FIELD_WIDTH}
+		/>;
+	}
+	return <GenericSelect<ThesisStatus>
+		value={props.thesis.status}
+		onChange={props.onChange}
+		disabledValues={disabledValues}
 		optionInfo={statusSelectInfos}
 		label={LABEL_TEXT}
 		inputCss={{ width: STATUS_FIELD_WIDTH }}
-	/>
-	: <InputWithLabel
-		labelText={LABEL_TEXT}
-		inputText={thesisStatusToString(props.value)}
-		inputType={InputType.ReadOnly}
-		inputWidth={STATUS_FIELD_WIDTH}
 	/>;
 });

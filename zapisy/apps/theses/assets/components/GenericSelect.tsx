@@ -23,6 +23,8 @@ type Props<T> = {
 	inputCss?: React.CSSProperties;
 	labelCss?: React.CSSProperties;
 	enabled?: boolean;
+	/** If specified, those values will be disabled in the select box */
+	disabledValues?: T[];
 };
 
 /**
@@ -42,6 +44,8 @@ export class GenericSelect<T> extends React.PureComponent<Props<T>> {
 		if (this.props.inputCss) {
 			Object.assign(styles, this.props.inputCss);
 		}
+		const key = Math.random();
+		const disabledVals = this.props.disabledValues || [];
 		return <div>
 				<span style={this.props.labelCss || {}}>{this.props.label || ""}</span>
 				<select
@@ -53,8 +57,9 @@ export class GenericSelect<T> extends React.PureComponent<Props<T>> {
 				{
 					this.props.optionInfo.map((info, i) => (
 						<option
-							key={`status_filteropt_${i}`}
+							key={`select_${key}_${i}`}
 							value={String(info.val)}
+							disabled={disabledVals.includes(info.val)}
 						>
 							{info.displayName}
 						</option>

@@ -225,6 +225,7 @@ export async function saveModifiedThesis(
  * Given a thesis object, serialize it and dispatch a request
  * to add it to the backend
  * @param thesis The thesis object to add
+ * @returns The ID of the newly added object
  */
 export async function saveNewThesis(thesis: Thesis): Promise<number> {
 	const objToSend = serializeNewThesis(thesis);
@@ -240,4 +241,16 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 		},
 	);
 	return (res.data as ThesisInJson).id;
+}
+
+/**
+ * Send a DELETE request to the backend for the specified thesis object
+ */
+export async function deleteThesis(thesis: Thesis): Promise<void> {
+	await safeSendThesisRequest(
+		`${BASE_API_URL}/theses/${thesis.id}/`,
+		{
+			method: "DELETE",
+		},
+	);
 }

@@ -13,13 +13,14 @@ import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode, ApplicationState } from "../../app_types";
-import { canModifyThesis } from "../../permissions";
+import { canModifyThesis, canDeleteThesis } from "../../permissions";
 import { Thesis } from "../../thesis";
 import { Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
 import { AppMode } from "../../app_logic/app_mode";
+import { confirmationDialog } from "../helpers";
 
-const SaveButton = React.memo(Button.extend`
+const ActionButton = React.memo(Button.extend`
 	&:disabled:hover {
 		background: white;
 	}
@@ -57,6 +58,11 @@ const RightDetailsContainer = styled.div`
 	margin-left: 20px;
 `;
 
+const ButtonsContainer = styled.div`
+	display: grid;
+	grid-gap: 10px;
+`;
+
 type Props = {
 	thesis: Thesis;
 	appState: ApplicationState;
@@ -64,6 +70,7 @@ type Props = {
 	mode: ThesisWorkMode;
 	hasTitleError: boolean;
 	onThesisModified: (thesis: Thesis) => void;
+	onDeletionRequested: () => void;
 	onSaveRequested: () => void;
 	onChangedTitle: () => void;
 };
@@ -76,10 +83,14 @@ export class ThesisDetails extends React.PureComponent<Props> {
 			}
 			ev.preventDefault();
 		});
+		Mousetrap.bind("del", () => {
+			this.handleDelete();
+		});
 	}
 
 	public componentWillUnmount() {
 		Mousetrap.unbindGlobal("ctrl+s");
+		Mousetrap.unbind("global");
 	}
 
 	public render() {
@@ -123,21 +134,33 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	private renderThesisRightPanel() {
 		return <>
 			<ThesisVotes/>
-			{this.renderSaveButton()}
+			<ButtonsContainer>
+				{this.renderDeleteButton()}
+				{this.renderSaveButton()}
+			</ButtonsContainer>
 		</>;
 	}
 
+	private renderDeleteButton() {
+		if (this.props.mode === ThesisWorkMode.Adding || !canDeleteThesis(this.props.thesis)) {
+			return null;
+		}
+		return <ActionButton
+			onClick={this.props.onDeletionRequested}
+			title={"Usuń pracę z systemu"}
+		>Usuń</ActionButton>;
+	}
+
 	private renderSaveButton() {
-		const readOnly = !canModifyThesis(this.props.thesis);
-		if (readOnly) {
+		if (!canModifyThesis(this.props.thesis)) {
 			return null;
 		}
 		const { hasUnsavedChanges } = this.props;
-		return <SaveButton
+		return <ActionButton
 			onClick={this.props.onSaveRequested}
 			disabled={!hasUnsavedChanges}
 			title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
-		>{this.getActionTitle()}</SaveButton>;
+		>{this.getActionTitle()}</ActionButton>;
 	}
 
 	private getActionTitle() {
@@ -146,6 +169,20 @@ export class ThesisDetails extends React.PureComponent<Props> {
 
 	private getActionDescription() {
 		return this.props.mode === ThesisWorkMode.Adding ? "Dodaj nową pracę" : "Zapisz zmiany";
+	}
+
+	private handleDelete = async () => {
+		if (!canDeleteThesis(this.props.thesis)) {
+			return;
+		}
+		const confirmed = await confirmationDialog({
+			message: `Czy usunąć pracę „${this.props.thesis.title}”?`,
+			yesText: "Tak, usuń",
+			noText: "Nie, wróć",
+		});
+		if (confirmed) {
+			this.props.onDeletionRequested();
+		}
 	}
 
 	private updateThesisState(updateObject: object) {

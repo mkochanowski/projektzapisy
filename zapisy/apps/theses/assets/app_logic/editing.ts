@@ -3,7 +3,7 @@ import { cloneDeep } from "lodash";
 
 import { Thesis } from "../thesis";
 import { ThesisEmptyTitle } from "../errors";
-import { saveModifiedThesis, saveNewThesis } from "../backend_callers";
+import { saveModifiedThesis, saveNewThesis, deleteThesis } from "../backend_callers";
 import { ThesisWorkMode, ApplicationState } from "../app_types";
 import { AppMode } from "./app_mode";
 import { List } from "./theses_list";
@@ -95,6 +95,25 @@ class C {
 		this.thesis = compositeThesisForThesis(this.thesis!.original);
 	}
 
+	public delete = flow(function*(this: C) {
+		try {
+			if (this.thesis == null) {
+				console.assert(false, "Cannot delete thesis when not selected");
+				return;
+			}
+			if (AppMode.workMode !== ThesisWorkMode.Editing) {
+				console.assert(false, "Cannot delete when not editing");
+				return;
+			}
+			AppMode.applicationState = ApplicationState.Saving;
+			yield deleteThesis(this.thesis.original);
+			yield List.reloadTheses();
+			this.selectThesis(null);
+		} finally {
+			AppMode.applicationState = ApplicationState.Normal;
+		}
+	});
+
 	private preSaveAsserts() {
 		const { thesis } = this;
 		if (thesis === null) {
@@ -135,32 +154,29 @@ class C {
 	 * if there are no unsaved changes.
 	 */
 	public save = flow(function*(this: C) {
-		if (!this.preSaveAsserts()) {
-			return;
-		}
-		this.performPreSaveChecks();
-
-		const thesis = this.thesis!;
-		const { workMode } = AppMode;
-
-		AppMode.applicationState = ApplicationState.Saving;
-		type NonViewModes = (ThesisWorkMode.Adding | ThesisWorkMode.Editing);
-		const handler = C.handlerForWorkMode[workMode as NonViewModes];
-
-		let id: number;
 		try {
-			id = yield handler(thesis);
-		} catch (err) {
+			if (!this.preSaveAsserts()) {
+				return;
+			}
+			this.performPreSaveChecks();
+
+			const thesis = this.thesis!;
+			const { workMode } = AppMode;
+
+			AppMode.applicationState = ApplicationState.Saving;
+			type NonViewModes = (ThesisWorkMode.Adding | ThesisWorkMode.Editing);
+			const handler = C.handlerForWorkMode[workMode as NonViewModes];
+
+			const id = yield handler(thesis);
+
+			// Reload without losing the current position
+			yield List.reloadTheses();
+
+			const toSelect = List.getThesisById(id);
+			this.selectThesis(toSelect);
+		} finally {
 			AppMode.applicationState = ApplicationState.Normal;
-			throw err;
 		}
-
-		// Reload without losing the current position
-		yield List.reloadTheses();
-
-		const toSelect = List.getThesisById(id);
-		AppMode.applicationState = ApplicationState.Normal;
-		this.selectThesis(toSelect);
 	});
 }
 
