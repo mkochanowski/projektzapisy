@@ -65,6 +65,7 @@ const ButtonsContainer = styled.div`
 
 type Props = {
 	thesis: Thesis;
+	original: Thesis;
 	appState: ApplicationState;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
@@ -109,16 +110,18 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private renderThesisLeftPanel() {
-		const { thesis } = this.props;
+		const { thesis, original } = this.props;
 		return <>
 			<ThesisTopRow
 				mode={this.props.mode}
 				thesis={thesis}
+				original={original}
 				onReservedUntilChanged={this.onReservedUntilChanged}
 				onStatusChanged={this.onStatusChanged}
 			/>
 			<ThesisMiddleForm
 				thesis={thesis}
+				original={original}
 				titleError={this.props.hasTitleError}
 				onTitleChanged={this.onTitleChanged}
 				onKindChanged={this.onKindChanged}
@@ -142,7 +145,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private renderDeleteButton() {
-		if (this.props.mode === ThesisWorkMode.Adding || !canDeleteThesis(this.props.thesis)) {
+		if (this.props.mode === ThesisWorkMode.Adding || !canDeleteThesis(this.props.original)) {
 			return null;
 		}
 		return <ActionButton
@@ -152,7 +155,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private renderSaveButton() {
-		if (!canModifyThesis(this.props.thesis)) {
+		if (!canModifyThesis(this.props.original)) {
 			return null;
 		}
 		const { hasUnsavedChanges } = this.props;
@@ -172,7 +175,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private handleDelete = async () => {
-		if (!canDeleteThesis(this.props.thesis)) {
+		if (!canDeleteThesis(this.props.original)) {
 			return;
 		}
 		const confirmed = await confirmationDialog({

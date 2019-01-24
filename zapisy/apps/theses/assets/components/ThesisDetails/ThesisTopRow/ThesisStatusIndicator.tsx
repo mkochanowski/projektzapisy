@@ -21,6 +21,7 @@ const statusSelectInfos = ALL_STATUSES.map(
 
 type Props = {
 	thesis: Thesis;
+	original: Thesis;
 	onChange: (val: ThesisStatus) => void;
 	enabled: boolean;
 };
@@ -33,7 +34,7 @@ const STATUS_FIELD_WIDTH = 190;
  */
 export const ThesisStatusIndicator = React.memo(function(props: Props) {
 	const disabledValues = ALL_STATUSES.filter(status => (
-		!canChangeStatusTo(props.thesis, status)
+		status !== props.original.status && !canChangeStatusTo(props.original, status)
 	));
 	if (!props.enabled || disabledValues.length === ALL_STATUSES.length) {
 		// If no status can be set by the current user, there's no point

@@ -33,6 +33,7 @@ const DATE_UPDATED_WIDTH = 150;
 
 type Props = {
 	thesis: Thesis;
+	original: Thesis;
 	mode: ThesisWorkMode;
 	onReservedUntilChanged: (nr: Moment) => void;
 	onStatusChanged: (ns: ThesisStatus) => void;
@@ -40,7 +41,7 @@ type Props = {
 
 export class ThesisTopRow extends React.PureComponent<Props> {
 	public render() {
-		const readOnly = !canModifyThesis(this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.original);
 		const { mode, thesis } = this.props;
 		return <TopRowContainer>
 			<ElementWrapper>
@@ -62,6 +63,7 @@ export class ThesisTopRow extends React.PureComponent<Props> {
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
 				thesis={thesis}
+				original={this.props.original}
 				enabled={!readOnly}
 			/>
 			</ElementWrapper>

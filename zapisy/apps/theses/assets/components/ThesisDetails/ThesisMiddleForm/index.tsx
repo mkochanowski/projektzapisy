@@ -45,6 +45,7 @@ type State = {
 
 type Props = {
 	thesis: Thesis;
+	original: Thesis;
 	/** Should the title field be highlighted to indicate an error? */
 	titleError: boolean;
 	onTitleChanged: (nt: string) => void;
@@ -71,7 +72,9 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	}
 
 	public componentWillReceiveProps(nextProps: Props) {
-		this.setState(getStateFromProps(nextProps));
+		if (this.props.thesis !== nextProps.thesis) {
+			this.setState(getStateFromProps(nextProps));
+		}
 	}
 
 	private handleDescriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -95,7 +98,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	}
 
 	public render() {
-		const readOnly = !canModifyThesis(this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.original);
 
 		return <div>
 			<MidFormTable>
@@ -121,7 +124,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				border: "1px solid red"
 			});
 		}
-		const titleReadOnly = readOnly || !canChangeTitle(this.props.thesis);
+		const titleReadOnly = readOnly || !canChangeTitle(this.props.original);
 		return <tr>
 			<td>Tytuł</td>
 			<td><textarea

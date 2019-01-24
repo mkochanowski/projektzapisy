@@ -163,8 +163,10 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		}
 	}
 	private renderThesisDetails() {
+		console.assert(!!ThesisEditing.thesis);
 		return <ThesisDetails
 			thesis={ThesisEditing.thesis!.modified}
+			original={ThesisEditing.thesis!.original}
 			appState={AppMode.applicationState}
 			hasUnsavedChanges={ThesisEditing.hasUnsavedChanges}
 			mode={AppMode.workMode!}
@@ -250,6 +252,7 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	private onDelete = async () => {
 		try {
 			await ThesisEditing.delete();
+			(this.props as any).alert.success("Praca została usunięta");
 		} catch (err) {
 			errorWithActionName("usunąć", err);
 		}

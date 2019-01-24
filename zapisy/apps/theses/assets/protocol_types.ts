@@ -42,7 +42,7 @@ export const enum ThesisStatus {
 export function thesisStatusToString(status: ThesisStatus) {
 	switch (status) {
 		case ThesisStatus.Accepted: return "Zaakceptowana";
-		case ThesisStatus.BeingEvaluated: return "Poddana pod głosowanie";
+		case ThesisStatus.BeingEvaluated: return "Weryfikowana przez komisję";
 		case ThesisStatus.Defended: return "Obroniona";
 		case ThesisStatus.InProgress: return "W realizacji";
 		case ThesisStatus.ReturnedForCorrections: return "Zwrócona do poprawek";
