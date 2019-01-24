@@ -39,6 +39,7 @@ jobs:
       - run: cd zapisy && sudo coverage run manage.py test apps.enrollment.records.tests --nomigrations
       - run: cd zapisy && sudo coverage run manage.py test apps.grade.poll --nomigrations
       - run: cd zapisy && sudo coverage run manage.py test apps.users --nomigrations
+      - run: cd zapisy && sudo coverage run manage.py test apps.email_change --nomigrations
       - run: cd zapisy && sudo coverage html
       - store_artifacts:
           path: zapisy/htmlcov
