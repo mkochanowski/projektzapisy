@@ -1,6 +1,7 @@
 import re
 from unittest import TestCase
 
+from django.core import mail
 from django.test import Client
 from gunicorn.config import User
 
@@ -22,12 +23,7 @@ class EmailChangeTest(TestCase):
     def test_email_change(self):
         response = self.client.get("/accounts/email/change/")
         self.assertNotEqual(len(re.findall('id_email', str(response.content))), 0)
-
-        self.wait_for_pass(
-            lambda: self.driver.find_element_by_id('id_email').send_keys('lorem@ipsum.com')
-        )
         current_len = len(mail.outbox)
-        self.wait_for_pass(
-            lambda: self.driver.find_element_by_xpath('//input[@type="submit"]').click()
-        )
+        self.client.post("/accounts/email/change/", {"id_email": 'lorem@ipsum.com'},
+                         follow=True)
         self.assertEqual(len(mail.outbox), current_len + 1)
