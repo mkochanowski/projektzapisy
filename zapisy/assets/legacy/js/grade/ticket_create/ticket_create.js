@@ -10,14 +10,14 @@ if (typeof Ticket != 'undefined') {
 Ticket.create = Object();
 Ticket.create.init = function () {
     $("#progressbar").progressbar({ value:0 });
-    Ticket.create.t_array = new Array();
-    Ticket.create.m_array = new Array();
+    Ticket.create.m_dict = {};
     Ticket.create.unblindst_array = new Array();
     Ticket.create.unblindt_array = new Array();
-    Ticket.create.k_array = new Array();
-    Ticket.create.pubkeys_array = new Array();
+    Ticket.create.k_dict = {};
+    Ticket.create.pubkeys_dict = {};
     Ticket.create.poll_info_array = new Array();
     Ticket.create.used = false;
+    Ticket.create.signing_requests = new Array();
 
     $("#connection_choice_button").click(function (event) {
         event.preventDefault();
@@ -34,10 +34,10 @@ Ticket.create.init = function () {
 Ticket.create.step1 = function () {
     $("#progressbar").progressbar("option", "value", 10);
     $.ajax({
-        type:"POST",
-        url:"/grade/ticket/ajax_tickets1",
-        dataType:'json',
-        success:Ticket.create.step2
+        type: "POST",
+        url: "/grade/ticket/ajax_tickets1",
+        dataType: 'json',
+        success: Ticket.create.step2
     });
     return false;
 }
@@ -46,14 +46,15 @@ Ticket.create.step1 = function () {
 // tickets, then send them to the server for signing
 Ticket.create.step2 = function (data) {
     $("#progressbar").progressbar("option", "value", 30);
-    $.each(data, Ticket.create.t_generator);
-    tickets_as_json = JSON.stringify(Ticket.create.t_array);
+    $.each(data, Ticket.create.tickets_generator);
+
+    signing_requests = JSON.stringify(Ticket.create.signing_requests);
     $.ajax({
-        type:"POST",
-        url:"/grade/ticket/ajax_tickets2",
-        dataType:'json',
-        data:tickets_as_json,
-        success:Ticket.create.step3
+        type: "POST",
+        url: "/grade/ticket/ajax_tickets2",
+        dataType: 'json',
+        data: signing_requests,
+        success: Ticket.create.step3
     });
 }
 
@@ -63,9 +64,9 @@ Ticket.create.step2 = function (data) {
 // ticket and its signature to the server to do
 // rendering for us(this should be done client side)
 
-Ticket.create.step3 = function (signed_tickets) {
+Ticket.create.step3 = function (signing_request_responses) {
     $("#progressbar").progressbar("option", "value", 70);
-    $.each(signed_tickets, Ticket.create.unblinds_generator);
+    $.each(signing_request_responses, Ticket.create.unblinds_generator);
 
     $('#pregen').css('display', 'none');
     $('#postgen').css('display', '');
@@ -82,13 +83,13 @@ Ticket.create.step3 = function (signed_tickets) {
     });
 }
 
-Ticket.create.unblinds_generator = function (index, unblind) {
-    var signature = str2bigInt(unblind.signature, 10);
-    var pubkey = Ticket.create.pubkeys_array[index];
+Ticket.create.unblinds_generator = function (_index, signing_request_response) {
+    var signature = str2bigInt(signing_request_response.signature, 10);
+    var pubkey = Ticket.create.pubkeys_dict[signing_request_response.id];
     var n = pubkey.n;
-    var r_inverse = inverseMod(Ticket.create.k_array[index], n);
-    Ticket.create.unblindst_array.push(bigInt2str(multMod(signature, r_inverse, n), 10));
-    Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10));
+    var k_inverse = inverseMod(Ticket.create.k_dict[signing_request_response.id], n);
+    Ticket.create.unblindst_array.push(bigInt2str(multMod(signature, k_inverse, n), 10));
+    Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_dict[signing_request_response.id], 10));
 }
 
 // This is where core of our crypto happens
@@ -96,13 +97,13 @@ Ticket.create.unblinds_generator = function (index, unblind) {
 // then the ticket is computed as SHA256(m) * k^e mod n
 // SHA256(m) means that we convert int m to string with base 10,
 // compute SHA256 of it, and then convert it back to int
-Ticket.create.t_generator = function (index, poll_data) {
+Ticket.create.tickets_generator = function (_index, poll_data) {
     var n = str2bigInt(poll_data.key.n, 10, 10);
     var e = str2bigInt(poll_data.key.e, 10, 10);
-    Ticket.create.pubkeys_array.push({
+    Ticket.create.pubkeys_dict[poll_data.poll_info.id] = {
         n: n,
         e: e
-    });
+    };
 
     Ticket.create.poll_info_array.push(poll_data.poll_info);
 
@@ -113,14 +114,16 @@ Ticket.create.t_generator = function (index, poll_data) {
         var k = randBigInt(bits, 1);
     } while ( greater(k, n) || greater(m, n) || !equalsInt(GCD(k, n), 1) );
 
-    Ticket.create.k_array.push(k);
-    Ticket.create.m_array.push(m);
+    Ticket.create.k_dict[poll_data.poll_info.id] = k;
+    Ticket.create.m_dict[poll_data.poll_info.id] = m;
     var m_sha256 = str2bigInt(forge_sha256(bigInt2str(m, 10)), 16);
     var k_pow_e = powMod(k, e, n);
     var t = multMod(m_sha256, k_pow_e, n);
 
-    Ticket.create.t_array.push(bigInt2str(t, 10))
-
+    Ticket.create.signing_requests.push({
+        id: poll_data.poll_info.id,
+        ticket: bigInt2str(t, 10)
+    });
 }
 
 Ticket.create.to_plaintext = function() {
