@@ -276,6 +276,7 @@ def secure_signer_without_save(user, g, t):
     except ValueError:
         return "Niepoprawny format"
 
+
 def match_signing_requests_with_polls(signing_requests, user):
     """
     For each signing request, matches it with poll corresponding to provided id, checking
@@ -305,9 +306,6 @@ def validate_tickets(signing_requests):
         except ValueError:
             continue
     return res
-
-
-    
 
 
 def secure_mark(user, poll):
