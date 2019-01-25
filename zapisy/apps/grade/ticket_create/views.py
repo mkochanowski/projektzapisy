@@ -15,7 +15,8 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
     secure_signer, get_valid_tickets, to_plaintext, secure_signer_without_save, \
-    secure_mark, parse_and_validate_tickets, get_poll_info_as_dict, get_pubkey_as_dict
+    secure_mark, validate_tickets, get_poll_info_as_dict, get_pubkey_as_dict, \
+    match_signing_requests_with_polls
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
@@ -66,21 +67,22 @@ def ajax_get_rsa_keys_step2(request):
 
     students_polls = Poll.get_all_polls_for_student(request.user.student)
     try:
-        raw_tickets = json.loads(request.body.decode("utf-8"))
+        signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
         return HttpResponse('Wrong request')
-    tickets = parse_and_validate_tickets(raw_tickets)
 
-    signed = []
-    for group, ticket in zip(students_polls, tickets):
-        signed_ticket = secure_signer_without_save(request.user, group, ticket)
-        signed.append(signed_ticket)
-        secure_mark(request.user, group)
+    signing_requests = validate_tickets(signing_requests)
+    matched_requests = match_signing_requests_with_polls(signing_requests, request.user)
 
-    response = [
-        {'signature': str(signed_ticket)}
-        for signed_ticket in signed
-    ]
+    response = []
+    for signing_request, poll in matched_requests:
+        signed_ticket = secure_signer_without_save(request.user, poll, int(signing_request['ticket']))
+        secure_mark(request.user, poll)
+        response.append({
+            'signature': str(signed_ticket),
+            'id': signing_request['id'],
+        })
+
     return JsonResponse(response, safe=False)
 
 

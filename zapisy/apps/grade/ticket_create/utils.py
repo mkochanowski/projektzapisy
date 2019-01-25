@@ -276,19 +276,38 @@ def secure_signer_without_save(user, g, t):
     except ValueError:
         return "Niepoprawny format"
 
+def match_signing_requests_with_polls(signing_requests, user):
+    """
+    For each signing request, matches it with poll corresponding to provided id, checking
+    if ticket for this poll wasn't already signed.
+    """
+    matched_requests = []
+    student_polls = Poll.get_all_polls_for_student(user.student)
+    for req in signing_requests:
+        for poll in student_polls:
+            if req['id'] == poll.pk:
+                try:
+                    check_ticket_not_signed(user, poll)
+                    matched_requests.append((req, poll))
+                except TicketUsed:
+                    pass
+    return matched_requests
 
-def parse_and_validate_tickets(ts: List[str]) -> List[int]:
-    ts_as_int = []
-    for ticket in ts:
+
+def validate_tickets(signing_requests):
+    res = []
+    for req in signing_requests:
         try:
-            ticket_as_int = int(ticket)
+            ticket_as_int = int(req['ticket'])
             if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
                 raise ValueError
-            ts_as_int.append(ticket_as_int)
+            res.append(req)
         except ValueError:
-            # TODO: except of ignoring wrong ticket format, we should handle it somehow
             continue
-    return ts_as_int
+    return res
+
+
+    
 
 
 def secure_mark(user, poll):
