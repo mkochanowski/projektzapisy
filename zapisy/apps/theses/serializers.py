@@ -136,7 +136,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         if "advisor" in validated_data:
             check_advisor_permissions(user, validated_data["advisor"])
         if "status" in validated_data and not can_change_status_to(
-            user, self.instance, validated_data["status"]
+            user, self.instance, ThesisStatus(validated_data["status"])
         ):
             raise exceptions.PermissionDenied(
                 f'This type of user cannot set status to {validated_data["status"]}'

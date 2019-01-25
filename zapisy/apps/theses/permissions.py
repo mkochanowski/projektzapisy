@@ -38,7 +38,8 @@ def can_delete_thesis(user: BaseUser, thesis: Thesis) -> bool:
     return (
         is_admin(user) or
         is_theses_board_member(user) and not thesis.is_archived() or
-        is_regular_employee(user) and ThesisStatus(thesis.status) in EMPLOYEE_DELETABLE_STATUSES
+        is_regular_employee(user) and is_owner_of_thesis(user, thesis) and
+        ThesisStatus(thesis.status) in EMPLOYEE_DELETABLE_STATUSES
     )
 
 
@@ -69,7 +70,7 @@ def can_set_status_for_new(user: BaseUser, status: ThesisStatus) -> bool:
     return is_thesis_staff(user) or status == ThesisStatus.BEING_EVALUATED
 
 
-def can_change_status_to(user: BaseUser, thesis: ThesisStatus, new_status: ThesisStatus) -> bool:
+def can_change_status_to(user: BaseUser, thesis: Thesis, new_status: ThesisStatus) -> bool:
     """Can the specified user change the status
     of the specified thesis to the new specified status?"""
     old_status = ThesisStatus(thesis.status)

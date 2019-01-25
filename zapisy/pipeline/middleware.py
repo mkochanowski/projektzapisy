@@ -5,7 +5,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 class MinifyHTMLMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        if 'text/html' in response['Content-Type']:
+        if 'Content-Type' in response and 'text/html' in response['Content-Type']:
             try:
                 response.content = minify_html(response.content.strip())
             except DjangoUnicodeDecodeError:
