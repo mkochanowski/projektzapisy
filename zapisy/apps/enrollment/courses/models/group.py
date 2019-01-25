@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
-from apps.notifications.custom_signals import student_pulled, teacher_changed
+from apps.notifications.custom_signals import student_pulled, student_not_pulled, teacher_changed
 
 import logging
 
@@ -419,6 +419,9 @@ class Group(models.Model):
                             self.remove_from_queued_counter(q.student)
                         total_queues += 1
                     break
+                else:
+                    student_not_pulled.send(sender=self.__class__, instance=self, user=q.student.user)
+
                 to_removed.append(q)
 
         for queue in to_removed:

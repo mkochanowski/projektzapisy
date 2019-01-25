@@ -19,6 +19,7 @@ def get_all_users_in_course_groups(course_groups: List[Group]):
 class NotificationPreferencesStudent(models.Model):
     user = models.ForeignKey(User, verbose_name='użytkownik', on_delete=models.CASCADE)
     pulled_from_queue = models.BooleanField(default=True, verbose_name='Dodano do grupy')
+    not_pulled_from_queue = models.BooleanField(default=True, verbose_name='Nie wciągnięto do grupy')
     added_new_group = models.BooleanField(default=True, verbose_name='Dodano nową grupe')
     teacher_has_been_changed = models.BooleanField(default=True, verbose_name='Prowadzący zmieniony')
 

@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from apps.enrollment.courses.models.group import Group
 from apps.notifications.api import notify_user, notify_selected_users
 from apps.notifications.models import get_all_users_in_course_groups
-from apps.notifications.custom_signals import student_pulled, teacher_changed
+from apps.notifications.custom_signals import student_pulled, student_not_pulled, teacher_changed
 from apps.notifications.templates import (
     ADDED_NEW_GROUP,
     ASSIGNED_TO_NEW_GROUP_AS_A_TEACHER,
@@ -37,6 +37,17 @@ def notify_that_user_was_pulled_from_queue(sender: Group, **kwargs) -> None:
     group = kwargs['instance']
 
     notify_user(kwargs['user'], PULLED_FROM_QUEUE, {
+        'course_name': group.course.information.entity.name,
+        'teacher': group.teacher.user.get_full_name(),
+        'type': group.human_readable_type().lower()
+    })
+
+
+@receiver(student_not_pulled, sender=Group)
+def notify_that_user_was_not_pulled_from_queue(sender: Group, **kwargs) -> None:
+    group = kwargs['instance']
+
+    notify_user(kwargs['user'], 'not_pulled_from_queue', {
         'course_name': group.course.information.entity.name,
         'teacher': group.teacher.user.get_full_name(),
         'type': group.human_readable_type().lower()
