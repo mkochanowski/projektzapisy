@@ -6,6 +6,7 @@ from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
 from apps.users.tests.factories import StudentFactory
 from apps.notifications2.utils import render_description
 from apps.notifications2.custom_signals import student_pulled
+from apps.notifications2.templates import PULLED_FROM_QUEUE
 from apps.enrollment.courses.models.group import Group
 
 
@@ -21,7 +22,7 @@ class Notifications2EmailTestCase(TestCase):
         student_pulled.send(sender=Group, instance=group, user=student.user)
 
         ctx = {
-            'content': render_description('pulled_from_queue', {
+            'content': render_description(PULLED_FROM_QUEUE, {
                 "course_name": group.course.information.entity.name,
                 "teacher": group.teacher.user.get_full_name(),
                 "type": group_types[str(group.type)]
