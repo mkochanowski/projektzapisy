@@ -1,4 +1,4 @@
-from apps.notifications2.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
+from apps.notifications.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
 from django.forms import ModelForm
 
 

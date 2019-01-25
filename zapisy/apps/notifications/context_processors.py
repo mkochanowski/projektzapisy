@@ -1,4 +1,4 @@
-from apps.notifications2.repositories import get_notifications_repository
+from apps.notifications.repositories import get_notifications_repository
 
 
 def notification_ico(request):

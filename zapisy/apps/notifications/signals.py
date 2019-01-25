@@ -4,9 +4,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.enrollment.courses.models.group import Group
-from apps.notifications2.api import notify_user, notify_selected_users
-from apps.notifications2.models import get_all_users_in_course_groups
-from apps.notifications2.custom_signals import student_pulled, teacher_changed
+from apps.notifications.api import notify_user, notify_selected_users
+from apps.notifications.models import get_all_users_in_course_groups
+from apps.notifications.custom_signals import student_pulled, teacher_changed
 
 
 @receiver(post_save, sender=Group)

@@ -4,12 +4,12 @@ from django.template.loader import render_to_string
 
 from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
 from apps.users.tests.factories import StudentFactory
-from apps.notifications2.utils import render_description
-from apps.notifications2.custom_signals import student_pulled
+from apps.notifications.utils import render_description
+from apps.notifications.custom_signals import student_pulled
 from apps.enrollment.courses.models.group import Group
 
 
-class Notifications2EmailTestCase(TestCase):
+class NotificationsEmailTestCase(TestCase):
     def test_pulled_from_queue(self):
         group_types = {"1": "wykład", "2": "ćwiczenia", "3": "pracownia", "5": "ćwiczenio-pracownia",
                        "6": "seminarium", "7": "lektorat", "8": "WF", "9": "repetytorium", "10": "projekt"}
@@ -29,4 +29,4 @@ class Notifications2EmailTestCase(TestCase):
             'greeting': f'Dzień dobry, {student.user.first_name}',
         }
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].body, render_to_string('notifications2/email_base.html', ctx))
+        self.assertEqual(mail.outbox[0].body, render_to_string('notifications/email_base.html', ctx))

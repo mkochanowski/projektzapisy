@@ -4,10 +4,10 @@ from django.shortcuts import render
 from django.contrib import messages
 
 from apps.users.models import BaseUser
-from apps.notifications2.forms import PreferencesFormStudent, PreferencesFormTeacher
-from apps.notifications2.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
-from apps.notifications2.repositories import get_notifications_repository
-from apps.notifications2.utils import render_description
+from apps.notifications.forms import PreferencesFormStudent, PreferencesFormTeacher
+from apps.notifications.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
+from apps.notifications.repositories import get_notifications_repository
+from apps.notifications.utils import render_description
 
 from libs.ajax_messages import AjaxFailureMessage
 
@@ -26,7 +26,7 @@ def index(request):
 
     repo.remove_all_older_than(request.user, datetime.now())
 
-    return render(request, 'notifications2/index.html', {'notifications': notifications})
+    return render(request, 'notifications/index.html', {'notifications': notifications})
 
 
 def FormView(request):
@@ -40,13 +40,13 @@ def FormView(request):
             post = form.save(commit=False)
             post.user = request.user
             post.save()
-            return render(request, 'notifications2/pref.html', {'form': form})
+            return render(request, 'notifications/preferences.html', {'form': form})
         else:
             messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
     else:
         form = create_form(request)
 
-    return render(request, 'notifications2/pref.html', {'form': form})
+    return render(request, 'notifications/preferences.html', {'form': form})
 
 
 def create_form(request):
