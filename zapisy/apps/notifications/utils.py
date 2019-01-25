@@ -1,7 +1,7 @@
 from typing import Dict
 
-from apps.notifications2.exceptions import DescriptionArgumentMissingException
-from apps.notifications2.templates import mapping
+from apps.notifications.exceptions import DescriptionArgumentMissingException
+from apps.notifications.templates import mapping
 
 
 def render_description(description_id: str, description_args: Dict):

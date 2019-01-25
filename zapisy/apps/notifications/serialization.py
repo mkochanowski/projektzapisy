@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 import json
 
-from apps.notifications2.datatypes import Notification
+from apps.notifications.datatypes import Notification
 
 
 class NotificationSerializer(ABC):

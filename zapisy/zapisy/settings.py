@@ -159,7 +159,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.request',
-                'apps.notifications2.context_processors.notification_ico'
+                'apps.notifications.context_processors.notification_ico'
             ],
             'loaders': TEMPLATE_LOADERS_TO_USE
             if DEBUG else
@@ -228,7 +228,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_filters',
     'el_pagination',
-    'apps.notifications2',
+    'apps.notifications',
     'django_cas_ng',
 
     'test_app',

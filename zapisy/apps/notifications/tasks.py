@@ -3,9 +3,9 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django_rq import job
 
-from apps.notifications2.repositories import get_notifications_repository
-from apps.notifications2.utils import render_description
-from apps.notifications2.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
+from apps.notifications.repositories import get_notifications_repository
+from apps.notifications.utils import render_description
+from apps.notifications.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
 from apps.users.models import BaseUser
 
 
@@ -38,7 +38,7 @@ def dispatch_notifications_task(user):
 
         send_mail(
             'Wiadomość od Systemu Zapisów IIUWr',  # FIXME (?)
-            render_to_string('notifications2/email_base.html', ctx),
+            render_to_string('notifications/email_base.html', ctx),
             settings.MASS_MAIL_FROM,
             [user.email])
 

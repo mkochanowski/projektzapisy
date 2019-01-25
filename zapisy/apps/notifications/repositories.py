@@ -6,8 +6,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 import redis
 
-from apps.notifications2.datatypes import Notification
-from apps.notifications2.serialization import (
+from apps.notifications.datatypes import Notification
+from apps.notifications.serialization import (
     JsonNotificationSerializer,
     NotificationSerializer,
 )

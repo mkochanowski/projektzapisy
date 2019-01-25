@@ -1,15 +1,15 @@
 from django.test import TestCase
 
-from apps.notifications2.exceptions import DescriptionArgumentMissingException
-from apps.notifications2.utils import render_description
-from apps.notifications2.templates import (
+from apps.notifications.exceptions import DescriptionArgumentMissingException
+from apps.notifications.utils import render_description
+from apps.notifications.templates import (
     ADDED_NEW_GROUP,
     ASSIGNED_TO_NEW_GROUP_AS_A_TEACHER,
     PULLED_FROM_QUEUE,
 )
 
 
-class Notifications2UtilsTestCase(TestCase):
+class NotificationsUtilsTestCase(TestCase):
 
     def test_pulled_from_queue_renders_properly(self):
         descr_args = {'course_name': 'matematyka dyskretna', 'teacher': 'Jan Kowalski', 'type': 'ćwiczenia'}

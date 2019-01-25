@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
-from apps.notifications2.custom_signals import student_pulled, teacher_changed
+from apps.notifications.custom_signals import student_pulled, teacher_changed
 
 import logging
 
