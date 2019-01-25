@@ -28,6 +28,7 @@ import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { confirmationDialog } from "./helpers";
+import { macosifyKeys } from "../utils";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -71,12 +72,11 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	}
 
 	private initializeKeyboardShortcuts() {
-		Mousetrap.bindGlobal("ctrl+m", this.setupForAddingThesis);
-		Mousetrap.bindGlobal("esc", this.onResetChanges);
+		Mousetrap.bindGlobal(macosifyKeys("ctrl+m"), this.setupForAddingThesis);
 	}
 
 	private deconfigureKeyboardShortcuts() {
-		Mousetrap.unbindGlobal(["ctrl+m", "esc"]);
+		Mousetrap.unbindGlobal(macosifyKeys("ctrl+m"));
 	}
 
 	private confirmUnload = (ev: BeforeUnloadEvent) => {
@@ -174,6 +174,7 @@ class ThesesAppInternal extends React.Component<Props, State> {
 			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}
 			onDeletionRequested={this.onDelete}
+			onResetRequested={this.onResetChanges}
 			onThesisModified={this.onThesisModified}
 		/>;
 	}

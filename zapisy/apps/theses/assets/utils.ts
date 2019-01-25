@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import { Moment } from "moment";
+import { isMacOS } from "common/browser_detection";
 
 /**
  * Returns a style object to be applied to "disabled" components.
@@ -38,4 +39,12 @@ export function nullableValuesEqual<T>(
 		val1 === null && val2 === null ||
 		val1 !== null && val2 !== null && compare(val1, val2)
 	);
+}
+
+// Use Cmd instead of ctrl on MacOS for keyboard shortcuts
+export function macosifyKeys(vals: string | string[]) {
+	const fixSingle = isMacOS()
+		? (key: string) => key.replace("ctrl", "command")
+		: (key: string) => key;
+	return Array.isArray(vals) ? vals.map(fixSingle) : fixSingle(vals);
 }

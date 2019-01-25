@@ -7,7 +7,11 @@ export type ConfirmationDialogProps = {
 	noText: string;
 };
 
-export function confirmationDialog(props: ConfirmationDialogProps) {
+/**
+ * Displays a confirmation dialog with the given parameters.
+ * @returns A promise that resolves to the user's choice
+ */
+export function confirmationDialog(props: ConfirmationDialogProps): Promise<boolean> {
 	const final = Object.assign({
 		title: "",
 	}, props);

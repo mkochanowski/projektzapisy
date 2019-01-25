@@ -4,14 +4,14 @@ import styled from "styled-components";
 import update from "immutability-helper";
 import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
-import { Moment } from "moment";
+import * as moment from "moment";
 
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 import "./style.less";
 import { Spinner } from "../Spinner";
-import { getDisabledStyle } from "../../utils";
+import { getDisabledStyle, macosifyKeys } from "../../utils";
 import { ThesisWorkMode, ApplicationState } from "../../app_types";
 import { canModifyThesis, canDeleteThesis } from "../../permissions";
 import { Thesis } from "../../thesis";
@@ -63,6 +63,8 @@ const ButtonsContainer = styled.div`
 	grid-gap: 10px;
 `;
 
+const DEFAULT_THESIS_RESERVATION_YEARS = 2;
+
 type Props = {
 	thesis: Thesis;
 	original: Thesis;
@@ -71,17 +73,18 @@ type Props = {
 	mode: ThesisWorkMode;
 	hasTitleError: boolean;
 	onThesisModified: (thesis: Thesis) => void;
-	onDeletionRequested: () => void;
-	onSaveRequested: () => void;
+	onDeletionRequested: () => Promise<void>;
+	onSaveRequested: () => Promise<void>;
+	onResetRequested: () => void;
 	onChangedTitle: () => void;
 };
 
 export class ThesisDetails extends React.PureComponent<Props> {
+	private actionInProgress: boolean = false;
+
 	public componentDidMount() {
-		Mousetrap.bindGlobal("ctrl+s", ev => {
-			if (this.props.hasUnsavedChanges) {
-				this.props.onSaveRequested();
-			}
+		Mousetrap.bindGlobal(macosifyKeys("ctrl+s"), ev => {
+			this.handleSave();
 			ev.preventDefault();
 		});
 		Mousetrap.bind("del", () => {
@@ -90,8 +93,8 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	public componentWillUnmount() {
-		Mousetrap.unbindGlobal("ctrl+s");
-		Mousetrap.unbind("global");
+		Mousetrap.unbindGlobal(macosifyKeys("ctrl+s"));
+		Mousetrap.unbind("del");
 	}
 
 	public render() {
@@ -138,10 +141,23 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		return <>
 			<ThesisVotes/>
 			<ButtonsContainer>
+				{this.renderResetButton()}
 				{this.renderDeleteButton()}
 				{this.renderSaveButton()}
 			</ButtonsContainer>
 		</>;
+	}
+
+	private renderResetButton() {
+		if (!canModifyThesis(this.props.original)) {
+			return null;
+		}
+		const { hasUnsavedChanges } = this.props;
+		return <ActionButton
+			onClick={this.props.onResetRequested}
+			disabled={!hasUnsavedChanges}
+			title={hasUnsavedChanges ? "Wycofaj dokonane zmiany" : "Nie dokonano zmian"}
+		>Wyczyść</ActionButton>;
 	}
 
 	private renderDeleteButton() {
@@ -149,7 +165,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 			return null;
 		}
 		return <ActionButton
-			onClick={this.props.onDeletionRequested}
+			onClick={this.handleDelete}
 			title={"Usuń pracę z systemu"}
 		>Usuń</ActionButton>;
 	}
@@ -160,7 +176,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		}
 		const { hasUnsavedChanges } = this.props;
 		return <ActionButton
-			onClick={this.props.onSaveRequested}
+			onClick={this.handleSave}
 			disabled={!hasUnsavedChanges}
 			title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
 		>{this.getActionTitle()}</ActionButton>;
@@ -175,17 +191,42 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private handleDelete = async () => {
-		if (!canDeleteThesis(this.props.original)) {
+		if (this.actionInProgress || !canDeleteThesis(this.props.original)) {
 			return;
 		}
+		this.actionInProgress = true;
 		const confirmed = await confirmationDialog({
 			message: `Czy usunąć pracę „${this.props.thesis.title}”?`,
 			yesText: "Tak, usuń",
 			noText: "Nie, wróć",
 		});
 		if (confirmed) {
-			this.props.onDeletionRequested();
+			await this.props.onDeletionRequested();
 		}
+		this.actionInProgress = false;
+	}
+
+	private async confirmArchiveThesis() {
+		return confirmationDialog({
+			message: `Czy zarchiwizować pracę „${this.props.thesis.title}”? ` +
+			"Dalszej edycji dokonywać będzie mógł wyłącznie administrator systemu.",
+			yesText: "Tak, zarchiwizuj",
+			noText: "Nie, wróć",
+		});
+	}
+
+	private handleSave = async () => {
+		if (this.actionInProgress || !this.props.hasUnsavedChanges) { return; }
+		this.actionInProgress = true;
+		const { original, thesis } = this.props;
+		if (
+			original.status === ThesisStatus.Defended ||
+			thesis.status !== ThesisStatus.Defended ||
+			await this.confirmArchiveThesis()
+		) {
+			await this.props.onSaveRequested();
+		}
+		this.actionInProgress = false;
 	}
 
 	private updateThesisState(updateObject: object) {
@@ -194,7 +235,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		);
 	}
 
-	private onReservedUntilChanged = (newDate: Moment): void => {
+	private onReservedUntilChanged = (newDate: moment.Moment): void => {
 		this.updateThesisState({ reservedUntil: { $set: newDate } });
 	}
 
@@ -222,7 +263,14 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private onStudentChanged = (newStudent: Student | null): void => {
-		this.updateThesisState({ student: { $set: newStudent } });
+		// also update the reservation date, but only if they haven't touched it previously
+		const { original, thesis } = this.props;
+		const update = { student: { $set: newStudent } };
+		if (original.isReservationDateSame(thesis.reservedUntil)) {
+			const expires = moment().add(DEFAULT_THESIS_RESERVATION_YEARS, "years");
+			Object.assign(update, { reservedUntil: { $set: expires } });
+		}
+		this.updateThesisState(update);
 	}
 
 	private onSecondStudentChanged = (newSecondStudent: Student | null): void => {

@@ -32,7 +32,8 @@ export function canDeleteThesis(thesis: Thesis) {
 	return (
 		Users.isUserAdmin() ||
 		Users.isUserMemberOfBoard() && !thesis.isArchived() ||
-		Users.isUserEmployee() && EMPLOYEE_DELETABLE_STATUSES.includes(thesis.status)
+		Users.isUserEmployee() && isOwnerOfThesis(thesis) &&
+		EMPLOYEE_DELETABLE_STATUSES.includes(thesis.status)
 	);
 }
 

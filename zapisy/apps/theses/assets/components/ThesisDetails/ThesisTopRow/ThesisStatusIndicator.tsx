@@ -1,4 +1,5 @@
 import * as React from "react";
+import { without } from "lodash";
 
 import { GenericSelect } from "../../GenericSelect";
 import { InputWithLabel, InputType } from "./InputWithLabel";
@@ -26,7 +27,7 @@ type Props = {
 	enabled: boolean;
 };
 
-const STATUS_FIELD_WIDTH = 190;
+const STATUS_FIELD_WIDTH = 210;
 
 /**
  * Shows the thesis status in a <select> field if modification
@@ -34,7 +35,7 @@ const STATUS_FIELD_WIDTH = 190;
  */
 export const ThesisStatusIndicator = React.memo(function(props: Props) {
 	const disabledValues = ALL_STATUSES.filter(status => (
-		status !== props.original.status && !canChangeStatusTo(props.original, status)
+		!canChangeStatusTo(props.original, status)
 	));
 	if (!props.enabled || disabledValues.length === ALL_STATUSES.length) {
 		// If no status can be set by the current user, there's no point
@@ -49,7 +50,8 @@ export const ThesisStatusIndicator = React.memo(function(props: Props) {
 	return <GenericSelect<ThesisStatus>
 		value={props.thesis.status}
 		onChange={props.onChange}
-		disabledValues={disabledValues}
+		// Don't disable the value we already have selected
+		disabledValues={without(disabledValues, props.original.status)}
 		optionInfo={statusSelectInfos}
 		label={LABEL_TEXT}
 		inputCss={{ width: STATUS_FIELD_WIDTH }}
