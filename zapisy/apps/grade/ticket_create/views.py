@@ -215,12 +215,6 @@ def client_connection(request):
 
 
 @csrf_exempt
-def keys_list(request):
-    keys = PublicKey.objects.all()  # .order_by('poll__group__course__name')
-    return render(request, 'grade/ticket_create/keys_list.html', {'list': keys})
-
-
-@csrf_exempt
 def keys_generate(request):
     data = {}
     data['keys_to_create'] = Poll.count_polls_without_keys()
