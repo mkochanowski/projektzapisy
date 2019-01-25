@@ -32,8 +32,6 @@ from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
 from apps.users.forms import EmailChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 from apps.users.exceptions import InvalidUserException
-from apps.notifications.forms import NotificationFormset
-from apps.notifications.models import NotificationPreferences
 from libs.ajax_messages import AjaxSuccessMessage
 from mailer.models import Message
 

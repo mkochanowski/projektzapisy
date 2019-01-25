@@ -52,3 +52,22 @@ def notify_that_teacher_was_changed(sender: Group, **kwargs) -> None:
         'teacher': teacher.get_full_name(),
         'type': group.human_readable_type().lower()
     })
+
+
+@receiver(teacher_changed, sender=Group)
+def notify_that_teacher_was_changed(sender: Group, **kwargs) -> None:
+    group = kwargs["instance"]
+    group_types: Dict = {"1": "wykład", "2": "ćwiczenia", "3": "pracownia", "5": "ćwiczenio-pracownia",
+                         "6": "seminarium", "7": "lektorat", "8": "WF", "9": "repetytorium", "10": "projekt"}
+
+    teacher = group.teacher.user
+    course_name = group.course.information.entity.name
+
+    notify_user(teacher, "assigned_to_new_group_as_teacher", {"course_name": course_name})
+
+    users = get_all_users_in_course_groups([group])
+    notify_selected_users(users, "teacher_has_been_changed", {
+        "course_name": course_name,
+        "teacher": teacher.get_full_name(),
+        "type": group_types[str(group.type)]
+    })
