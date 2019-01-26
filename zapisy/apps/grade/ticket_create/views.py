@@ -105,7 +105,7 @@ def connections_choice(request):
         return render(request, 'grade/ticket_create/connection_choice.html', {'grade': grade})
 
 
-@csrf_exempt
+@employee_required
 def keys_generate(request):
     data = {}
     data['keys_to_create'] = Poll.count_polls_without_keys()
