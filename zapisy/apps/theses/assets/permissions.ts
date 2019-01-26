@@ -61,7 +61,7 @@ export function canChangeTitle(thesis: Thesis) {
 	];
 	return (
 		Users.isUserStaff() ||
-		isOwnerOfThesis(thesis) && allowedStatuses.includes(thesis.status)
+		allowedStatuses.includes(thesis.status)
 	);
 }
 
@@ -73,8 +73,7 @@ export function canChangeStatusTo(thesis: Thesis, newStatus: ThesisStatus) {
 	const oldStatus = thesis.status;
 	return (
 		Users.isUserStaff() ||
-		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Defended ||
-		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Accepted
+		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Defended
 	);
 }
 
