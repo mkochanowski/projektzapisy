@@ -112,12 +112,16 @@ class Group(models.Model):
     objects = models.Manager()
     statistics = StatisticManager()
 
-    def get_teacher_full_name(self):
-        """return teacher's full name of current group"""
-        if self.teacher is None:
-            return '(nieznany prowadzący)'
-        else:
-            return self.teacher.user.get_full_name()
+    # def get_teacher_full_name(self):
+    #     """return teacher's full name of current group"""
+    #     if self.teacher is None:
+    #         return '(nieznany prowadzący)'
+    #     else:
+    #         return self.teacher.user.get_full_name()
+
+    def get_teachers_full_names(self):
+        """return list of full names for teachers of current group"""
+        return ", ".join(['nieznany prowadzący' if t is None else t.user.get_full_name() for t in self.teachers.all()])
 
     def get_all_terms(self):
         """return all terms of current group"""
@@ -550,12 +554,12 @@ class Group(models.Model):
     def __str__(self):
         return "%s: %s - %s" % (str(self.course.entity.get_short_name()),
                                 str(self.get_type_display()),
-                                str(self.get_teacher_full_name()))
+                                str(self.get_teachers_full_names()))
 
     def long_print(self):
         return "%s: %s - %s" % (str(self.course.entity.name),
                                 str(self.get_type_display()),
-                                str(self.get_teacher_full_name()))
+                                str(self.get_teachers_full_names()))
 
     def get_absolute_url(self):
         return reverse('records-group', args=[self.id])

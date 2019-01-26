@@ -367,7 +367,7 @@ def to_plaintext(vtl):
         else:
             res += str(p.group.course.name) + " &#10;"
             res += str(p.group.get_type_display()) + ": "
-            res += str(p.group.get_teacher_full_name()) + " &#10;"
+            res += str(p.group.get_teachers_full_names()) + " &#10;"
         if p.studies_type:
             res += 'typ studiów: ' + str(p.studies_type) + " &#10;"
 

@@ -19,7 +19,7 @@ class PollCombineForm(forms.Form):
                     title = '[' + polls[0].title + '] Przedmiot: ' + \
                             polls[0].group.course.name + \
                             ' ' + polls[0].group.get_type_display() + ': ' + \
-                            polls[0].group.get_teacher_full_name()
+                            polls[0].group.get_teachers_full_names()
                 if polls[0].studies_type:
                     ', studia ' + polls[0].studies_type
 
@@ -37,7 +37,7 @@ class PollCombineForm(forms.Form):
                     else:
                         title += '<li>[' + poll.title + '] ' + \
                                  poll.group.get_type_display() + ': ' + \
-                                 poll.group.get_teacher_full_name() + '</li>'
+                                 poll.group.get_teachers_full_names() + '</li>'
                 title += '</ul>'
 
                 field = forms.BooleanField(label=SafeText(title),

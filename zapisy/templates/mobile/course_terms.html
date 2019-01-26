@@ -18,7 +18,7 @@
                             <p>{% for term in  lecture.get_all_terms%}
                                 {{ term }}<br/>
                             {% endfor %}
-                            {{ lecture.get_teacher_full_name }}<br/>
+                            {{ lecture.get_teachers_full_names }}<br/>
                             ({{ lecture.get_count_of_enrolled }}/{{ lecture.limit }})</p>
                             {% if not lecture.signed %}
                                 <form action='/group/{{lecture.id}}/assign/' name='enrol_unenrol' method="post">
@@ -38,7 +38,7 @@
                            <p> {% for term in ex.get_all_terms%}
                                 {{ term }}<br/>
                             {% endfor %}
-                            {{ ex.get_teacher_full_name }}<br/>
+                            {{ ex.get_teachers_full_names }}<br/>
                             ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exercise == ex.id %}
@@ -65,7 +65,7 @@
                             {% for term in ex.get_all_terms%}
                                 {{ term }}<br/>
                             {% endfor %}
-                            {{ ex.get_teacher_full_name }}<br/>
+                            {{ ex.get_teachers_full_names }}<br/>
                             ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exlaboratory == ex.id %}
@@ -93,7 +93,7 @@
                             <p>{% for term in lab.get_all_terms%}
                                 {{ term }}<br/>
                             {% endfor %}
-                            {{ lab.get_teacher_full_name }}<br/>
+                            {{ lab.get_teachers_full_names }}<br/>
                             ({{ lab.get_count_of_enrolled }}/{{ lab.limit }})
                             </p>
                             {% if course.user_enrolled_to_laboratory == lab.id %}
@@ -123,7 +123,7 @@
                             <p>{% for term in ex.get_all_terms%}
                                 {{ term }}<br/>
                             {% endfor %}
-                            {{ ex.get_teacher_full_name }}<br/>
+                            {{ ex.get_teachers_full_names }}<br/>
                             ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exercise == ex.id %}
@@ -180,7 +180,7 @@
                     {% for term in ex.get_all_terms%}
                     {{ term }} <br/>
                     {% endfor %}
-                    {{ ex.get_teacher_full_name }}
+                    {{ ex.get_teachers_full_names }}
                     <br/>
                     ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                     </p>
@@ -209,7 +209,7 @@
                     {% for term in ex.get_all_terms%}
                         {{ term }} <br/>
                     {% endfor %}
-                    {{ ex.get_teacher_full_name }}
+                    {{ ex.get_teachers_full_names }}
                     <br/>
                     ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                     </p>

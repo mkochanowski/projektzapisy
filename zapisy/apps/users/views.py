@@ -402,7 +402,7 @@ def create_ical_file(request: HttpRequest) -> HttpResponse:
                     + ', Instytut Informatyki Uniwersytetu Wrocławskiego'
 
             event.add('description').value = 'prowadzący: ' \
-                + group.get_teacher_full_name()
+                + group.get_teachers_full_names()
             event.add('dtstart').value = start_datetime
             event.add('dtend').value = end_datetime
 

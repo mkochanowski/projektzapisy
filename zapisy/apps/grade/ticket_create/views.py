@@ -170,7 +170,7 @@ def client_connection(request):
                         if polls[0].group:
                             st += str(polls[0].group.course.name) + '%%%'
                             st += str(polls[0].group.get_type_display()) + ': %%%'
-                            st += str(polls[0].group.get_teacher_full_name()) + '%%%'
+                            st += str(polls[0].group.get_teachers_full_names()) + '%%%'
 
                         st += str('***')
 
@@ -183,7 +183,7 @@ def client_connection(request):
                                 st += 'Ankiety ogólne: %%%   [' + poll.title + '] '
                             else:
                                 st += 'Przedmiot: ' + polls[0].group.course.name + '%%%    [' + poll.title + '] ' + \
-                                      poll.group.get_type_display() + ': ' + poll.group.get_teacher_full_name() + '***'
+                                      poll.group.get_type_display() + ': ' + poll.group.get_teachers_full_names() + '***'
                                 st += str(PublicKey.objects.get(poll=poll.pk).public_key) + '&&&'
                         st += '???'
 

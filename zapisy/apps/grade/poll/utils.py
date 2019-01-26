@@ -264,7 +264,7 @@ def group_polls_by_course(polls):
 
 
 def poll_sort_by_teacher_key(p):
-    return p.group.get_teacher_full_name() if p.group else ""
+    return p.group.get_teachers_full_names() if p.group else ""
 
 
 def group_polls_by_teacher(polls):
@@ -273,7 +273,7 @@ def group_polls_by_teacher(polls):
     groupped = []
     if polls:
         try:
-            act_sub = polls[0].group.get_teacher_full_name()
+            act_sub = polls[0].group.get_teachers_full_names()
         except BaseException:
             act_sub = "Ankiety ogólne"
         act = [polls[0]]
@@ -281,7 +281,7 @@ def group_polls_by_teacher(polls):
 
         for poll in polls:
             try:
-                sub = poll.group.get_teacher_full_name()
+                sub = poll.group.get_teachers_full_names()
             except BaseException:
                 sub = "Ankiety ogólne"
 
@@ -333,7 +333,7 @@ def generate_csv_title(poll):
     try:
         res += ' ' + poll.group.course.name
         res += ' ' + poll.group.get_type_display()
-        res += ' ' + poll.group.get_teacher_full_name()
+        res += ' ' + poll.group.get_teachers_full_names()
     except BaseException:
         res += ' ' + 'Ankieta ogólna'
     res += ' ' + str(poll.pk)

@@ -331,7 +331,7 @@ class Record(models.Model):
     def __str__(self):
         return "%s (%s - %s)" % (self.group.course,
                                  self.group.get_type_display(),
-                                 self.group.get_teacher_full_name())
+                                 self.group.get_teachers_full_names())
 
 
 class QueueManager(models.Manager):
@@ -552,4 +552,4 @@ class Queue(models.Model):
     def __str__(self):
         return "%s (%s - %s)" % (self.group.course,
                                  self.group.get_type_display(),
-                                 self.group.get_teacher_full_name())
+                                 self.group.get_teachers_full_names())

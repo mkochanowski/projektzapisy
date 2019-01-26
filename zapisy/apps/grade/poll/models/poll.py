@@ -60,7 +60,7 @@ class Poll(models.Model):
         res = str(self.title)
         if self.group:
             res += ', ' + str(self.group.get_type_display()) + " - " + \
-                str(self.group.get_teacher_full_name())
+                str(self.group.get_teachers_full_names())
         if self.studies_type:
             res += ', typ studiów: ' + str(self.studies_type)
         return res
@@ -73,7 +73,7 @@ class Poll(models.Model):
             sep = ', '
 
         if self.group:
-            res += ': ' + self.group.get_teacher_full_name()
+            res += ': ' + self.group.get_teachers_full_names()
         else:
             res += sep + 'Ankieta ogólna'
 
@@ -149,7 +149,7 @@ class Poll(models.Model):
         if self.group:
             res += str(self.group.course.name) + '</td><td>'
             res += str(self.group.get_type_display()) + '</td><td>'
-            res += str(self.group.get_teacher_full_name()) + '</td><td>'
+            res += str(self.group.get_teachers_full_names()) + '</td><td>'
         else:
             res += '-</td><td>-</td><td>-</td><td>'
 
