@@ -76,8 +76,7 @@ def can_change_status_to(user: BaseUser, thesis: Thesis, new_status: ThesisStatu
     old_status = ThesisStatus(thesis.status)
     return (
         is_thesis_staff(user) or
-        old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.DEFENDED or
-        old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.ACCEPTED
+        old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.DEFENDED
     )
 
 
