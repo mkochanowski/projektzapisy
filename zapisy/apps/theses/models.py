@@ -85,8 +85,19 @@ class Thesis(models.Model):
         """Ensure that the title never contains superfluous whitespace"""
         self.title = self.title.strip()
 
+    def adjust_status(self):
+        """If there is a student and the thesis has been accepted, we automatically
+        move it to "in progress"; conversely, if it was in progress but the students
+        have been removed, go back to accepted
+        """
+        if self.status == ThesisStatus.ACCEPTED and (self.student or self.student_2):
+            self.status = ThesisStatus.IN_PROGRESS
+        elif self.status == ThesisStatus.IN_PROGRESS and not self.student and not self.student_2:
+            self.status = ThesisStatus.ACCEPTED
+
     def save(self, *args, **kwargs):
         self.full_clean()
+        self.adjust_status()
         if self.status != self.__original_status:
             # If the status changed, update modified date
             self.modified_date = datetime.now()
