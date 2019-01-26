@@ -90,10 +90,11 @@ class Thesis(models.Model):
         move it to "in progress"; conversely, if it was in progress but the students
         have been removed, go back to accepted
         """
-        if self.status == ThesisStatus.ACCEPTED and (self.student or self.student_2):
-            self.status = ThesisStatus.IN_PROGRESS
-        elif self.status == ThesisStatus.IN_PROGRESS and not self.student and not self.student_2:
-            self.status = ThesisStatus.ACCEPTED
+        current_status = ThesisStatus(self.status)
+        if current_status == ThesisStatus.ACCEPTED and (self.student or self.student_2):
+            self.status = ThesisStatus.IN_PROGRESS.value
+        elif current_status == ThesisStatus.IN_PROGRESS and not self.student and not self.student_2:
+            self.status = ThesisStatus.ACCEPTED.value
 
     def save(self, *args, **kwargs):
         self.full_clean()
