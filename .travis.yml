@@ -48,7 +48,7 @@ cache:
     # above can be used
     - zapisy/node_modules
     # Cache the virtualenv packages folder so virtualenv doesn't waste
-    # installing locally cached packages
+    # time installing locally cached packages
     - "/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages"
 
 notifications:
