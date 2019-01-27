@@ -19,31 +19,30 @@ services:
 install:
   - pip install -r zapisy/requirements.test.txt
   # Installs Yarn/NPM dependencies.
-  - cd zapisy && yarn && cd ..
-  # Builds assets.
-  - cd zapisy && yarn build && cd ..
+  - cd zapisy && yarn
 
 before_script:
   - psql -c 'CREATE DATABASE fereol_test;' -U postgres
   - mv env/.env_travis env/.env
   - mkdir zapisy/logs
 
-# Run scripts specified in Jobs rather than one global script.
+# Lint, build frontend dependencies, run Django tests
 script: |
   set -e
   flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
   cd zapisy
-  python manage.py test apps.news.tests --nomigrations
-  python manage.py test apps.schedule --nomigrations
-  python manage.py test apps.enrollment.courses --nomigrations
-  python manage.py test apps.enrollment.records.tests --nomigrations
-  python manage.py test apps.grade.poll --nomigrations
-  python manage.py test apps.users --nomigrations
+  yarn build
+  python manage.py test apps --failfast --parallel
 
 cache:
 - pip
+# This caches yarn/.cache, which mostly means we don't need to redownload packages
 - yarn
 directories:
+  # And this caches the packages themselves, so we don't spend time installing
+  # them unnecesarily. This mostly supersedes the option above, except cases
+  # where the branch is switched and packages need to be added; then the cache
+  # above can be used.
   - zapisy/node_modules
 
 notifications:
