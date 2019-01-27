@@ -8,16 +8,19 @@ env:
 
 services:
   - postgresql
-before_script:
-  - psql -c 'CREATE DATABASE fereol_test;' -U postgres
-  - mv env/.env_travis env/.env
-
 
 install:
   - pip install -r zapisy/requirements.test.txt
   # Installs Reviewdog to comment linting errors on Github Pull Requests.
   - mkdir -p ~/bin/ && export export PATH="~/bin/:$PATH"
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ~/bin/reviewdog && chmod +x ~/bin/reviewdog
+
+before_script:
+  - psql -c 'CREATE DATABASE fereol_test;' -U postgres
+  - mv env/.env_travis env/.env
+
+# Run scripts specified in Jobs rather than one global script.
+script: true
 
 jobs:
   include:
