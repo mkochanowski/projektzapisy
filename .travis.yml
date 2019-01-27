@@ -28,18 +28,15 @@ before_script:
   - mv env/.env_travis env/.env
   - mkdir zapisy/logs
 
-jobs:
-  include:
-    - stage: lint
-    - script: flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
-
-    - stage: test
-    - script: cd zapisy && python manage.py test apps.news.tests --nomigrations
-    - script: cd zapisy && python manage.py test apps.schedule --nomigrations
-    - script: cd zapisy && python manage.py test apps.enrollment.courses --nomigrations
-    - script: cd zapisy && python manage.py test apps.enrollment.records.tests --nomigrations
-    - script: cd zapisy && python manage.py test apps.grade.poll --nomigrations
-    - script: cd zapisy && python manage.py test apps.users --nomigrations
+# Run scripts specified in Jobs rather than one global script.
+script: |
+  flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
+  python manage.py test apps.news.tests --nomigrations
+  python manage.py test apps.schedule --nomigrations
+  python manage.py test apps.enrollment.courses --nomigrations
+  python manage.py test apps.enrollment.records.tests --nomigrations
+  python manage.py test apps.grade.poll --nomigrations
+  python manage.py test apps.users --nomigrations
 
 cache:
 - pip
