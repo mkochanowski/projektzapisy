@@ -1,0 +1,37 @@
+language: python
+python:
+  - "3.6"
+
+env:
+  global:
+    - REVIEWDOG_VERSION="0.9.11"
+
+services:
+  - postgresql
+before_script:
+  - psql -c 'CREATE DATABASE fereol_test;' -U postgres
+  - mv env/.env_circleci env/.env
+
+
+install:
+  - pip install -r zapisy/requirements.test.txt
+  # Installs Reviewdog to comment linting errors on Github Pull Requests.
+  - mkdir -p ~/bin/ && export export PATH="~/bin/:$PATH"
+  - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ~/bin/reviewdog && chmod +x ~/bin/reviewdog
+
+jobs:
+  include:
+    - stage: lint
+    - script: flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 . | reviewdog -f pep8 -reporter=github-pr-check
+
+    - stage: test
+    - script: cd zapisy && python manage.py collectstatic --noinput
+    - script: cd zapisy && sudo coverage run manage.py test apps.news.tests --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test apps.schedule --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test apps.enrollment.courses --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test apps.enrollment.records.tests --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test apps.grade.poll --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test apps.users --nomigrations
+    - script: cd zapisy && sudo coverage run manage.py test test_app --nomigrations
+
+
