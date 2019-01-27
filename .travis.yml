@@ -6,6 +6,13 @@ env:
   global:
     - REVIEWDOG_VERSION="0.9.11"
 
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+    packages:
+      - yarn
 services:
   - postgresql
 
@@ -14,6 +21,10 @@ install:
   # Installs Reviewdog to comment linting errors on Github Pull Requests.
   - mkdir -p ~/bin/ && export export PATH="~/bin/:$PATH"
   - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ~/bin/reviewdog && chmod +x ~/bin/reviewdog
+  # Installs Yarn/NPM dependencies.
+  - cd zapisy && yarn && cd ..
+  # Builds assets.
+  - cd zapisy && yarn build && cd ..
 
 before_script:
   - psql -c 'CREATE DATABASE fereol_test;' -U postgres
@@ -36,4 +47,6 @@ jobs:
     - script: cd zapisy && python manage.py test apps.grade.poll --nomigrations
     - script: cd zapisy && python manage.py test apps.users --nomigrations
 
-
+cache:
+- pip
+- yarn
