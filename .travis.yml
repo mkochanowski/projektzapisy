@@ -31,6 +31,7 @@ before_script:
 # Run scripts specified in Jobs rather than one global script.
 script: |
   flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
+  cd zapisy
   python manage.py test apps.news.tests --nomigrations
   python manage.py test apps.schedule --nomigrations
   python manage.py test apps.enrollment.courses --nomigrations
