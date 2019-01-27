@@ -10,7 +10,7 @@ services:
   - postgresql
 before_script:
   - psql -c 'CREATE DATABASE fereol_test;' -U postgres
-  - mv env/.env_circleci env/.env
+  - mv env/.env_travis env/.env
 
 
 install:
