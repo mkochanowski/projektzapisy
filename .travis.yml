@@ -27,15 +27,14 @@ before_script:
   - mkdir zapisy/logs
 
 # Lint, build frontend dependencies, run Django tests
-script: |
-  set -e
-  python -m flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
-  cd zapisy
-  yarn build
-  # Don't store the build cache; it changes after each build, Travis then
-  # picks that change up and repacks the cache archive which takes forever
-  rm -rf node_modules/.cache-loader-*
-  python manage.py test apps --failfast --parallel
+script:
+  - python -m flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
+  - cd zapisy
+  - yarn build
+  - # Don't store the build cache; it changes after each build, Travis then
+  - # picks that change up and repacks the cache archive which takes forever
+  - rm -rf node_modules/.cache-loader-*
+  - python manage.py test apps --failfast --parallel
 
 cache:
   - pip
