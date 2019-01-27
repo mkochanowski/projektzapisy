@@ -28,9 +28,6 @@ before_script:
   - mv env/.env_travis env/.env
   - mkdir zapisy/logs
 
-# Run scripts specified in Jobs rather than one global script.
-script: true
-
 jobs:
   include:
     - stage: lint
