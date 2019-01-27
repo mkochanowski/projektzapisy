@@ -44,7 +44,7 @@ cache:
     # And this caches the packages themselves, so we don't spend time installing
     # them unnecesarily. This mostly supersedes the option above, except cases
     # where the branch is switched and packages need to be added; then the cache
-    # above can be used.
+    # above can be used
     - zapisy/node_modules
     - "/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages"
 
