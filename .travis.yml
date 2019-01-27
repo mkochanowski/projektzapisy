@@ -20,6 +20,7 @@ install:
   - ls -la /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
   - pip install -r zapisy/requirements.test.txt
   # Installs Yarn/NPM dependencies.
+  - ls -la node_modules
   - cd zapisy && yarn && cd ..
 
 before_script:
@@ -32,7 +33,6 @@ script: |
   set -e
   flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
   cd zapisy
-  ls -la node_modules
   yarn build
   python manage.py test apps --failfast --parallel
 
