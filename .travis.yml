@@ -20,7 +20,7 @@ install:
   - ls -la /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
   - pip install -r zapisy/requirements.test.txt
   # Installs Yarn/NPM dependencies.
-  - cd zapisy && ls -la node_modules && cd ..
+  - cd zapisy && ls -la node_modules || true && cd ..
   - cd zapisy && yarn && cd ..
 
 before_script:
