@@ -37,10 +37,10 @@ script: |
   python manage.py test apps --failfast --parallel
 
 cache:
-- pip
-# This caches yarn/.cache, which mostly means we don't need to redownload packages
-- yarn
-  directories:
+  - pip
+  # This caches yarn/.cache, which mostly means we don't need to redownload packages
+  - yarn
+  - directories:
     # And this caches the packages themselves, so we don't spend time installing
     # them unnecesarily. This mostly supersedes the option above, except cases
     # where the branch is switched and packages need to be added; then the cache
