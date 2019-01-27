@@ -19,7 +19,7 @@ services:
 install:
   - pip install -r zapisy/requirements.test.txt
   # Installs Yarn/NPM dependencies.
-  - cd zapisy && yarn
+  - cd zapisy && yarn && cd ..
 
 before_script:
   - psql -c 'CREATE DATABASE fereol_test;' -U postgres
