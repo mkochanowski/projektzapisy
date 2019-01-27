@@ -112,16 +112,11 @@ class Group(models.Model):
     objects = models.Manager()
     statistics = StatisticManager()
 
-    # def get_teacher_full_name(self):
-    #     """return teacher's full name of current group"""
-    #     if self.teacher is None:
-    #         return '(nieznany prowadzący)'
-    #     else:
-    #         return self.teacher.user.get_full_name()
-
     def get_teachers_full_names(self):
         """return list of full names for teachers of current group"""
-        return ", ".join(['nieznany prowadzący' if t is None else t.user.get_full_name() for t in self.teachers.all()])
+        queryset = self.teachers.prefetch_related('user')
+        teachers_list = [t.user.get_full_name() for t in queryset if t]
+        return ", ".join(teachers_list) if teachers_list else 'nieznany prowadzący'
 
     def get_all_terms(self):
         """return all terms of current group"""

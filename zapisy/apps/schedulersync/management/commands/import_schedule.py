@@ -255,7 +255,7 @@ class Command(BaseCommand):
             'entity_name': g['extra']['course'],
             'group_type': GROUP_TYPES[g['extra']['group_type']],
             'teacher': self.get_employee(g['teachers'][0]),
-            'teachers': [self.get_employee(x) for x in g['teachers']]
+            'teachers': [self.get_employee(x) for x in g['teachers'] if self.get_employee(x) is not None]
         }
 
         # start_time will be determined as the minimum start_time among all terms
