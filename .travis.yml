@@ -17,10 +17,8 @@ services:
   - postgresql
 
 install:
-  - ls -la /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
   - pip install -r zapisy/requirements.test.txt
   # Installs Yarn/NPM dependencies.
-  - cd zapisy && ls -la node_modules || true && cd ..
   - cd zapisy && yarn && cd ..
 
 before_script:
@@ -34,6 +32,9 @@ script: |
   python -m flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
   cd zapisy
   yarn build
+  # Don't store the build cache; it changes after each build, Travis then
+  # picks that change up and repacks the cache archive which takes forever
+  rm -rf node_modules/.cache-loader-*
   python manage.py test apps --failfast --parallel
 
 cache:
@@ -46,6 +47,8 @@ cache:
     # where the branch is switched and packages need to be added; then the cache
     # above can be used
     - zapisy/node_modules
+    # Cache the virtualenv packages folder so virtualenv doesn't waste
+    # installing locally cached packages
     - "/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages"
 
 notifications:
