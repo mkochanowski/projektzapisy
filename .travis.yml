@@ -1,0 +1,68 @@
+language: python
+python:
+  - "3.6"
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'http://dl.yarnpkg.com/debian/pubkey.gpg'
+    packages:
+      - yarn
+services:
+  - postgresql
+
+install:
+  - pip install -r zapisy/requirements.test.txt
+  - |
+    if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Test" ]]; then
+      # Installs Yarn/NPM dependencies.
+      cd zapisy && yarn && cd ..
+      # Builds assets.
+      cd zapisy && yarn build && cd ..
+      # Don't store the build cache; it changes after each build, Travis then
+      # picks that change up and repacks the cache archive which takes forever
+      rm -rf zapisy/node_modules/.cache-loader-*
+    fi
+
+
+before_script:
+  - psql -c 'CREATE DATABASE fereol_test;' -U postgres
+  - mv env/.env_travis env/.env
+  - mkdir zapisy/logs
+
+# Run scripts specified in Jobs rather than one global script.
+script: skip
+
+jobs:
+  include:
+    - stage: lint
+      script: python -m flake8 --statistics --ignore=E265,E501,F401,F841 --exclude=node_modules,*migrations --max-line-length 120 .
+
+    - stage: test
+      cache:
+        - pip
+        # This caches yarn/.cache, which mostly means we don't need to redownload packages
+        - yarn
+        - directories:
+          # And this caches the packages themselves, so we don't spend time installing
+          # them unnecesarily. This mostly supersedes the option above, except for cases
+          # where the branch is switched and packages need to be added; then the cache
+          # above can be used
+          - zapisy/node_modules
+          # Cache the virtualenv packages folder so virtualenv doesn't waste
+          # time installing locally cached packages
+          - '/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages'
+      script: cd zapisy && python manage.py test apps --failfast --parallel
+
+cache:
+  - pip
+  - directories:
+    # Cache the virtualenv packages folder so virtualenv doesn't waste
+    # time installing locally cached packages
+    - '/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages'
+
+notifications:
+  email: false
+  slack:
+    secure: TxxFzsD0xTpqgNfzWWreV13LNiI2DVQMLVpkLCJdukUj/53eiwrVV52nOBVXgPKYUCmZTJbYWR25SR179rbY0E+mlp/fY4kqrU1quu/bOoqfxLYYWnlKunMWHtilGZJhbsVsH7U/3WTr4Gw6LeGU3JY3EXrFidcVikm9lLNvqoZpQ+uHhEtcgDUXevCq7dsRRY1X2EWM260/bkMRWhbn0U2d21o2e/7JyIlLvT3CcdWsd3TcUeYCajiW8QZNwJOOuQJtM79bCfDeY2KG9qZHLcQvw7JGKbdANOtlUHeqIEPXJFTf2iGXKOQ9i4wmAdOGDQb6j/i3JjcFTBz1kRtuOWer6ZP56oRGLFK0qkoYNiiumJGIq4eN6rr71cQrN4H9FtKlibcv2l1RrwyJKhizWt8ewhDUkA9fG9QXLlqnnXWMCa1pcHQ3ifewpRWdr/vdMc0r/PZUb1dcUSOAlDREiEO6MAR0WDGRz+4rYn/ckTjZZYCT+fFmJ4I6HLLuNXaH2WLzoSx/QVT2Lt35NuAN5LZmkKc0CXMW7CmbVA7DXfxV23v/eHKmj3/c/yP1BjS1nDxAHNZMHxgy8kglnqJctyh+/6GqAunne0gb/DfEjKkQQGBPjlSD8kJCd+ybgKMVfIqoQhCkPZqwztzi5OWakxZJxnWbUwjnY27LGr8g/VM=
