@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import environ
 
@@ -10,6 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, os.pardir, 'env', '.env'))
 
 DEBUG = env.bool('DEBUG')
 RELEASE = env.bool('RELEASE')
+TESTING = sys.argv[1:2] == ["test"]
 
 # With DEBUG = False Django will refuse to serve requests to hosts different than this one.
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
@@ -289,6 +291,17 @@ CACHES = {
         'TIMEOUT': 300,
     }
 }
+
+# When testing, don't use strong hashers that take forever to compute
+# Taken from https://github.com/FactoryBoy/factory_boy/issues/224
+# This very noticeably improves performance when creating multiple test users
+# (by an order of magnitude, for ~40 users 30 sec -> 1 sec)
+# We very much don't want this to ever happen in a productive environment,
+# so also check for RELEASE
+if TESTING and not RELEASE:
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+    )
 
 NEWS_PER_PAGE = 15
 
