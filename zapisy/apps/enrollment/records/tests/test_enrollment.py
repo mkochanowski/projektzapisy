@@ -1,4 +1,4 @@
-from django.test import TransactionTestCase, TestCase
+from django.test import TestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models.group import Group
