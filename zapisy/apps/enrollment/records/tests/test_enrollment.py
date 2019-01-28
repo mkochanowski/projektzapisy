@@ -1,4 +1,4 @@
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, TestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models.group import Group
@@ -21,9 +21,7 @@ from datetime import datetime, timedelta
 def open_course_for_student(student, course, opening_time=datetime.now()):
     # OpeningTimesView has student as pk
     # so we cannot have more than one course opened at the moment
-    otvs = OpeningTimesView.objects.filter(student=student)
-    for otv in otvs:
-        otv.delete()
+    OpeningTimesView.objects.filter(student=student).delete()
     OpeningTimesView.objects.create(
         student=student,
         course=course,
@@ -37,9 +35,7 @@ def add_points_for_course(student, course):
                                      entity=course.entity)
 
 
-class DummyTest(TransactionTestCase):
-    reset_sequences = True
-
+class DummyTest(TestCase):
     def setUp(self):
         sql_calls = [
             """
@@ -54,7 +50,6 @@ class DummyTest(TransactionTestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-            connection.commit()
 
     def tearDown(self):
         sql_calls = [
@@ -63,7 +58,6 @@ class DummyTest(TransactionTestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-            connection.commit()
 
     def testAddStudentToGroup(self):
         today = datetime.now()
