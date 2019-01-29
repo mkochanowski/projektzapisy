@@ -7,26 +7,23 @@
 Powiadomienia
 {% endblock %}
 
-<style>
-
-</style>
-
 {% block center %}
-<h1>Powiadomienia</h1>
-<h2><a href="/notifications/preferences">Preferencje</a></h2>
-
-<div class="news-content">
-    {% for element in notifications %}
-        {{ element }} <br />
-    {% endfor %}
-    <div class="od-news-item">
-        <div class="od-news-header">
-            <h3></h3>
-            <span class="od-news-date"></span>
-        </div>
-        <div class="od-news-body">
-            <p></p>
-        </div>
-    </div>
+<div class="notifications-list">
+    <h3>Lista powiadomień</h3>
+    {% if notifications %}
+    <ol>
+        {% for notification in notifications %}
+        <li>{{ notification }}</li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p>jest pusta</p>
+    {% endif %}
 </div>
-  {% endblock %}
+
+<hr>
+<div class="notifications-preferences">
+    <h3>Ustawienia</h3>
+    <p>Jeśli chcesz wyłączyć powiadomienia mailowe <a href="/notifications/preferences"> >> Preferencje</a></p>
+</div>
+{% endblock %}

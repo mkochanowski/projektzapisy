@@ -142,7 +142,6 @@
                 {% if user.is_authenticated %}
                     <div class="user-panel">
                         <strong>
-                        <a class="notification_ico" href="/notifications"> {{ notification_counter }} </a> |
                         {{ user.get_full_name }}
                         </strong>
                         |
@@ -150,6 +149,7 @@
                         {% if user.is_staff %}
                             <a href="/fereol_admin/">Admin</a> |
                         {% endif %}
+                        <a href="/notifications"> Powiadomienia ({{ notification_counter }}) </a> |
                         {% if user.profile.is_student and user.student.get_number_of_news > 0 %}
                             <a href="{% url 'news-all' %}"
                                class="unread">Aktualności ({{ user.student.get_number_of_news }})</a> |

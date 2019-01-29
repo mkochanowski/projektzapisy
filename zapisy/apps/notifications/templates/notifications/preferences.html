@@ -6,18 +6,13 @@
 <a href="/">Strona główna</a> &raquo; Powiadomienia &raquo; Preferencje
 {% endblock %}
 
-<style>
-
-</style>
-
-
 {% block center %}
-<h1>Powiadomienia</h1>
 
-    Preferencje
-    <form method="post" action="">
+<h2>Preferencje</h2>
+<p>O czym chcesz być informowany mailowo?</p>
+<form method="post" action="">
     {% csrf_token %}
-    <table>
+    <table class="table">
     {{ form.as_table }}
     </table>
     <button type="submit">Wyślij</button>

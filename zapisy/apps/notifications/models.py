@@ -18,12 +18,14 @@ def get_all_users_in_course_groups(course_groups: List[Group]):
 
 class NotificationPreferencesStudent(models.Model):
     user = models.ForeignKey(User, verbose_name='użytkownik', on_delete=models.CASCADE)
-    pulled_from_queue = models.BooleanField(default=True, verbose_name='Dodano do grupy')
-    not_pulled_from_queue = models.BooleanField(default=True, verbose_name='Nie wciągnięto do grupy')
-    added_new_group = models.BooleanField(default=True, verbose_name='Dodano nową grupe')
-    teacher_has_been_changed = models.BooleanField(default=True, verbose_name='Prowadzący zmieniony')
+    pulled_from_queue = models.BooleanField(default=True, verbose_name='Wciągnięcie do grupy')
+    not_pulled_from_queue = models.BooleanField(default=True, verbose_name='Anulowanie wciągnięcia do grupy')
+    added_new_group = models.BooleanField(default=True, verbose_name='Dodanie nowej grupy przedmiotu, na który jesteś '
+                                                                     'zapisany')
+    teacher_has_been_changed = models.BooleanField(default=True, verbose_name='Zmiana prowadzącego grupy z przedmiotu, '
+                                                                              'na który jesteś zapisany')
 
 
 class NotificationPreferencesTeacher(models.Model):
     user = models.ForeignKey(User, verbose_name='użytkownik', on_delete=models.CASCADE)
-    assigned_to_new_group_as_teacher = models.BooleanField(default=True, verbose_name='Przydzielono do grupy')
+    assigned_to_new_group_as_teacher = models.BooleanField(default=True, verbose_name='Przydzielenie do grupy')

@@ -7,11 +7,11 @@ TEACHER_HAS_BEEN_CHANGED = 'teacher_has_been_changed'
 
 mapping = {
     PULLED_FROM_QUEUE: 'Nastąpiło wciągnięcie Cię do grupy przedmiotu {course_name}, gdzie prowadzący to {teacher} a '
-                       'typ grupy {type}',
+                       'typ grupy {type}.',
     NOT_PULLED_FROM_QUEUE: 'Proces wciągania Cię do grupy przedmiotu {course_name}, gdzie prowadzący to {teacher} a '
-                           'typ grupy {type}, został anulowany, ze względu na przekroczenie limitu ECTS',
-    ADDED_NEW_GROUP: 'W przedmiocie {course_name} została dodana grupa prowadzona przez {teacher}',
-    ASSIGNED_TO_NEW_GROUP_AS_A_TEACHER: 'Przydzielono Cię do grupy przedmiotu {course_name} jako prowadzącego',
+                           'typ grupy {type}, został anulowany, ze względu na przekroczenie limitu ECTS.',
+    ADDED_NEW_GROUP: 'W przedmiocie {course_name} została dodana grupa prowadzona przez {teacher}.',
+    ASSIGNED_TO_NEW_GROUP_AS_A_TEACHER: 'Przydzielono Cię do grupy przedmiotu {course_name} jako prowadzącego.',
     TEACHER_HAS_BEEN_CHANGED: 'Nastąpiła zmiana prowadzacego w grupie przedmiotu {course_name}, gdzie typ grupy to '
-                              '{type}, na {teacher},'
+                              '{type}, na {teacher}.'
 }
