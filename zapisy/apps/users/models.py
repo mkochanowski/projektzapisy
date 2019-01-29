@@ -31,6 +31,10 @@ class Related(models.Manager):
         return super(Related, self).get_queryset().select_related('user')
 
 
+def is_user_in_group(user: User, group_name: str) -> bool:
+    return user.groups.filter(name=group_name).exists() if user else False
+
+
 class BaseUser(models.Model):
     """
     User abstract class. For every app user there is entry in django.auth.
@@ -79,15 +83,15 @@ class BaseUser(models.Model):
 
     @staticmethod
     def is_student(user: User) -> bool:
-        if user:
-            return user.groups.filter(name='students').exists()
-        return False
+        return is_user_in_group(user, 'students')
 
     @staticmethod
     def is_employee(user: User) -> bool:
-        if user:
-            return user.groups.filter(name='employees').exists()
-        return False
+        return is_user_in_group(user, 'employees')
+
+    @staticmethod
+    def is_external_contractor(user: User) -> bool:
+        return is_user_in_group(user, 'external_contractors')
 
     def __str__(self) -> str:
         return self.get_full_name()
