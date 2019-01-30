@@ -23,9 +23,8 @@ from apps.enrollment.records.utils import run_rearanged
 
 class GroupInline(admin.TabularInline):
     model = Group
-    exclude = ['teacher']
     extra = 0
-    raw_id_fields = ("teacher",)
+    raw_id_fields = ("teachers",)
 
 
 class CourseForm(forms.ModelForm):
@@ -289,7 +288,7 @@ class GroupAdmin(admin.ModelAdmin):
         'limit',
         'limit_isim',
         'get_terms_as_string')
-    list_filter = ('type', 'course__semester', 'teacher')
+    list_filter = ('type', 'course__semester', 'teachers')
     search_fields = (
         'teacher__user__first_name',
         'teacher__user__last_name',
@@ -299,7 +298,7 @@ class GroupAdmin(admin.ModelAdmin):
         TeachersInline, TermInline, RecordInline, QueuedInline
     ]
 
-    raw_id_fields = ('course', 'teacher')
+    raw_id_fields = ('course', 'teachers')
 
     def response_add(self, request, new_object, post_url_continue='../%s/'):
         obj = self.after_saving_model_and_related_inlines(new_object)

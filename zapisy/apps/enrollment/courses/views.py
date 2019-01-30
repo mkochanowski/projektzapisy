@@ -164,9 +164,9 @@ def course(request, slug):
                     'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s AND records_queue.deleted = false),0)" % (student_id,
                                                                                                                                                                                                              ),
                     'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (Record.STATUS_ENROLLED,
-                                                                                                                                                                                      student_id)}). select_related(
-                'teacher',
-                'teacher__user'))
+                                                                                                                                                                                      student_id)}). prefetch_related(
+                'teachers',
+                'teachers__user'))
 
         # TODO: zrobić sortowanie groups w pythonie po terminach
 
@@ -321,7 +321,7 @@ def course(request, slug):
             currentEcts = student.get_points()
             ectsLimitExceeded = True
 
-        employees = {group.teacher for group in Group.objects.filter(course=course)}
+        employees = {teacher for group in Group.objects.filter(course=course) for teacher in group.teachers.all()}
 
         data.update({
             'details_hidden': courseView_details_hidden,
