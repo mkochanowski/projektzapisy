@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.test import SimpleTestCase
 
 from apps.notifications.datatypes import Notification
@@ -9,7 +7,7 @@ from apps.notifications.serialization import JsonNotificationSerializer
 class NotificationsSerializationTestCase(SimpleTestCase):
 
     def test_json_serialization_is_reversible(self):
-        before = Notification(datetime.now(), 'aaa{foo}bbb', {'foo': 'bar'})
+        before = Notification('aaa{foo}bbb', {'foo': 'bar'})
         serialized = JsonNotificationSerializer().serialize(before)
         after = JsonNotificationSerializer().deserialize(serialized)
 

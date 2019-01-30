@@ -13,8 +13,6 @@ from apps.enrollment.courses.models.group import Group
 
 class NotificationsEmailTestCase(TestCase):
     def test_pulled_from_queue(self):
-        group_types = {"1": "wykład", "2": "ćwiczenia", "3": "pracownia", "5": "ćwiczenio-pracownia",
-                       "6": "seminarium", "7": "lektorat", "8": "WF", "9": "repetytorium", "10": "projekt"}
         student = StudentFactory()
         course = CourseFactory()
         group = GroupFactory(course=course)
@@ -26,7 +24,7 @@ class NotificationsEmailTestCase(TestCase):
             'content': render_description(PULLED_FROM_QUEUE, {
                 "course_name": group.course.information.entity.name,
                 "teacher": group.teacher.user.get_full_name(),
-                "type": group_types[str(group.type)]
+                "type": group.human_readable_type().lower()
             }),
             'greeting': f'Dzień dobry, {student.user.first_name}',
         }
