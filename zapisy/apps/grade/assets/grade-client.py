@@ -180,7 +180,9 @@ class Tickets:
       """
       data = {
           'csrfmiddlewaretoken': self.csrftoken,
-          'ts': json.dumps(list(map(str, self.ts)))
+          'ts': json.dumps(
+              [{'id': id, 'ticket': str(ticket)}
+               for (id, ticket) in zip(self.poll_info, self.ts)])
       }
       headers = {
           'X-Requested-With': 'XMLHttpRequest'
