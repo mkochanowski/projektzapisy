@@ -1,5 +1,3 @@
-from django.test import LiveServerTestCase
-
 from django.contrib.auth.models import User, Group as UserGroup
 from apps.users.models import Employee, Student, PersonalDataConsent
 from apps.enrollment.courses.models.semester import Semester
@@ -9,16 +7,13 @@ from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.term import Term
 from apps.enrollment.courses.models.classroom import Classroom
 from apps.offer.vote.models import SystemState
-from apps.offer.vote.vote_form import VoteFormset
 
 
 import os, re
-from time import sleep
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.db import connection
-from django.core import mail
 
 from django.conf import settings
 from django.contrib.auth.models import User
