@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from django.core import mail
 from django.test import Client
-from gunicorn.config import User
+from django.contrib.auth.models import User
 
 
 class EmailChangeTest(TestCase):
@@ -24,6 +24,6 @@ class EmailChangeTest(TestCase):
         response = self.client.get("/accounts/email/change/")
         self.assertNotEqual(len(re.findall('id_email', str(response.content))), 0)
         current_len = len(mail.outbox)
-        self.client.post("/accounts/email/change/", {"id_email": 'lorem@ipsum.com'},
+        self.client.post("/accounts/email/change/", {"email": 'lorem@ipsum.com'},
                          follow=True)
         self.assertEqual(len(mail.outbox), current_len + 1)
