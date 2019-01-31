@@ -1,5 +1,10 @@
 # projektzapisy Changelog
 
+# Version 31.1.19
+
+* REST API for students votes in offer is introduced to make exporting votes to scheduler easier.
+* Bug in key-generation is fixed, that was probably introduced by upgrading Django to 2.0.
+
 # Version 5.12.18
 
 * Ubuntu upgraded to 18.04.

@@ -4,6 +4,7 @@ from rest_framework import serializers
 from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.semester import Semester
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
+from apps.offer.vote.models import SingleVote, SystemState
 from apps.schedule.models.specialreservation import SpecialReservation
 from apps.users.models import Employee
 
@@ -56,3 +57,33 @@ class SpecialReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecialReservation
         fields = '__all__'
+
+
+class SingleVoteSerializer(serializers.ModelSerializer):
+    """Serializes single student vote.
+
+    Gets correct vote value, course name and student id.
+    """
+    vote_points = serializers.SerializerMethodField()
+    course_name = serializers.CharField(source='entity.name')
+
+    def get_vote_points(self, vote_model):
+        """Getter function for vote_points field."""
+        return max(vote_model.value, vote_model.correction)
+
+    class Meta:
+        model = SingleVote
+        fields = ('student', 'course_name', 'vote_points')
+
+
+class SystemStateSerializer(serializers.ModelSerializer):
+    """Serializes vote system state, get id and friendly name"""
+    state_name = serializers.SerializerMethodField()
+
+    def get_state_name(self, systemstate_model):
+        """Getter function for system state_name field."""
+        return str(systemstate_model)
+
+    class Meta:
+        model = SystemState
+        fields = ('id', 'state_name')
