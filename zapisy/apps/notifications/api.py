@@ -9,7 +9,7 @@ from apps.notifications.tasks import dispatch_notifications_task
 
 def notify_user(user: User, notification: Notification):
     """
-    Notify user about given notification.
+    Dispatch one notification to one user.
     Repository saves notification to redis.
     Then we queue user to send(regarding preferences) all his pending notifications, including this one.
     """
@@ -21,5 +21,8 @@ def notify_user(user: User, notification: Notification):
 
 
 def notify_selected_users(users: List[User], notification: Notification):
+    """
+    Dispatch one notification to multiple users.
+    """
     for user in users:
         notify_user(user, notification)
