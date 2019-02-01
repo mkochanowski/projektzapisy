@@ -290,10 +290,9 @@ class GroupAdmin(admin.ModelAdmin):
         'get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teachers')
     search_fields = (
-        'teacher__user__first_name',
-        'teacher__user__last_name',
+        'teachers__user__first_name',
+        'teachers__user__last_name',
         'course__entity__name')
-    exclude = ['teacher']
     inlines = [
         TeachersInline, TermInline, RecordInline, QueuedInline
     ]
@@ -368,8 +367,8 @@ class GroupAdmin(admin.ModelAdmin):
             ev.type = '3'
             ev.visible = True
             ev.status = '1'
-            if obj.teacher:
-                ev.author_id = obj.teacher.user.id
+            if obj.teachers.count():
+                ev.author_id = obj.teachers.all()[0].user.id
             else:
                 ev.author_id = 1
             ev.save()
@@ -403,8 +402,8 @@ class GroupAdmin(admin.ModelAdmin):
         display those for the currently signed in user.
         """
         qs = super(GroupAdmin, self).get_queryset(request)
-        return qs.select_related('teacher', 'teacher__user', 'course',
-                                 'course__semester').prefetch_related('term')
+        return qs.select_related('course', 'course__semester').prefetch_related(
+                                'term', 'teachers', 'teachers__user')
 
     class Media:
         css = {

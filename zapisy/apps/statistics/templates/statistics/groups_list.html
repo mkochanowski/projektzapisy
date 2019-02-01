@@ -29,7 +29,12 @@
                 </tr>
                 {% for group in course.list|dictsort:'type' %}
                     <tr{% if group.limit < group.enrolled %} class="overlimit"{% elif group.limit == group.enrolled %} class="fulllimit"{% endif %}>
-                        <td>{{ group.teacher.user.get_full_name }}</td>
+                        <td>
+                            {% for teacher in group.teachers.all %}
+                                {{ teacher.user.get_full_name }}
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>{{ group.get_type_display }}</td>
                         <td>{{ group.limit }}</td>
                         <td>{{ group.limit_isim }}</td>

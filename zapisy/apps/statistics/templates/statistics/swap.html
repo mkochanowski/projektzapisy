@@ -19,7 +19,11 @@
                 {% for group in course.groups_items|dictsort:'type' %}
                     {% if group.swaps %}
                     <tr>
-                        <td><a href="{% url 'records-group' group.id %}">{{ group.teacher.user.get_full_name }}</a></td>
+                        <td>
+                            {% for teacher in group.teachers.all %}
+                                <a href="{% url 'records-group' group.id %}">{{ teacher.user.get_full_name }}</a>
+                            {% endfor %}
+                        </td>
                         <td>{{ group.get_type_display }}</td>
                         <td>
                             <table>
