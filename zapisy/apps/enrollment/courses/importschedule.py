@@ -85,12 +85,12 @@ def import_semester_schedule(xmlfile):
         """ This function parses <groups> element """
 
         for el_group in el_groups:
-            el_teacher = el_group.find('teacher')
+            el_teachers = el_group.find('teachers')
 
-            if el_teacher:
-                teacher = get_teacher(el_teacher)
+            if el_teachers:
+                teachers = get_teachers(el_teachers)
             else:
-                teacher = None
+                teachers = []
 
             el_type_text = el_group.find('type').text
 
@@ -114,7 +114,7 @@ def import_semester_schedule(xmlfile):
             limit = el_group.find('limit').text
 
             group = Group.objects.create(course=course,
-                                         teacher=teacher,
+                                         teachers=teachers,
                                          type=gr_type,
                                          limit=limit
                                          )

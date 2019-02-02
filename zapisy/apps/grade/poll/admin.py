@@ -9,7 +9,7 @@ class PollAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PollAdminForm, self).__init__(*args, **kwargs)
         self.fields['group'].queryset = self.fields['group'].queryset.select_related(
-            'course', 'course__entity', 'teacher', 'teacher__user')
+            'course', 'course__entity').prefetch_related('teachers', 'teachers__user')
         self.fields['author'].queryset = self.fields['author'].queryset.select_related('user')
 
 

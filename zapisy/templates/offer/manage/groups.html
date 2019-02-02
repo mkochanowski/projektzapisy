@@ -28,19 +28,24 @@
   {% for group, group_teachers in groups_with_teachers %}
   <tr>
     <td>
-      <strong>{{group.teacher}}</strong>
+      <strong>
+        {% for teacher in group.teachers.all %}
+          {{teacher}}
+          <br>
+        {% endfor %}
+      </strong>
     </td>
     <td>
       <select name="group_{{group.id}}">
         {% if group_teachers == None %}
           {% for teacher in teachers %}
-            <option value="{{teacher.id}}" {% if teacher == group.teacher %}selected="selected"{% endif %}>{{teacher.get_full_name}}</option>
+            <option value="{{teacher.id}}" {% if teacher in group.teachers.all %}selected="selected"{% endif %}>{{teacher.get_full_name}}</option>
           {% endfor %}
         {% else %}
           {% for level, teachers in group_teachers %}
             <optgroup label="{{level}}">
               {% for teacher in teachers %}
-                <option value="{{teacher.id}}" {% if teacher == group.teacher %}selected="selected"{% endif %}>{{teacher.get_full_name}}</option>
+                <option value="{{teacher.id}}" {% if teacher in group.teachers.all %}selected="selected"{% endif %}>{{teacher.get_full_name}}</option>
               {% endfor %}
             </optgroup>
           {% endfor %}

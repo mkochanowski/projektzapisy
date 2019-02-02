@@ -161,8 +161,8 @@
 
                             <li{% if  poll.id == pid %} class="active_poll"{% endif %}><a id="grade-fillable-poll-link-{{ poll.id }}"
                                     
-                                   href="{% url 'grade-poll-poll-results-semester' semester.id 'S' poll.id %}">{{ poll.group.teacher }} - {{ poll.title }}
-
+                                   href="{% url 'grade-poll-poll-results-semester' semester.id 'S' poll.id %}">
+                                   {{  poll.group.teachers.all |join:", " }} - {{ poll.title }}
                             </a></li>
                             {% endfor %}
                         </ul></li>

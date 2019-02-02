@@ -69,13 +69,12 @@ class Term(models.Model):
 
         if employee:
             from apps.enrollment.records.models import Record
-            filtered = filtered.filter(group__teacher=employee)
+            filtered = filtered.filter(group__teachers=employee)
 
         return filtered.select_related('classroom', 'group', 'group__course',
                                        'group__course__semester', 'group__course__entity',
-                                       'group__course__entity__type',
-                                       'group__teacher', 'group__teacher__user').\
-            prefetch_related('classrooms').\
+                                       'group__course__entity__type').\
+            prefetch_related('classrooms', 'group__teachers', 'group__teachers__user').\
             order_by('dayOfWeek', 'start_time').all()
 
     def day_in_zero_base(self):

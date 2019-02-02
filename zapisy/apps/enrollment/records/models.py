@@ -140,8 +140,8 @@ class Record(models.Model):
             TODO: DEPRECATED
         '''
         records = Record.enrolled.filter(student=student).\
-            select_related('group', 'group__course', 'group__teacher',
-                           'group__teacher__user', 'group__term').\
+            select_related('group', 'group__course', 'group__term').\
+            prefetch_related('group__teachers', 'group__teachers__user').\
             order_by('group__course__entity__name')
         groups = [record.group for record in records]
         for group in groups:

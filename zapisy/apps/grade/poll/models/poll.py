@@ -170,9 +170,10 @@ class Poll(models.Model):
             semester=semester,
             deleted=False).select_related(
             'group',
-            'group__course',
-            'group__teacher',
-            'group__teacher__user')
+            'group__course').prefetch_related(
+            'group__teachers',
+            'group__teachers__user'
+            )
 
     @staticmethod
     def get_groups_without_poll():

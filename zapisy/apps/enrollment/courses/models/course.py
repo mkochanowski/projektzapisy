@@ -341,7 +341,7 @@ class CourseEntity(models.Model):
             "exam": self.exam,
             "semester": self.semester,
             "suggested_for_first_year": self.suggested_for_first_year,
-            "teacher": self.owner.id if self.owner else -1,
+            "teachers": [self.owner.id if self.owner else -1],
             "effects": [effect.pk for effect in self.get_all_effects()],
             "tags": [tag.pk for tag in self.get_all_tags()]
         }
@@ -856,9 +856,8 @@ class Course(models.Model):
     def get_student_courses_in_semester(student, semester):
         from apps.enrollment.records.models import Record
 
-        return Record.objects.select_related('group', 'group__teacher', 'group__course',
-                                             'group__course__entity').prefetch_related('group__term',
-                                                                                       'group__term__classrooms').filter(
+        return Record.objects.select_related('group', 'group__course',
+                                             'group__course__entity').prefetch_related('group__term', 'group__term__classrooms').prefetch_related('group__teachers').filter(
             status='1', student=student, group__course__semester=semester). \
             extra(select={'points': f'SELECT value FROM courses_studentpointsview WHERE student_id={student.id} '
                                     f'AND entity_id=courses_course.entity_id'}).order_by(

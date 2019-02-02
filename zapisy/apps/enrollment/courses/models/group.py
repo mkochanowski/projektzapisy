@@ -47,7 +47,7 @@ class StatisticManager(models.Manager):
 
     def in_semester(self, semester):
         return self.get_queryset().filter(course__semester=semester)\
-            .select_related('course', 'teacher', 'teacher__user', 'course__entity')\
+            .select_related('course', 'course__entity').prefetch_related('teachers', 'teachers__user')\
             .order_by('course')\
             .extra(select={
                 'queued': "SELECT COUNT(*) FROM records_queue rq WHERE"
@@ -463,15 +463,13 @@ class Group(models.Model):
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course',
-                           'course__entity__type', 'course__entity', 'course__semester').all()
+            select_related('course','course__entity__type', 'course__entity', 'course__semester').prefetch_related('teachers', 'teachers__user').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course',
-                           'course__entity__type', 'course__entity', 'course__semester').all()
+            select_related('course', 'course__entity__type', 'course__entity', 'course__semester').prefetch_related('teachers', 'teachers__user').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -493,7 +491,7 @@ class Group(models.Model):
     def teacher_in_present(employees, semester):
         teachers = Group.objects.filter(
             course__semester=semester).distinct().values_list(
-            'teacher__pk', flat=True)
+            'teachers__pk', flat=True)
 
         for employee in employees:
             employee.teacher = employee.pk in teachers
@@ -514,11 +512,10 @@ class Group(models.Model):
             'course': self.course_id,
 
             'url': reverse('records-group', args=[self.pk]),
-            'teacher_name': self.teacher and self.teacher.user.get_full_name() or 'nieznany prowadzący',
-            'teacher_url': self.teacher and reverse('employee-profile', args=[self.teacher.user.id]) or '',
-
-            'is_teacher': False if (employee is None or self.teacher is None)
-            else self.teacher.id == employee.id,
+            'teachers_names': self.teachers and (", ").join([teacher.user.get_full_name() for teacher in self.teachers.all()]) or 'nieznany prowadzący',
+            'teacher_url': '',
+            'is_teacher': False if (employee is None or self.teachers is [])
+            else employee.id in [t.user.id for t in self.teachers.all()],
             'is_enrolled': self.id in enrolled,
             'is_queued': self.id in queued,
             'is_pinned': self.id in pinned,
@@ -542,9 +539,8 @@ class Group(models.Model):
             course__semester=semester). select_related(
             'course',
             'course__semester',
-            'course__entity',
-            'teacher',
-            'teacher__user').order_by('course__entity__name')
+            'course__entity'). prefetch_related('teachers',
+            'teachers__user').order_by('course__entity__name')
 
     def __str__(self):
         return "%s: %s - %s" % (str(self.course.entity.get_short_name()),
@@ -571,10 +567,7 @@ def log_add_group(sender, instance, created, **kwargs):
                               '9': 'w', '10': 'p'}
         kod_grupy = group.id
         kod_przed_sem = group.course.id
-        teacher_name_array = (group.teacher and group.teacher.user.get_full_name() or "Nieznany prowadzący").split(" ")
-        kod_uz = teacher_name_array[0]
-        if teacher_name_array[0] != teacher_name_array[-1]:
-            kod_uz += " " + teacher_name_array[-1]
+        kod_uz = group.get_teachers_full_names()
         max_osoby = group.limit
         rodzaj_zajec = GROUP_TYPE_MAPPING[group.type]
         message = '[06] group has been created {}{}{}{}{}'.format(
