@@ -4,5 +4,5 @@ from . import views
 app_name = "notifications"
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^preferences/$', views.FormView, name='pref'),
+    url(r'^preferences/$', views.preferences, name='preferences'),
 ]

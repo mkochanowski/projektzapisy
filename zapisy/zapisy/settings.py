@@ -57,6 +57,7 @@ RQ_QUEUES = {
         'DB': 0,
         'PASSWORD': '',
         'DEFAULT_TIMEOUT': 360,
+        'ASYNC': RUN_ASYNC,
     },
     'dispatch-notifications': {
         'HOST': 'localhost',

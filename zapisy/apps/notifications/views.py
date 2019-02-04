@@ -16,20 +16,18 @@ def index(request):
     if not request.user.is_authenticated:
         return AjaxFailureMessage.auto_render(
             'NotAuthenticated', 'Nie jesteś zalogowany.', request)
-
+    now = datetime.now()
     repo = get_notifications_repository()
-
     notifications = [
         render_description(notification.description_id, notification.description_args)
         for notification in repo.get_all_for_user(request.user)
     ]
-
-    repo.remove_all_older_than(request.user, datetime.now())
+    repo.remove_all_older_than(request.user, now)
 
     return render(request, 'notifications/index.html', {'notifications': notifications})
 
 
-def FormView(request):
+def preferences(request):
     if not request.user.is_authenticated:
         return AjaxFailureMessage.auto_render(
             'NotAuthenticated', 'Nie jesteś zalogowany.', request)

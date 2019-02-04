@@ -1,5 +1,5 @@
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.template.loader import render_to_string
 
 from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
@@ -11,6 +11,7 @@ from apps.notifications.custom_signals import student_pulled
 from apps.enrollment.courses.models.group import Group
 
 
+@override_settings(RUN_ASYNC=False)
 class NotificationsEmailTestCase(TestCase):
     def test_pulled_from_queue(self):
         student = StudentFactory()

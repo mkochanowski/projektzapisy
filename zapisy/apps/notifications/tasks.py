@@ -11,8 +11,8 @@ from apps.users.models import BaseUser
 
 @job('dispatch-notifications')
 def dispatch_notifications_task(user):
-    """
-    Dispatch all pending notifications for the given user.
+    """Dispatch all pending notifications for the given user.
+
     It's purposedly designed around processing all notification_s_
     at a time instead of handling them one by one
     so we can introduce a rate-limit and/or batch them together
