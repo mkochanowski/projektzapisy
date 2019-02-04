@@ -4,9 +4,9 @@ from django.template.loader import render_to_string
 
 from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
 from apps.users.tests.factories import StudentFactory
+from apps.notifications.templates import NotificationType
 from apps.notifications.utils import render_description
 from apps.notifications.custom_signals import student_pulled
-from apps.notifications.templates import PULLED_FROM_QUEUE
 
 from apps.enrollment.courses.models.group import Group
 
@@ -21,7 +21,7 @@ class NotificationsEmailTestCase(TestCase):
         student_pulled.send(sender=Group, instance=group, user=student.user)
 
         ctx = {
-            'content': render_description(PULLED_FROM_QUEUE, {
+            'content': render_description(NotificationType.PULLED_FROM_QUEUE, {
                 "course_name": group.course.information.entity.name,
                 "teacher": group.teacher.user.get_full_name(),
                 "type": group.human_readable_type().lower()
