@@ -244,21 +244,7 @@ def mark_poll_used(user, poll):
     u.save()
 
 
-def ticket_check_and_mark(user, poll):
-    check_poll_visiblity(user, poll)
-    check_ticket_not_signed(user, poll)
-    mark_poll_used(user, poll)
-
-
 def ticket_check_and_sign(user, poll, ticket):
-    check_poll_visiblity(user, poll)
-    check_ticket_not_signed(user, poll)
-    key = PrivateKey.objects.get(poll=poll)
-    signed = key.sign_ticket(ticket)
-    mark_poll_used(user, poll)
-
-
-def ticket_check_and_sign_without_mark(user, poll, ticket):
     check_poll_visiblity(user, poll)
     check_ticket_not_signed(user, poll)
     key = PrivateKey.objects.get(poll=poll)
@@ -266,15 +252,27 @@ def ticket_check_and_sign_without_mark(user, poll, ticket):
     return signed
 
 
-def secure_signer_without_save(user, g, t):
+def get_signing_response(user, poll, signing_request):
     try:
-        return ticket_check_and_sign_without_mark(user, g, t)
+        signed_ticket = ticket_check_and_sign(user, poll, signing_request['ticket'])
+        error_msg = None
     except InvalidPollException:
-        return "Nie jesteś przypisany do tej ankiety",
+        error_msg = "Nie jesteś przypisany do tej ankiety"
     except TicketUsed:
-        return "Bilet już pobrano",
-    except ValueError:
-        return "Niepoprawny format"
+        error_msg = "Bilet już pobrano"
+
+    if error_msg:
+        return {
+            'status': 'ERROR',
+            'message': error_msg,
+            'id': signing_request['id'],
+        }
+    else:
+        return {
+            'status': 'OK',
+            'id': signing_request['id'],
+            'signature': str(signed_ticket),
+        }
 
 
 def match_signing_requests_with_polls(signing_requests, user):
@@ -307,24 +305,6 @@ def validate_signing_requests(signing_requests):
         except ValueError:
             continue
     return res
-
-
-def secure_mark(user, poll):
-    try:
-        return ticket_check_and_mark(user, poll),
-    except InvalidPollException:
-        return "Nie jesteś przypisany do tej ankiety",
-    except TicketUsed:
-        return "Bilet już pobrano",
-
-
-def secure_signer(user, g, t):
-    try:
-        return ticket_check_and_sign(user, g, t),
-    except InvalidPollException:
-        return "Nie jesteś przypisany do tej ankiety",
-    except TicketUsed:
-        return "Bilet już pobrano",
 
 
 def get_valid_tickets(ticket_list):
