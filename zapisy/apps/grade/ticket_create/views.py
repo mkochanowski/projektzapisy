@@ -13,10 +13,9 @@ from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.users.models import BaseUser
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
-from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
-    secure_signer, get_valid_tickets, to_plaintext, secure_signer_without_save, \
-    secure_mark, validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
-    match_signing_requests_with_polls
+from apps.grade.ticket_create.utils import generate_keys_for_polls, group_polls_by_course, \
+    get_valid_tickets, validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
+    match_signing_requests_with_polls, get_signing_response, mark_poll_used
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
@@ -70,12 +69,10 @@ def ajax_sign_tickets(request):
 
     response = []
     for signing_request, poll in matched_requests:
-        signed_ticket = secure_signer_without_save(request.user, poll, signing_request['ticket'])
-        secure_mark(request.user, poll)
-        response.append({
-            'signature': str(signed_ticket),
-            'id': signing_request['id'],
-        })
+        signing_response = get_signing_response(request.user, poll, signing_request)
+        if signing_response['status'] != 'ERROR':
+            mark_poll_used(request.user, poll)
+        response.append(signing_response)
 
     return JsonResponse(response, safe=False)
 
