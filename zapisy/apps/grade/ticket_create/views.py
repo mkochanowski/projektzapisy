@@ -22,8 +22,6 @@ from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
 
 
-# KEYS generate:
-
 @employee_required
 def ajax_keys_generate(request):
     generate_keys_for_polls()
@@ -89,15 +87,9 @@ def ajax_get_rsa_keys_step2(request):
 @student_required
 def tickets_generate(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
-    students_polls = Poll.get_all_polls_for_student(request.user.student)
-    if students_polls:
-        semester = students_polls[0].semester
-    else:
-        semester = None
-    groupped_polls = group_polls_by_course(students_polls)
-    polls_lists, general_polls = Poll.get_polls_list(request.user.student)
-    connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
+        students_polls = Poll.get_all_polls_for_student(request.user.student)
+        polls_lists, general_polls = Poll.get_polls_list(request.user.student)
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
         return render(request, 'grade/ticket_create/tickets_generate.html', data)
     else:
