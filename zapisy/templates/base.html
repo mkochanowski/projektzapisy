@@ -14,7 +14,8 @@
     <meta name="description"
           content="System obsługi cyklu dydaktycznego Instytut Informatyki Uniwersytetu Wrocławskiego">
     <meta name="author" content="KSI i Studenci Instytutu Informatyki Uniwersytetu Wrocławskiego">
-    <script src="{% static "common_chunks.js" %}"></script>
+    {% render_bundle "polyfill" %}
+    {% render_bundle "vendors" %}
     {% render_bundle "main" %}
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
@@ -130,7 +131,11 @@
                         </li>
                     {% endif %}
                     <li{% block events_active %}{% endblock %}>
-                        <a href="{% url 'events:classrooms' %}">Sale</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'events:classrooms' %}">Sale</a>
+                        {% else %}
+                            <a href="{% url 'events:event_show' %}">Sale</a>
+                        {% endif %}
                     </li>
 
                 </ul>

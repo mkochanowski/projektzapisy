@@ -11,14 +11,14 @@ import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+const TerserWebpackPlugin = require("terser-webpack-plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
 
-// Leave one cpu free for the ts type checker
-const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 });
-
-const smp = new SpeedMeasurePlugin();
+// Leave one cpu free for the ts type checker...
+const happyThreadPool = HappyPack.ThreadPool({
+	// ...but make sure we spawn at least one thread
+	size: Math.max(os.cpus().length - 1, 1)
+});
 
 let DEV: boolean;
 switch (process.env.NODE_ENV) {
@@ -163,32 +163,32 @@ const webpackConfig: webpack.Configuration = {
 	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
 	mode: DEV ? "development" : "production",
 	optimization: {
-		// This is only applied if optimization.minimize is true (mode === "development")
+		// This is only applied if optimization.minimize is true (mode === "production")
 		minimizer: [
-			new UglifyJSPlugin({
+			new TerserWebpackPlugin({
 				sourceMap: false,
 				parallel: true,
-				uglifyOptions: {
-					compress: true,
-					output: { comments: false },
-					comments: false,
-					ecma: 5,
+				terserOptions: {
+					parse: { ecma: 8 },
 					mangle: {
 						toplevel: true,
 						eval: true,
 					},
-					hoist_funs: true,
+					output: {
+						comments: false,
+					}
 				},
 			}),
 		],
 		splitChunks: {
 			cacheGroups: {
-			  	commons: {
-					name: "commons",
-					filename: "common_chunks.js",
+				vendors: {
+					test: /node_modules/,
 					chunks: "initial",
-					minChunks: 2
-			  	}
+					name: "vendors",
+					priority: 10,
+					enforce: true
+				}
 			},
 		},
 	},
@@ -241,9 +241,7 @@ const webpackConfig: webpack.Configuration = {
 					),
 					esModule: true,
 					postcss: [
-					  require("autoprefixer")({
-						browsers: ["last 2 versions"]
-					  })
+						require("autoprefixer")({ browsers: ["last 2 versions"] })
 					],
 				},
 			},

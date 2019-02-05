@@ -43,6 +43,14 @@ def cmp(a, b):
     return (a > b) - (b < a)
 
 
+def cmp(x, y):
+    if x < y:
+        return -1
+    if x == y:
+        return 0
+    return 1
+
+
 def poll_cmp(poll1, poll2):
     if poll1.group:
         if poll2.group:
