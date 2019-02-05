@@ -302,7 +302,7 @@ def validate_signing_requests(signing_requests):
                 raise ValueError
             req['ticket'] = ticket_as_int
             res.append(req)
-        except ValueError:
+        except (ValueError, TypeError):
             continue
     return res
 
