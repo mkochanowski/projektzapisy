@@ -14,7 +14,6 @@ from apps.grade.ticket_create.models import PublicKey, \
     PrivateKey, \
     UsedTicketStamp
 from functools import cmp_to_key
-from typing import List
 
 KEY_BITS = 1024
 
@@ -33,15 +32,12 @@ def flatten(x):
     return result
 
 
-def cmp(a, b):
-    """
-    Since there is no cmp in python 3 documentation suggests this expression to
-    emulate the feature
-    :param a:
-    :param b:
-    :return:
-    """
-    return (a > b) - (b < a)
+def cmp(x, y):
+    if x < y:
+        return -1
+    if x == y:
+        return 0
+    return 1
 
 
 def poll_cmp(poll1, poll2):
@@ -345,7 +341,7 @@ def get_poll_info_as_dict(poll):
 def from_plaintext(tickets_plaintext):
     """
     Converts plaintext tickets provided by student to list of (id, (ticket, signature)).
-    id and signature are of type int, and ticket is of type string for compatibility with 
+    id and signature are of type int, and ticket is of type string for compatibility with
     already existing code.
     """
     res = []
