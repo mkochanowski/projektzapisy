@@ -4,7 +4,7 @@ from functools import reduce
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.core.cache import cache
 from django.contrib.auth import authenticate
 from django.utils.safestring import SafeText
@@ -34,15 +34,13 @@ def ajax_keys_progress(request):
     return HttpResponse(str(count))
 
 
+@require_POST
 @student_required
 def ajax_get_rsa_keys_step1(request):
     """
     For each poll student is allowed to vote in, responds with its public key
     and information, such as course name, teachers name.
     """
-    if request.method != 'POST':
-        return HttpResponse('Wrong request')
-
     students_polls = Poll.get_all_polls_for_student(request.user.student)
     response_data = []
     for poll in students_polls:
@@ -54,15 +52,13 @@ def ajax_get_rsa_keys_step1(request):
     return JsonResponse(response_data, safe=False)
 
 
+@require_POST
 @student_required
 def ajax_get_rsa_keys_step2(request):
     """
     Reads tickets sent by the user, signs them and marks them as already
     used, so user cannot sign them twice. Responds with generated signatures.
     """
-    if request.method != 'POST':
-        return HttpResponse('Wrong request')
-
     students_polls = Poll.get_all_polls_for_student(request.user.student)
     try:
         signing_requests = json.loads(request.body.decode('utf-8'))
