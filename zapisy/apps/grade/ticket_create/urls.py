@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^keys_generate$', views.keys_generate, name='grade-ticket-keys-generate'),
 
     # feature do poprawienia w przyszłości
-    url(r'^connections_choice$', views.connections_choice, name='grade-ticket-connections-choice')
+    url(r'^tickets_generate$', views.tickets_generate, name='grade-ticket-tickets-generate')
 ]

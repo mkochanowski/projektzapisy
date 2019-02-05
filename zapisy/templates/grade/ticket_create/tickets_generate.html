@@ -1,14 +1,14 @@
 {% extends "grade/base.html" %}
 {% load compressed %}
 {% block styles %}
-    {% compressed_css 'connectionchoice' %}
+    {% compressed_css 'ticketsgenerate' %}
 {% endblock %}
 
 {% block js %}
-    {% compressed_js 'connectionchoice' %}
+    {% compressed_js 'ticketsgenerate' %}
 {% endblock %}
 
-{% block connection-choice %}active{% endblock %}
+{% block tickets-generate %} class="active"{% endblock %}
 
 {% block main-subtitle %}Pobieranie kluczy{% endblock %}
 
@@ -31,14 +31,14 @@
         {% endif %}
         {% if grade %}
         <div id="progressbar" style="margin-bottom: 10px;"></div>
-    	<div id="grade-connection-choice">
-    	<form method="post" id="connection_choice">{% csrf_token %}
+    	<div id="grade-tickets-generate">
+    	<form method="post" id="tickets_generate">{% csrf_token %}
     	<h2>
     		Pobieranie kluczy do następujących ankiet:
     	</h2>
 
         <h4>Ankiety przypisane do przedmiotu:</h4>
-    	<table id = "grade-connection-choice-form">
+    	<table id = "grade-tickets-generate-form">
             {% for k, poll in polls.items %}
                 <ul>
                     <li><h4><a href="{% url 'course-page' poll.courses.slug %}">{{ poll.courses }}</a></h4>
@@ -64,7 +64,7 @@
             {% endif %}
     	</table>
             {% if general_polls or polls %}
-            <div style="text-align: center"><input id="connection_choice_button" class="btn" type="submit" value="Pobierz klucze"></div>
+            <div style="text-align: center"><input id="tickets_generate_button" class="btn" type="submit" value="Pobierz klucze"></div>
                 {% endif %}
         	</form>
     	</div>

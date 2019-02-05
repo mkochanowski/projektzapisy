@@ -19,7 +19,7 @@ Ticket.create.init = function () {
     Ticket.create.used = false;
     Ticket.create.signing_requests = new Array();
 
-    $("#connection_choice_button").click(function (event) {
+    $("#tickets_generate_button").click(function (event) {
         event.preventDefault();
         if (Ticket.create.used) {
             return false;
