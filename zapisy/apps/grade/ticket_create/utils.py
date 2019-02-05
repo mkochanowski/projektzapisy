@@ -354,58 +354,23 @@ def get_poll_info_as_dict(poll):
     return res
 
 
-# FIXME explanation of ticket parsing code: str(int())
-# The list is split into chunks, some of which are empty, and some of which
-# contain the tickets we want (e.g. ['123123', '', '', 'somecrap', '321321'])
-# The list is iterated until doing int(list[i]) succeeds; at this point
-# it's assumed we've found the key. However, we actually want to return
-# the tickets as strings, not ints.
-# This entire function should be rewritten from scratch
 def from_plaintext(tickets_plaintext):
+    """
+    Converts plaintext tickets provided by student to list of (id, (ticket, signature)).
+    id and signature are of type int, and ticket is of type string for compatibility with 
+    already existing code.
+    """
+    res = []
     pre_tickets = tickets_plaintext.split('----------------------------------')
-    pre_tickets = [[x] for x in pre_tickets]
-    for sign in whitespace:
-        pre_tickets = [flatten(
-            [x.split(sign) for x in ls]) for ls in pre_tickets]
+    for ticket_plaintext in pre_tickets:
+        try:
+            ticket_plaintext = ticket_plaintext.split()
+            id_idx = ticket_plaintext.index('id:')
+            id_ = ticket_plaintext[id_idx + 1]
+            ticket = ticket_plaintext[id_idx + 2]
+            signature = ticket_plaintext[id_idx + 3]
+            res.append((int(id_), (ticket, int(signature))))
+        except (ValueError, IndexError):
+            continue
 
-    convert = False
-    ids_tickets_signed = []
-    for poll_info in pre_tickets:
-        i = 0
-        while i < len(poll_info):
-            if convert:
-                j = i
-                id = -1
-                t = -1
-                st = -1
-                while True:
-                    try:
-                        id = int(poll_info[j])
-                        break
-                    except BaseException:
-                        j += 1
-
-                j += 1
-                while True:
-                    try:
-                        t = str(int(poll_info[j]))
-                        break
-                    except BaseException:
-                        j += 1
-
-                j += 1
-                while True:
-                    try:
-                        st = int(poll_info[j])
-                        break
-                    except BaseException:
-                        j += 1
-
-                i = j + 1
-                convert = False
-                ids_tickets_signed.append((id, (t, st)))
-            elif poll_info[i].startswith('id:'):
-                convert = True
-            i += 1
-
-    return ids_tickets_signed
+    return res
