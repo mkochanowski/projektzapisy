@@ -307,18 +307,6 @@ def validate_signing_requests(signing_requests):
     return res
 
 
-def get_valid_tickets(ticket_list):
-    err = []
-    val = []
-    for group, ticket, st in ticket_list:
-        if st == "Nie jesteś przypisany do tej ankiety" or \
-           st == "Bilet już pobrano":
-            err.append((str(group), st))
-        else:
-            val.append((group, ticket, st))
-    return err, val
-
-
 def to_plaintext(vtl):
     res = ""
     for p, t, st in vtl:
