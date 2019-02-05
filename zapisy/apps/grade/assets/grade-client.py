@@ -135,7 +135,7 @@ class Tickets:
           'X-Requested-With': 'XMLHttpRequest'
       }
 
-      response = self.client.post(self.url+'grade/ticket/ajax_tickets1', data=data, headers=headers)
+      response = self.client.post(self.url+'grade/ticket/ajax_get_keys', data=data, headers=headers)
 
       if response.ok:
          # zwrócone dane to lista obiektów
@@ -178,17 +178,17 @@ class Tickets:
       """
          Wyślij karty w kopertach do podpisania
       """
-      data = {
-          'csrfmiddlewaretoken': self.csrftoken,
-          'ts': json.dumps(
-              [{'id': id, 'ticket': str(ticket)}
-               for (id, ticket) in zip(self.poll_info, self.ts)])
-      }
+      data = [{
+         'id': poll_info['id'],
+         'ticket': str(ticket),
+      } for (poll_info, ticket) in zip(self.poll_info, self.ts)]
+
       headers = {
-          'X-Requested-With': 'XMLHttpRequest'
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-Csrftoken': self.csrftoken,
       }
 
-      response = self.client.post(self.url+'grade/ticket/ajax_tickets2', data=data, headers=headers)
+      response = self.client.post(self.url+'grade/ticket/ajax_sign_tickets', json=data, headers=headers)
 
       if response.ok:
          # zwrócone dane to lista obiektów
