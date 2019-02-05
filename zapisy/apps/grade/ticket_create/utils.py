@@ -295,13 +295,14 @@ def match_signing_requests_with_polls(signing_requests, user):
     return matched_requests
 
 
-def validate_tickets(signing_requests):
+def validate_signing_requests(signing_requests):
     res = []
     for req in signing_requests:
         try:
             ticket_as_int = int(req['ticket'])
             if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
                 raise ValueError
+            req['ticket'] = ticket_as_int
             res.append(req)
         except ValueError:
             continue
