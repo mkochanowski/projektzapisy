@@ -35,7 +35,7 @@ Ticket.create.step1 = function () {
     $("#progressbar").progressbar("option", "value", 10);
     $.ajax({
         type: "POST",
-        url: "/grade/ticket/ajax_tickets1",
+        url: "/grade/ticket/ajax_get_keys",
         dataType: 'json',
         success: Ticket.create.step2
     });
@@ -51,7 +51,7 @@ Ticket.create.step2 = function (data) {
     signing_requests = JSON.stringify(Ticket.create.signing_requests);
     $.ajax({
         type: "POST",
-        url: "/grade/ticket/ajax_tickets2",
+        url: "/grade/ticket/ajax_sign_tickets",
         dataType: 'json',
         data: signing_requests,
         success: Ticket.create.step3
