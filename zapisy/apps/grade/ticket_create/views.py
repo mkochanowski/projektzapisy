@@ -1,23 +1,15 @@
 import json
-from functools import reduce
 
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
-from django.contrib.auth import authenticate
-from django.utils.safestring import SafeText
-
-from apps.grade.ticket_create.models.student_graded import StudentGraded
-from apps.users.models import BaseUser
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
-from apps.grade.ticket_create.utils import generate_keys_for_polls, group_polls_by_course, \
-    get_valid_tickets, validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
+from apps.grade.ticket_create.utils import generate_keys_for_polls, \
+    validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
     match_signing_requests_with_polls, get_signing_response, mark_poll_used
-from apps.grade.ticket_create.models import PublicKey
-from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
 
 
