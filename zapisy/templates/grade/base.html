@@ -14,9 +14,7 @@
     <li class="nav-item {% block grade-info %}{% endblock %}">
         <a class="nav-link" href="{% url 'grade-main' %}">Zasady</a></li>
     {%if user.student and grade %}
-    <li class="nav-item {% block connection-choice %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-ticket-connections-choice' %}">Pobierz klucze</a>
-    </li>
+        <li{% block tickets-generate %}{% endblock %}><a href="{% url 'grade-ticket-tickets-generate' %}">Pobierz klucze</a></li>
     {% endif %}
     {% if grade %}
         <li class="nav-item {% block fill_grade_form %}{% endblock %}">

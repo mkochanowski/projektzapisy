@@ -87,7 +87,7 @@ def ajax_get_rsa_keys_step2(request):
 
 
 @student_required
-def connections_choice(request):
+def tickets_generate(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     students_polls = Poll.get_all_polls_for_student(request.user.student)
     if students_polls:
@@ -99,10 +99,10 @@ def connections_choice(request):
     connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
-        return render(request, 'grade/ticket_create/connection_choice.html', data)
+        return render(request, 'grade/ticket_create/tickets_generate.html', data)
     else:
         messages.error(request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów")
-        return render(request, 'grade/ticket_create/connection_choice.html', {'grade': grade})
+        return render(request, 'grade/ticket_create/tickets_generate.html', {'grade': grade})
 
 
 @employee_required
