@@ -15,7 +15,7 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
     secure_signer, get_valid_tickets, to_plaintext, secure_signer_without_save, \
-    secure_mark, validate_tickets, get_poll_info_as_dict, get_pubkey_as_dict, \
+    secure_mark, validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
     match_signing_requests_with_polls
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
@@ -65,12 +65,12 @@ def ajax_sign_tickets(request):
     except json.decoder.JSONDecodeError:
         return HttpResponse('Wrong request')
 
-    signing_requests = validate_tickets(signing_requests)
+    signing_requests = validate_signing_requests(signing_requests)
     matched_requests = match_signing_requests_with_polls(signing_requests, request.user)
 
     response = []
     for signing_request, poll in matched_requests:
-        signed_ticket = secure_signer_without_save(request.user, poll, int(signing_request['ticket']))
+        signed_ticket = secure_signer_without_save(request.user, poll, signing_request['ticket'])
         secure_mark(request.user, poll)
         response.append({
             'signature': str(signed_ticket),
