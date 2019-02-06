@@ -24,7 +24,9 @@
 
 {% block content %}
 	<div id="od-vote-main">
-		{% if isVoteActive %}
+        {% if max_points == 0 %}
+            <p class="disabled-link">Nie masz punktów do wykorzystania w tym głosowaniu.</p>
+		{% elif isVoteActive %}
 			<h3>Zasady głosowania</h3>
 			<div id="od-vote-main-rules">
 				<ol>
