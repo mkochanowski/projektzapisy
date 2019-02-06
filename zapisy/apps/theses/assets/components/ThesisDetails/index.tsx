@@ -18,7 +18,7 @@ import { Thesis } from "../../thesis";
 import { Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
 import { AppMode } from "../../app_logic/app_mode";
-import { confirmationDialog } from "../helpers";
+import { confirmationDialog, formatTitle } from "../Dialogs";
 
 const ActionButton = React.memo(Button.extend`
 	&:disabled:hover {
@@ -196,7 +196,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		}
 		this.actionInProgress = true;
 		const confirmed = await confirmationDialog({
-			message: `Czy usunąć pracę „${this.props.thesis.title}”?`,
+			message: <>Czy usunąć pracę {formatTitle(this.props.thesis.title)}?</>,
 			yesText: "Tak, usuń",
 			noText: "Nie, wróć",
 		});
@@ -208,8 +208,8 @@ export class ThesisDetails extends React.PureComponent<Props> {
 
 	private async confirmArchiveThesis() {
 		return confirmationDialog({
-			message: `Czy zarchiwizować pracę „${this.props.thesis.title}”? ` +
-			"Dalszej edycji dokonywać będzie mógł wyłącznie administrator systemu.",
+			message: <>Czy zarchiwizować pracę {formatTitle(this.props.thesis.title)}?
+			Dalszej edycji dokonywać będzie mógł wyłącznie administrator systemu.</>,
 			yesText: "Tak, zarchiwizuj",
 			noText: "Nie, wróć",
 		});

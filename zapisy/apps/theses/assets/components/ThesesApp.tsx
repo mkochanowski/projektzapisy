@@ -10,7 +10,6 @@ import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
 import { observer } from "mobx-react";
 import styled from "styled-components";
-import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { withAlert } from "react-alert";
 
@@ -27,7 +26,7 @@ import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { confirmationDialog } from "./helpers";
+import { confirmationDialog, showErrorMessage, formatTitle } from "./Dialogs";
 import { macosifyKeys } from "../utils";
 
 const TopRowContainer = styled.div`
@@ -292,18 +291,12 @@ function errorWithActionName(actionName: string, err: Error) {
 		"Odśwież stronę/sprawdź połączenie sieciowe i spróbuj jeszcze raz. " +
 		"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 	);
-	// This isn't a confirmation message, but that component can also
-	// be used for modal alerts
-	confirmAlert({
-		title: "Błąd",
-		message: msg,
-		buttons: [{ label: "OK" }],
-	});
+	showErrorMessage(msg);
 }
 
 function buildUnsavedConfirmation(title: string) {
 	return title.trim()
-		? `Czy porzucić niezapisane zmiany w pracy „${title}”?`
+		? <>Czy porzucić niezapisane zmiany w pracy {formatTitle(title)}?</>
 		: "Czy porzucić niezapisane zmiany w edytowanej pracy?";
 }
 
