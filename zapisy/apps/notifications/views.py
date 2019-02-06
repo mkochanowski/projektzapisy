@@ -50,9 +50,7 @@ def preferences(request):
 
 
 def create_form(request):
-    """
-        It is not a view itself, just factory for preferences and preferences_save
-    """
+    """It is not a view itself, just factory for preferences and preferences_save"""
     if BaseUser.is_employee(request.user):
         instance, created = NotificationPreferencesTeacher.objects.get_or_create(user=request.user)
         if request.method == 'POST':
