@@ -9,6 +9,11 @@ from apps.users.models import BaseUser, Employee, Student, is_user_in_group
 THESIS_BOARD_GROUP_NAME = "Komisja prac dyplomowych"
 
 
+def is_student(user: BaseUser) -> bool:
+    """Determine if the specified user is a student"""
+    return get_user_type(user) == ThesisUserType.STUDENT
+
+
 def is_theses_board_member(user: BaseUser) -> bool:
     """Is the specified user a member of the theses board?"""
     return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)

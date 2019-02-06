@@ -18,7 +18,8 @@ from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .users import (
     wrap_user, get_theses_board, get_user_type,
-    get_theses_user_full_name, ThesisUserType
+    get_theses_user_full_name, ThesisUserType,
+    is_student
 )
 
 """Names of processing parameters in query strings"""
@@ -138,6 +139,7 @@ def filter_queryset(
 ) -> QuerySet:
     """Filter the specified theses queryset based on the passed conditions"""
     result = filter_theses_queryset_for_type(qs, thesis_type)
+    result = filter_theses_queryset_for_user(qs, user)
     if only_mine:
         result = filter_theses_queryset_for_only_mine(result, user)
     if title:
@@ -228,6 +230,21 @@ def filter_theses_queryset_for_only_mine(qs: QuerySet, user: BaseUser):
         return qs.filter(Q(student=user) | Q(student_2=user))
     return qs.filter(Q(advisor=user) | Q(auxiliary_advisor=user))
 
+
+NOT_READY_STATUSES = (
+    ThesisStatus.BEING_EVALUATED.value,
+    ThesisStatus.RETURNED_FOR_CORRECTIONS.value
+)
+
+
+def filter_theses_queryset_for_user(qs: QuerySet, user: BaseUser):
+    """Filter the queryset based on special logic depending
+    on the type of the user
+    """
+    # Students should not see theses that are not "ready" yet
+    if is_student(user):
+        return qs.exclude(status__in=NOT_READY_STATUSES)
+    return qs
 
 class ThesesBoardViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
