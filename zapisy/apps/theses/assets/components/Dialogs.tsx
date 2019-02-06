@@ -3,6 +3,8 @@ import { confirmAlert } from "react-confirm-alert";
 import styled from "styled-components";
 import * as Mousetrap from "mousetrap";
 
+import "./dialog_styles.less";
+
 const DialogContainer = styled.div`
 	font-family: Arial, Helvetica, sans-serif;
 	width: 400px;
@@ -13,8 +15,9 @@ const DialogContainer = styled.div`
 	box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
 	color: #666;
 
-	& > h1 {
-		margin-top: 0;
+	& > h2 {
+		margin-top: -10px;
+		margin-bottom: 15px;
 	}
 `;
 
@@ -35,7 +38,7 @@ const DangerButton = styled(BaseButton)`
 	}
 `;
 
-const ConfirmButton = styled(BaseButton)`
+const SafeButton = styled(BaseButton)`
 	color: #6f6f6f;
 	&:hover {
 		color: #6f6f6f;
@@ -43,23 +46,35 @@ const ConfirmButton = styled(BaseButton)`
 	}
 `;
 
+const ConfirmButton = styled(BaseButton)`
+	color: #fff;
+	background-color: #337ab7;
+	border-color: #2e6da4;
+	font-size: 14px;
+	min-width: 100px;
+	&:hover {
+		color: #fff;
+		filter: brightness(1.1);
+	}
+`;
+
 const Buttons = styled.div`
 	margin-top: 20px;
 `;
 
-export type ConfirmationDialogProps = {
+export type ConfirmationProps = {
 	title?: string;
 	message: string | JSX.Element;
 	yesText: string;
 	noText: string;
 };
 
-type CustomDialogUIProps = ConfirmationDialogProps & {
+type ConfirmDialogUIProps = ConfirmationProps & {
 	closeUI: () => void;
 	resolve: (r: boolean) => void;
 };
 
-class ConfirmDialogUI extends React.PureComponent<CustomDialogUIProps> {
+class ConfirmDialogUI extends React.PureComponent<ConfirmDialogUIProps> {
 	public componentDidMount() {
 		Mousetrap.bindGlobal("enter", this.onYes);
 		Mousetrap.bindGlobal("esc", this.onNo);
@@ -80,11 +95,12 @@ class ConfirmDialogUI extends React.PureComponent<CustomDialogUIProps> {
 	public render() {
 		const { props } = this;
 		return <DialogContainer>
+			{props.title ? <h2>{props.title}</h2> : null}
 			{props.message}
 			<Buttons>
-				<ConfirmButton type="button" className="btn" onClick={this.onNo}>
+				<SafeButton type="button" className="btn" onClick={this.onNo}>
 					{props.noText}
-				</ConfirmButton>
+				</SafeButton>
 				<DangerButton type="button" className="btn" onClick={this.onYes}>
 					{props.yesText}
 				</DangerButton>
@@ -97,7 +113,7 @@ class ConfirmDialogUI extends React.PureComponent<CustomDialogUIProps> {
  * Displays a confirmation dialog with the given parameters.
  * @returns A promise that resolves to the user's choice
  */
-export function confirmationDialog(props: ConfirmationDialogProps): Promise<boolean> {
+export function confirmationDialog(props: ConfirmationProps): Promise<boolean> {
 	return new Promise((resolve) => {
 		confirmAlert({
 			title: "",
@@ -113,11 +129,59 @@ export function confirmationDialog(props: ConfirmationDialogProps): Promise<bool
 	});
 }
 
-export function showErrorMessage(msg: string) {
+export type MessageProps = {
+	title?: string;
+	message: string | JSX.Element;
+	buttonText?: string;
+};
+
+type MessageDialogUIProps = MessageProps & {
+	closeUI: () => void;
+};
+
+const OkButtonContainer = styled(Buttons)`
+	width: 100%;
+	text-align: center;
+`;
+
+class MessageDialogUI extends React.PureComponent<MessageDialogUIProps> {
+	public componentDidMount() {
+		Mousetrap.bindGlobal(["enter", "esc"], this.close);
+	}
+	public componentWillUnmount() {
+		Mousetrap.unbindGlobal(["enter", "esc"]);
+	}
+
+	private close = () => {
+		this.props.closeUI();
+	}
+
+	public render() {
+		const { props } = this;
+		return <DialogContainer>
+			{props.title ? <h2>{props.title}</h2> : null}
+			{props.message}
+			<OkButtonContainer>
+				<ConfirmButton type="button" className="btn" onClick={this.close}>
+					{props.buttonText}
+				</ConfirmButton>
+			</OkButtonContainer>
+		</DialogContainer>;
+	}
+}
+
+export function showErrorMessage(props: MessageProps) {
 	confirmAlert({
-		title: "Błąd",
-		message: msg,
-		buttons: [{ label: "OK" }],
+		message: "",
+		title: "",
+		customUI: ({ onClose }: any) => (
+			<MessageDialogUI
+				closeUI={onClose}
+				title={props.title || "Błąd"}
+				message={props.message}
+				buttonText={props.buttonText || "OK"}
+			/>
+		)
 	});
 }
 

@@ -286,12 +286,12 @@ class ThesesAppInternal extends React.Component<Props, State> {
 }
 
 function errorWithActionName(actionName: string, err: Error) {
-	const msg = (
+	const message = (
 		`Nie udało się ${actionName} pracy (${err}). ` +
 		"Odśwież stronę/sprawdź połączenie sieciowe i spróbuj jeszcze raz. " +
 		"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 	);
-	showErrorMessage(msg);
+	showErrorMessage({ message });
 }
 
 function buildUnsavedConfirmation(title: string) {
