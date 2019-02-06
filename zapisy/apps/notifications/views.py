@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.shortcuts import render
 from django.contrib import messages
-
+from django.shortcuts import redirect
 from apps.users.models import BaseUser
 from apps.notifications.forms import PreferencesFormStudent, PreferencesFormTeacher
 from apps.notifications.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
@@ -27,34 +27,36 @@ def index(request):
     return render(request, 'notifications/index.html', {'notifications': notifications})
 
 
-def preferences(request):
-    if not request.user.is_authenticated:
-        return AjaxFailureMessage.auto_render(
-            'NotAuthenticated', 'Nie jesteś zalogowany.', request)
-
+def save(request):
     if request.method == "POST":
-        form = create_form(request)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.save()
-            return render(request, 'notifications/preferences.html', {'form': form})
+        if BaseUser.is_employee(request.user):
+            instance, created = NotificationPreferencesTeacher.objects.get_or_create(user=request.user)
+            form = PreferencesFormTeacher(request.POST, instance=instance)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.save()
+                return redirect('/notifications/preferences')
+            else:
+                messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
         else:
-            messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
-    else:
-        form = create_form(request)
-
-    return render(request, 'notifications/preferences.html', {'form': form})
+            instance, created = NotificationPreferencesStudent.objects.get_or_create(user=request.user)
+            form = PreferencesFormStudent(request.POST, instance=instance)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.save()
+                return redirect('/notifications/preferences')
+            else:
+                messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
 
 
 def create_form(request):
     if BaseUser.is_employee(request.user):
         instance, created = NotificationPreferencesTeacher.objects.get_or_create(user=request.user)
-        if request.method == 'POST':
-            return PreferencesFormTeacher(request.POST, instance=instance)
-        return PreferencesFormTeacher(instance=instance)
+        form = PreferencesFormTeacher(instance=instance)
+        return render(request, 'notifications/preferences.html', {'form': form})
 
     instance, created = NotificationPreferencesStudent.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        return PreferencesFormStudent(request.POST, instance=instance)
-    return PreferencesFormStudent(instance=instance)
+    form = PreferencesFormStudent(instance=instance)
+    return render(request, 'notifications/preferences.html', {'form': form})

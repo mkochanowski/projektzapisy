@@ -10,7 +10,7 @@
 
 <h2>Preferencje</h2>
 <p>O czym chcesz być informowany mailowo?</p>
-<form method="post" action="">
+<form method="POST" action="{% url 'notifications:save' %}">
     {% csrf_token %}
     <table class="table">
     {{ form.as_table }}
