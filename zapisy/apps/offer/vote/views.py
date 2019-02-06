@@ -61,9 +61,10 @@ def vote_main(request):
         Vote main page
     """
     system_state = SystemState.get_state()
+    vote_beg = "Nieustalone" if system_state.vote_beg is None else system_state.vote_beg.strftime("%H:%M %d.%m.%Y")
+    vote_end = "Nieustalone" if system_state.vote_end is None else system_state.vote_end.strftime("%H:%M %d.%m.%Y")
     data = {'isVoteActive': system_state.is_system_active(), 'max_points': system_state.max_points,
-            'semester': Semester.get_current_semester(), 'vote_beg': system_state.vote_beg.strftime("%H:%M %d.%m.%Y"),
-            'vote_end': system_state.vote_end.strftime("%H:%M %d.%m.%Y")}
+            'semester': Semester.get_current_semester(), 'vote_beg': vote_beg, 'vote_end': vote_end}
     return render(request, 'offer/vote/index.html', data)
 
 
