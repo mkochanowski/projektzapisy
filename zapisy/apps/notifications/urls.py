@@ -4,6 +4,6 @@ from . import views
 app_name = "notifications"
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^preferences/$', views.create_form, name='preferences'),
-    url(r'^preferences/save$', views.save, name='save'),
+    url(r'^preferences/$', views.preferences, name='preferences'),
+    url(r'^preferences/save$', views.preferences_save, name='save'),
 ]
