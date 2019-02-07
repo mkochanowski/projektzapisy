@@ -44,8 +44,7 @@ class Tickets:
     """
        Główna logika generowania kluczy do głosowania
     """
-    # url = 'https://zapisy.ii.uni.wroc.pl/'
-    url = 'http://localhost:8002/'
+    url = 'https://zapisy.ii.uni.wroc.pl/'
     template = "[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n" + \
         ('-' * 34) + " \n"
 
