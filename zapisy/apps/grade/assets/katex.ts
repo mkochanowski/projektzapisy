@@ -2,7 +2,6 @@ import "katex/dist/katex.css";
 import "./katex.less";
 
 import renderMathInElement from "katex/dist/contrib/auto-render";
-// import { whenDomLoaded } from "common/utils";
 
 type UnconstrainedFunction = (...args: any[]) => any;
 export function whenDomLoaded(fn: UnconstrainedFunction): void {
