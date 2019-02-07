@@ -26,8 +26,10 @@ import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { confirmationDialog, showErrorMessage, formatTitle } from "./Dialogs";
 import { macosifyKeys } from "../utils";
+import { confirmationDialog } from "./Dialogs/ConfirmationDialog";
+import { showErrorMessage } from "./Dialogs/MessageDialog";
+import { formatTitle } from "./util";
 
 const TopRowContainer = styled.div`
 	display: flex;

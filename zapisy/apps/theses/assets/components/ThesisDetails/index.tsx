@@ -18,7 +18,8 @@ import { Thesis } from "../../thesis";
 import { Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
 import { AppMode } from "../../app_logic/app_mode";
-import { confirmationDialog, formatTitle } from "../Dialogs";
+import { confirmationDialog } from "../Dialogs/ConfirmationDialog";
+import { formatTitle } from "../util";
 
 const ActionButton = React.memo(Button.extend`
 	&:disabled:hover {
@@ -27,7 +28,7 @@ const ActionButton = React.memo(Button.extend`
 	&:disabled {
 		color: grey;
 		cursor: default;
-	}
+	}../Dialogs/Dialogs
 	min-height: initial;
 	height: 25px;
 `);
