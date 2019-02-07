@@ -1,11 +1,8 @@
 {% extends "grade/base.html" %}
-{% load compressed %}
-{% block styles %}
-    {% compressed_css 'ticketsgenerate' %}
-{% endblock %}
+{% load render_bundle from webpack_loader %}
 
-{% block js %}
-    {% compressed_js 'ticketsgenerate' %}
+{% block js %}{{ block.super }}
+    {% render_bundle "grade-ticketsgenerate" %}
 {% endblock %}
 
 {% block tickets-generate %} class="active"{% endblock %}
