@@ -57,14 +57,16 @@ class SystemState(models.Model):
 
     vote_beg = models.DateField(
         verbose_name='Początek głosowania',
-        default=get_default_vote_beg)
+        default=get_default_vote_beg,
+        null=True)
 
     def get_default_vote_end():
         return DEFAULT_VOTE_END
 
     vote_end = models.DateField(
         verbose_name='Koniec głosowania',
-        default=get_default_vote_end)
+        default=get_default_vote_end,
+        null=True)
 
     def get_default_correction_beg():
         return DEFAULT_CORRECTION_BEG
