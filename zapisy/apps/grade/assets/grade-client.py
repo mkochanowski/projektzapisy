@@ -154,7 +154,7 @@ class Tickets:
 
             poll = dict()
             self.data[data['poll_info']['id']] = poll
-            poll['public_keys'] = {'n': n, 'e': e}
+            poll['public_key'] = {'n': n, 'e': e}
             poll['poll_info'] = data['poll_info']
 
             bits = 1 if n == 0 else int(log(n, 2)) + 1
@@ -165,13 +165,13 @@ class Tickets:
                 k = rand(bits)
                 condition = k > n or m > n or gcd(k, n) != 1
 
-            poll['ks'] = k
-            poll['ms'] = m
+            poll['k'] = k
+            poll['m'] = m
             m_sha256 = int(sha256(str(m).encode('ascii')).hexdigest(), 16)
             k_pow_e = pow(k, e, n)
             t = (m_sha256 * k_pow_e) % n
 
-            poll['ts'] = t
+            poll['t'] = t
 
         self.poll_data = None
 
@@ -181,7 +181,7 @@ class Tickets:
         """
         data = [{
             'id': id,
-            'ticket': str(poll['ts']),
+            'ticket': str(poll['t']),
         } for id, poll in self.data.items()]
 
         headers = {
@@ -217,9 +217,9 @@ class Tickets:
             id = data['id']
             if data['status'] == 'OK':
                 st = int(data['signature'])
-                public_key = self.data[id]['public_keys']
-                rk = modinv(self.data[id]['ks'], public_key['n'])
-                self.data[id]['signed_tickets'] = (st * rk) % public_key['n']
+                public_key = self.data[id]['public_key']
+                rk = modinv(self.data[id]['k'], public_key['n'])
+                self.data[id]['s'] = (st * rk) % public_key['n']
             else:
                 self.backup_file.write("Błąd id: {id} \t| {message}\n".format(**data))
                 del self.data[id]
@@ -237,8 +237,8 @@ class Tickets:
                         '{course_name} \n{type}: {teacher_name}'.format(
                             **poll['poll_info']),
                 'id': id,
-                'ticket': str(poll['ms']),
-                'signed_ticket': poll['signed_tickets'],
+                'ticket': str(poll['m']),
+                'signed_ticket': poll['s'],
             }
             self.out_file.write(self.template.format(**data))
 
