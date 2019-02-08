@@ -53,13 +53,8 @@ class Tickets:
         self.client = requests.session()
         self.loggedin = False
         self.poll_data = None
-        self.public_keys = []
-        self.poll_info = []
-        self.ks = []
-        self.ms = []
-        self.ts = []
+        self.data = dict()
         self.signed_blind_tickets = None
-        self.signed_tickets = []
         self.out_file = out_file
         self.backup_file = backup_file
 
@@ -157,8 +152,10 @@ class Tickets:
             n = int(data['key']['n'])
             e = int(data['key']['e'])
 
-            self.public_keys.append({'n': n, 'e': e})
-            self.poll_info.append(data['poll_info'])
+            poll = dict()
+            self.data[data['poll_info']['id']] = poll
+            poll['public_keys'] = {'n': n, 'e': e}
+            poll['poll_info'] = data['poll_info']
 
             bits = 1 if n == 0 else int(log(n, 2)) + 1
 
@@ -168,13 +165,13 @@ class Tickets:
                 k = rand(bits)
                 condition = k > n or m > n or gcd(k, n) != 1
 
-            self.ks.append(k)
-            self.ms.append(m)
+            poll['ks'] = k
+            poll['ms'] = m
             m_sha256 = int(sha256(str(m).encode('ascii')).hexdigest(), 16)
             k_pow_e = pow(k, e, n)
             t = (m_sha256 * k_pow_e) % n
 
-            self.ts.append(t)
+            poll['ts'] = t
 
         self.poll_data = None
 
@@ -183,9 +180,9 @@ class Tickets:
            Wyślij karty w kopertach do podpisania
         """
         data = [{
-            'id': poll_info['id'],
-            'ticket': str(ticket),
-        } for (poll_info, ticket) in zip(self.poll_info, self.ts)]
+            'id': id,
+            'ticket': str(poll['ts']),
+        } for id, poll in self.data.items()]
 
         headers = {
             'X-Requested-With': 'XMLHttpRequest',
@@ -197,9 +194,15 @@ class Tickets:
 
         if response.ok:
             # zwrócone dane to lista obiektów
-            # [{'signature': string }]
-            # wartość 'signature' to informacja o błędzie
-            # lub podpisana karta w kopercie
+            # [{
+            #    'status': 'OK'|'ERROR',
+            #    'id': identifier,
+            #    'message'|'signature': string,
+            # }]
+            # wartość 'message' to informacja o błędzie
+            # obecna gdy status to 'ERROR'
+            # wartość 'signature' to podpisana karta w kopercie
+            # obecna gdy status to 'OK'
             self.signed_blind_tickets = response.json()
             # karty można podpisać tylko raz
             # dlatego nie przetworzoną odpowiedź należy zapisać
@@ -210,18 +213,16 @@ class Tickets:
         """
            Wyjęcie podpisanych kart z kopert
         """
-        error_msgs = [
-            'Nie jesteś przypisany do tej ankiety',
-            'Bilet już pobrano',
-        ]
-        for index, data in enumerate(self.signed_blind_tickets):
-            if data['signature'] in error_msgs:
-                self.signed_tickets.append(data['signature'])
-            else:
+        for data in self.signed_blind_tickets:
+            id = data['id']
+            if data['status'] == 'OK':
                 st = int(data['signature'])
-                public_key = self.public_keys[index]
-                rk = modinv(self.ks[index], public_key['n'])
-                self.signed_tickets.append((st * rk) % public_key['n'])
+                public_key = self.data[id]['public_keys']
+                rk = modinv(self.data[id]['ks'], public_key['n'])
+                self.data[id]['signed_tickets'] = (st * rk) % public_key['n']
+            else:
+                self.backup_file.write("Błąd id: {id} \t| {message}\n".format(**data))
+                del self.data[id]
 
         self.signed_blind_tickets = None
 
@@ -229,15 +230,15 @@ class Tickets:
         """
            Zapisanie kopert w ustalonym formacie
         """
-        for poll_info, ticket, signed_ticket in zip(self.poll_info, self.ms, self.signed_tickets):
+        for id, poll in self.data.items():
             data = {
-                'title': poll_info['title'],
-                'name': 'Ankieta ogólna ' if not poll_info.get('course_name', False) else
+                'title': poll['poll_info']['title'],
+                'name': 'Ankieta ogólna ' if not poll['poll_info'].get('course_name', False) else
                         '{course_name} \n{type}: {teacher_name}'.format(
-                            **poll_info),
-                'id': poll_info['id'],
-                'ticket': str(ticket),
-                'signed_ticket': signed_ticket
+                            **poll['poll_info']),
+                'id': id,
+                'ticket': str(poll['ms']),
+                'signed_ticket': poll['signed_tickets'],
             }
             self.out_file.write(self.template.format(**data))
 
