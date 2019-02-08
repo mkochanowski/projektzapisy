@@ -20,6 +20,7 @@ var hasWideChar = function(str) {
     return false;
 };
 
+
 /* ==================================================== */
 /* ======= modified copy of wrapper.js ================ */
 /* ==================================================== */
@@ -33,6 +34,7 @@ var forge_sha256 = function(str) {
         hasWideChar(str)?'utf8':undefined);
     return o.digest().toHex();
 };
+
 
 
 var TicketCreate = function() {
@@ -59,21 +61,21 @@ var TicketCreate = function() {
         });
     };
 
-    this.unblinds_generator = that => ((_index, signing_request_response) => {
+    this.unblinds_generator = (that => ((_index, signing_request_response) => {
         var signature = str2bigInt(signing_request_response.signature, 10);
         var pubkey = that.pubkeys_dict[signing_request_response.id];
         var n = pubkey.n;
         var k_inverse = inverseMod(that.k_dict[signing_request_response.id], n);
         that.unblindst_array.push(bigInt2str(multMod(signature, k_inverse, n), 10));
         that.unblindt_array.push(bigInt2str(that.m_dict[signing_request_response.id], 10));
-    });
+    }))(this);
 
     // This is where core of our crypto happens
     // m and k are generated randomly with exactly same bit length as n,
     // then the ticket is computed as SHA256(m) * k^e mod n
     // SHA256(m) means that we convert int m to string with base 10,
     // compute SHA256 of it, and then convert it back to int
-    this.tickets_generator = that => ((_index, poll_data) => {
+    this.tickets_generator = (that => ((_index, poll_data) => {
         var n = str2bigInt(poll_data.key.n, 10, 10);
         var e = str2bigInt(poll_data.key.e, 10, 10);
         that.pubkeys_dict[poll_data.poll_info.id] = {
@@ -100,7 +102,7 @@ var TicketCreate = function() {
             id: poll_data.poll_info.id,
             ticket: bigInt2str(t, 10)
         });
-    });
+    }))(this);
 
     this.to_plaintext = function() {
         var res = '';
@@ -134,16 +136,16 @@ var TicketCreate = function() {
             processData: false,
             contentType: false,
             data: new FormData(document.getElementById("tickets_generate")),
-            success: this.step2(this)
+            success: this.step2
         });
        return false;
     };
 
     // Once we have the public keys, use them to generate
     // tickets, then send them to the server for signing
-    this.step2 = that => (data => {
+    this.step2 = (that => (data => {
         $("#progressbar").progressbar("option", "value", 30);
-        $.each(data, that.tickets_generator(that));
+        $.each(data, that.tickets_generator);
 
         let signing_requests = JSON.stringify(that.signing_requests);
         $.ajax({
@@ -153,10 +155,9 @@ var TicketCreate = function() {
             headers: {'X-Csrftoken': document.cookie.match(
                 new RegExp('(^| )csrftoken=([^;]+)'))[2]},
             data: signing_requests,
-            success: that.step3(that),
-            error: () => {alert("error");}
+            success: that.step3,
         });
-    });
+    }))(this);
 
     // The server signed our generated tickets and sent
     // them to us; Now we unblind the signed ticket by
@@ -164,9 +165,9 @@ var TicketCreate = function() {
     // ticket and its signature to the server to do
     // rendering for us(this should be done client side)
 
-    this.step3 = that => ((signing_request_responses) => {
+    this.step3 = (that => ((signing_request_responses) => {
         $("#progressbar").progressbar("option", "value", 70);
-        $.each(signing_request_responses, that.unblinds_generator(that));
+        $.each(signing_request_responses, that.unblinds_generator);
 
         $('#pregen').css('display', 'none');
         $('#postgen').css('display', '');
@@ -181,10 +182,8 @@ var TicketCreate = function() {
             document.execCommand('copy');
             sel.removeAllRanges();
         });
-    });
+    }))(this);
 };
-
-
 
 
 $(document).ready(() => {
