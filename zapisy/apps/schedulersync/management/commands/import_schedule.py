@@ -180,13 +180,11 @@ class Command(BaseCommand):
                 if data['group_type'] == '1':
                     # The lecture always has a single group but possibly many terms
                     group = Group.objects.get_or_create(course=course,
-                                                        teacher=data['teacher'],
                                                         teachers=data['teachers'],
                                                         type=data['group_type'],
                                                         limit=data['limit'])[0]
                 else:
                     group = Group.objects.create(course=course,
-                                                 teacher=data['teacher'],
                                                  teachers=data['teachers'],
                                                  type=data['group_type'],
                                                  limit=data['limit'])
@@ -202,8 +200,8 @@ class Command(BaseCommand):
                                                  .format(data['id'])))
             self.stdout.write(self.style.SUCCESS('  time: {}-{}'
                                                  .format(data['start_time'], data['end_time'])))
-            self.stdout.write(self.style.SUCCESS('  teacher: {}'
-                                                 .format(data['teacher'])))
+            self.stdout.write(self.style.SUCCESS('  teachers: {}'
+                                                 .format(data['teachers'])))
             self.stdout.write(self.style.SUCCESS('  classrooms: {}\n'
                                                  .format(data['classrooms'])))
             self.created_terms += 1
@@ -214,15 +212,12 @@ class Command(BaseCommand):
                      if getattr(term, k) != data[k]]
             if term.group.type != data['group_type']:
                 diffs.append(('type', (term.group.type, data['group_type'])))
-            if term.group.teacher != data['teacher']:
-                diffs.append(('teacher', (term.group.teacher, data['teacher'])))
             if term.group.teachers != data['teachers']:
                 diffs.append(('teachers', (term.group.teachers, data['teachers'])))
             term.dayOfWeek = data['dayOfWeek']
             term.start_time = data['start_time']
             term.end_time = data['end_time']
             term.group.type = data['group_type']
-            term.group.teacher = data['teacher']
             term.group.teachers = data['teachers']
             if set(term.classrooms.all()) != set(data['classrooms']):
                 diffs.append(('classroom', (set(term.classrooms.all()), set(data['classrooms']))))
@@ -254,7 +249,6 @@ class Command(BaseCommand):
             'id': g['id'],
             'entity_name': g['extra']['course'],
             'group_type': GROUP_TYPES[g['extra']['group_type']],
-            'teacher': self.get_employee(g['teachers'][0]),
             'teachers': [self.get_employee(x) for x in g['teachers'] if self.get_employee(x) is not None]
         }
 
@@ -352,8 +346,8 @@ class Command(BaseCommand):
     def prepare_slack_message(self):
         attachments = []
         for term in self.all_creations:
-            text = "day: {}\nstart_time: {}\nend_time: {}\nteacher: {}".format(
-                term.dayOfWeek, term.start_time, term.end_time, term.group.teacher
+            text = "day: {}\nstart_time: {}\nend_time: {}\nteachers: {}".format(
+                term.dayOfWeek, term.start_time, term.end_time, term.group.teachers
             )
             attachment = {
                 "color": "good",
