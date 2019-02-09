@@ -92,7 +92,15 @@ class GroupFactory(DjangoModelFactory):
     course = factory.SubFactory(CourseFactory)
     type = 2
     limit = 10
-    teachers = [factory.SubFactory(EmployeeFactory)]
+
+    @factory.post_generation
+    def teachers(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for employee in extracted:
+                self.teachers.add(employee)
 
 
 class ChangedDayForFridayFactory(DjangoModelFactory):

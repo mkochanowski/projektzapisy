@@ -604,7 +604,8 @@ class EventTestCase(TestCase):
 
     def test_get_followers_when_type_exam_or_test(self):
         students = StudentFactory.create_batch(random.randint(10, 20))
-        group = enrollment_factories.GroupFactory()
+        teachers = EmployeeFactory.create_batch(random.randint(0, 2))
+        group = enrollment_factories.GroupFactory(teachers=teachers)
         for student in students:
             RecordFactory(student=student, group=group, status=Record.STATUS_ENROLLED)
         users = [student.user for student in students]
