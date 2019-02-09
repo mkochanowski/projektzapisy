@@ -126,9 +126,10 @@ def prepare_data(request, slug):
         for poll in Poll.objects.filter(
                 pk__in=polls_id).select_related(
                 'group',
-                'group__course',
-                'group__teacher',
-                'group__teacher__user'):
+                'group__course').prefetch_related(
+                'group__teachers',
+                'group__teachers__user'
+                ):
             dict[poll.pk] = poll
 
         data['polls'] = [((x_s_l7[0][0], x_s_l7[0][1]), slug == x_s_l7[0][1], [(id_t_st2[0], id_t_st2[1],
@@ -142,9 +143,10 @@ def prepare_data(request, slug):
         for poll in Poll.objects.filter(
                 pk__in=finished_id).select_related(
                 'group',
-                'group__course',
-                'group__teacher',
-                'group__teacher__user'):
+                'group__course').prefetch_related(
+                'group__teachers',
+                'group__teachers__user'
+                ):
             dict[poll.pk] = poll
 
         data['finished'] = [((x_s_l8[0][0], x_s_l8[0][1]), slug == x_s_l8[0][1], [(id_t_st3[0], id_t_st3[1],
@@ -438,7 +440,8 @@ def course_list(courses):
 def groups_list(groups):
     group_list = []
     for group in groups:
-        group_list.append((group.pk, str(group.teacher)))
+        teachers_str = ', '.join(map(str, (group.teachers.all())))
+        group_list.append((group.pk, teachers_str))
     return group_list
 
 
@@ -724,14 +727,14 @@ def make_message_from_polls(polls):
 def prepare_data_for_create_poll(request, group_id=0):
     data = pop_template_from_session(request)
 
-    if group_id > 0:
+    if int(group_id) > 0:
         group = Group.objects.get(pk=group_id)
         data['group'] = group.pk
         data['type'] = group.type
         data['course_id'] = group.course.pk
         data['semester'] = group.course.semester.pk
         data['groups'] = Group.objects.filter(
-            type=group.type, course=group.course).order_by('teacher')
+            type=group.type, course=group.course).order_by('teachers')
 
     if data['semester']:
         data['courses'] = get_courses_for_user(request, data['semester'])
@@ -757,7 +760,7 @@ def prepare_data_for_create_template(request, group_id=0):
         data['type'] = group.type
         data['course_id'] = group.course.pk
         data['groups'] = Group.objects.filter(
-            type=group.type, course=group.course).order_by('teacher')
+            type=group.type, course=group.course).order_by('teachers')
 
     data['courses'] = CourseEntity.objects.all()
 
@@ -778,7 +781,8 @@ def get_courses_for_user(request, semester):
     if request.user.is_staff:
         return Course.objects.filter(semester=semester).order_by('entity__name')
     else:
-        courses = Group.objects.filter(course__semester=semester, teacher=request.user.employee)\
+        courses = Group.objects.filter(
+            course__semester=semester, teachers=request.user.employee)\
             .values_list('course__pk', flat=True)
         return Course.objects.filter(Q(semester=semester), Q(
             teachers=request.user.employee) | Q(pk__in=courses)) .order_by('name')
@@ -792,12 +796,12 @@ def get_groups_for_user(request, type, course):
     """
     sub = Course.objects.filter(pk=course, teachers=request.user.employee)
     if request.user.is_staff or sub:
-        return Group.objects.filter(type=type, course=course).order_by('teacher')
+        return Group.objects.filter(type=type, course=course).order_by('teachers')
     else:
         return Group.objects.filter(
             type=type,
             course=course,
-            teacher=request.user.employee).order_by('teacher')
+            teachers=request.user.employee).order_by('teachers')
 
 
 def make_pages(pages, page_number):
