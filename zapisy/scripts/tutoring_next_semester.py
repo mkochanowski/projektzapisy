@@ -9,8 +9,8 @@ def run():
     sem2 = sem.get_next_by_semester_beginning()
     course1 = Course.objects.get(semester=sem, entity=ent)
     course2 = Course.objects.get(semester=sem2, entity=ent)
-    groups1 = course1.groups.filter().order_by('teacher')
-    groups2 = course2.groups.filter().order_by('teacher')
+    groups1 = course1.groups.filter().order_by('teachers')
+    groups2 = course2.groups.filter().order_by('teachers')
     for i in range(len(groups1)):
         g1 = groups1[i]
         g2 = groups2[i]

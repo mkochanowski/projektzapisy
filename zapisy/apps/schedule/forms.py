@@ -74,7 +74,7 @@ class EventForm(forms.ModelForm):
 
             if not user.has_perm('schedule.manage_events'):
                 queryset = Course.objects.filter(groups__type='1',
-                                                 groups__teacher=user.employee,
+                                                 groups__teachers=user.employee,
                                                  semester__in=[semester, previous_semester])
 
             self.fields['course'].queryset = queryset

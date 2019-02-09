@@ -63,12 +63,6 @@ class Group(models.Model):
         verbose_name='przedmiot',
         related_name='groups',
         on_delete=models.CASCADE)
-    # teacher = models.ForeignKey(
-    #     'users.Employee',
-    #     null=True,
-    #     blank=True,
-    #     verbose_name='prowadzący',
-    #     on_delete=models.CASCADE)
     teachers = models.ManyToManyField(
         'users.Employee',
         blank=True,

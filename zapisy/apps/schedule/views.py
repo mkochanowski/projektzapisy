@@ -301,7 +301,7 @@ class MyScheduleAjaxView(FullCalendarView):
             query.append(Q(record__student=self.request.user.student) & Q(record__status='1'))
 
         if BaseUser.is_employee(self.request.user):
-            query.append(Q(teacher=self.request.user.employee))
+            query.append(Q(teachers=self.request.user.employee))
 
         queryset = super(MyScheduleAjaxView, self).get_queryset()
         groups = Group.objects.filter(reduce(operator.or_, query))
