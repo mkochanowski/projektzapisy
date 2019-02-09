@@ -69,14 +69,14 @@ class DummyTest(TransactionTestCase):
         student.save()
         return user
 
-    def createTeacher(self):
+    def createTeachers(self):
         user = User(
             username='klo',
             is_active=True)
         user.save()
         employee = Employee(user=user)
         employee.save()
-        return (user, employee)
+        return [(user, employee)]
 
     def createCourse(self, semester):
         entity = CourseEntity(name="Algorytmy i Struktury Danych")
@@ -92,21 +92,21 @@ class DummyTest(TransactionTestCase):
         course.save()
         return course
 
-    def createExerciseGroup(self, course, teacher):
+    def createExerciseGroup(self, course, teachers):
         group = Group(
             type=2,
             limit=5,
             course=course,
-            teacher=teacher)
+            teachers=teachers)
         group.save()
         return group
 
-    def createLectureGroup(self, course, teacher):
+    def createLectureGroup(self, course, teachers):
         group = Group(
             type=1,
             limit=100,
             course=course,
-            teacher=teacher)
+            teachers=teachers)
         group.save()
         return group
 

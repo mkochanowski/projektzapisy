@@ -293,7 +293,7 @@
         "fields": {
             "limit": 1, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     }, 
@@ -303,7 +303,7 @@
         "fields": {
             "limit": 1, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -313,7 +313,7 @@
         "fields": {
             "limit": 1, 
             "type": "1", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -323,7 +323,7 @@
         "fields": {
             "limit": 1, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -333,7 +333,7 @@
         "fields": {
             "limit": 1, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -343,7 +343,7 @@
         "fields": {
             "limit": 1, 
             "type": "3", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -353,7 +353,7 @@
         "fields": {
             "limit": 1, 
             "type": "3", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },

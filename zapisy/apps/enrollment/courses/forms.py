@@ -142,7 +142,7 @@ class Parser(object):
             classrooms = str(fields[i + 2]).split(',')
 
         return {
-            'teacher': self._convert_employee(name),
+            'teachers': [self._convert_employee(name)],
             'day': self._convert_day(day),
             'start': str(start),
             'end': str(end),
@@ -171,7 +171,7 @@ class ImportForm(object):
                 gr = Group()
                 gr.course = c
                 gr.type = group['type']
-                gr.teacher_id = group['teacher']
+                gr.teachers_ids = group['teachers']
                 """
                 group -> termin, sala, osoba
               """

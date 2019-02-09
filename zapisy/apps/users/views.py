@@ -381,7 +381,11 @@ def create_ical_file(request: HttpRequest) -> HttpResponse:
     if BaseUser.is_student(user):
         groups = [g for g in Record.get_groups_for_student(user) if g.course.semester == semester]
     elif BaseUser.is_employee(user):
-        groups = list(Group.objects.filter(course__semester=semester, teacher=user.employee))
+        filtred_groups = list(Group.objects.filter(course__semester=semester))
+        groups = []
+        for g in filtred_groups:
+            if user.employee in g.teachers.all():
+                groups.append(g)
     else:
         raise InvalidUserException()
     for group in groups:

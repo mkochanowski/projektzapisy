@@ -92,7 +92,7 @@ class GroupFactory(DjangoModelFactory):
     course = factory.SubFactory(CourseFactory)
     type = 2
     limit = 10
-    teacher = factory.SubFactory(EmployeeFactory)
+    teachers = [factory.SubFactory(EmployeeFactory)]
 
 
 class ChangedDayForFridayFactory(DjangoModelFactory):

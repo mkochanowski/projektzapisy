@@ -327,7 +327,7 @@
         "fields": {
             "limit": 20, 
             "type": "1", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     }, 
@@ -337,7 +337,7 @@
         "fields": {
             "limit": 1, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     }, 
@@ -347,7 +347,7 @@
         "fields": {
             "limit": 20, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     }, 
@@ -357,7 +357,7 @@
         "fields": {
             "limit": 20, 
             "type": "2", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 100
         }
     },
@@ -367,7 +367,7 @@
         "fields": {
             "limit": 1, 
             "type": "1", 
-            "teacher": 1000, 
+            "teachers": [1000], 
             "course": 102
         }
     },

@@ -556,7 +556,7 @@
         "fields": {
             "limit": 30, 
             "type": "1", 
-            "teacher": 1, 
+            "teachers": [1], 
             "course": 1
         }
     }, 
@@ -566,7 +566,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 3, 
+            "teachers": [3], 
             "course": 1
         }
     }, 
@@ -576,7 +576,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 4, 
+            "teachers": [4], 
             "course": 1
         }
     }, 
@@ -586,7 +586,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 5, 
+            "teachers": [5], 
             "course": 1
         }
     }, 
@@ -596,7 +596,7 @@
         "fields": {
             "limit": 20, 
             "type": "1", 
-            "teacher": 4, 
+            "teachers": [4], 
             "course": 2
         }
     }, 
@@ -606,7 +606,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 1, 
+            "teachers": [1], 
             "course": 2
         }
     }, 
@@ -616,7 +616,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 4, 
+            "teachers": [4], 
             "course": 2
         }
     }, 
@@ -626,7 +626,7 @@
         "fields": {
             "limit": 15, 
             "type": "1", 
-            "teacher": 5, 
+            "teachers": [5], 
             "course": 3
         }
     }, 
@@ -636,7 +636,7 @@
         "fields": {
             "limit": 15, 
             "type": "2", 
-            "teacher": 5, 
+            "teachers": [5], 
             "course": 3
         }
     }, 
@@ -646,7 +646,7 @@
         "fields": {
             "limit": 20, 
             "type": "1", 
-            "teacher": 4, 
+            "teachers": [4], 
             "course": 4
         }
     }, 
@@ -656,7 +656,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 4, 
+            "teachers": [4], 
             "course": 4
         }
     }, 
@@ -666,7 +666,7 @@
         "fields": {
             "limit": 10, 
             "type": "2", 
-            "teacher": 1, 
+            "teachers": [1], 
             "course": 4
         }
     }, 

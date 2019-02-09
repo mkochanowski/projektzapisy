@@ -278,19 +278,19 @@ def import_schedule(file, semester):
                 classrooms = get_classroom(rooms)
 
                 group_type = GROUP_TYPES[g.group('type')]
-                teacher = find_teacher(g.group('teacher'))
+                teachers = [find_teacher(teacher) for teacher in g.group('teachers')]
                 limit = LIMITS[group_type]
 
                 t = 15 * (int(g.group('end_time')) - int(g.group('start_time')))
 
                 if group_type == '1':
                     group = Group.objects.get_or_create(course=course,
-                                                        teacher=teacher,
+                                                        teachers=teachers,
                                                         type=group_type,
                                                         limit=limit)[0]
                 else:
                     group = Group.objects.create(course=course,
-                                                 teacher=teacher,
+                                                 teachers=teachers,
                                                  type=group_type,
                                                  limit=limit)
                 term = Term.objects.create(dayOfWeek=dayOfWeek,
