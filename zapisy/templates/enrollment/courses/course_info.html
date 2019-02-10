@@ -27,14 +27,14 @@
             {% for t in tutorial.groups %}
                 <tr {% if t.signed %} class="signed" {% endif %} >
                     <td>
-                        {% if t.teachers %}
+                        {% if t.teachers.all %}
                             {% for single_teacher in t.teachers.all %}
                                 <p>
                                     <a href="{% url 'employee-profile' single_teacher.user.id %}" class="person">{{ single_teacher.user.get_full_name }}</a>
                                 </p>
                             {% endfor %}
                         {% else %}
-                            {% trans "(nieznany prowadzący)" %}
+                            {% trans "nieznany prowadzący" %}
                         {% endif %}
                         {% if t.extra %}
                             <br/><span class="small">{{ t.extra }}</span>
