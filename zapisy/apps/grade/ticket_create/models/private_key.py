@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from Crypto.Signature import pkcs1_15
@@ -23,7 +21,7 @@ class PrivateKey(models.Model):
     def _int_from_bytes(xbytes: bytes) -> int:
         return int.from_bytes(xbytes, 'big')
 
-    def sign_ticket(self, ticket: int) -> Tuple[int]:
+    def sign_ticket(self, ticket: int) -> int:
         key = RSA.importKey(self.private_key)
         if ticket >= key.n:
             raise ValueError
