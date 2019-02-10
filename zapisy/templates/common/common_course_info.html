@@ -2,7 +2,7 @@
 
 {% if course_entity.owner %}
 <tr>
-    <th>Prowadzący</th>
+    <th>Opiekun</th>
     <td>
         <a href="{% url 'employee-profile' course_entity.owner.user.id %}"
         class="person">{{ course_entity.owner.user.get_full_name }}</a>
