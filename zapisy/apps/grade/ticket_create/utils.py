@@ -16,7 +16,7 @@ from apps.grade.ticket_create.models import PublicKey, \
 from functools import cmp_to_key
 
 KEY_BITS = 1024
-
+SEPARATOR = '----------------------------------'
 
 def flatten(x):
     result = []
@@ -319,7 +319,7 @@ def to_plaintext(vtl):
         res += 'id: ' + str(p.pk) + ' &#10;'
         res += str(t) + " &#10;"
         res += str(st) + " &#10;"
-        res += "---------------------------------- &#10;"
+        res += SEPARATOR + " &#10;"
     return SafeText(str(res))
 
 
@@ -345,7 +345,7 @@ def from_plaintext(tickets_plaintext):
     already existing code.
     """
     res = []
-    pre_tickets = tickets_plaintext.split('----------------------------------')
+    pre_tickets = tickets_plaintext.split(SEPARATOR)
     for ticket_plaintext in pre_tickets:
         try:
             ticket_plaintext = ticket_plaintext.split()
