@@ -18,6 +18,7 @@ from functools import cmp_to_key
 KEY_BITS = 1024
 SEPARATOR = '----------------------------------'
 
+
 def flatten(x):
     result = []
     for el in x:
