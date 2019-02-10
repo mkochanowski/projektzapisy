@@ -1,4 +1,5 @@
 import random
+from datetime import date, timedelta
 
 from faker import Faker
 
@@ -37,8 +38,8 @@ def random_status():  # noqa: E302
     return random.choice(valid_statuses)
 
 
-def random_reserved():
-    return random_bool()
+def random_reserved_until():
+    return date.today() + timedelta(days=random.randrange(100))
 
 
 def random_description():
@@ -60,7 +61,7 @@ def run():
             auxiliary_advisor=random_advisor(emps) if random_bool() else None,
             kind=random_kind(),
             status=ThesisStatus.BEING_EVALUATED.value,
-            reserved=random_reserved(),
+            reserved_until=random_reserved_until() if random_bool() else None,
             description=random_description(),
             student=random_student(studs),
             student_2=random_student(studs) if random_bool() else None
