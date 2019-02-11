@@ -60,19 +60,23 @@ class SystemState(models.Model):
 
     winter_correction_beg = models.DateField(
         verbose_name='Początek korekty zimowej',
-        default=None)
+        default=None,
+        null=True)
 
     winter_correction_end = models.DateField(
         verbose_name='Koniec korekty zimowej',
-        default=None)
+        default=None,
+        null=True)
 
     summer_correction_beg = models.DateField(
         verbose_name='Początek korekty letniej',
-        default=None)
+        default=None,
+        null=True)
 
     summer_correction_end = models.DateField(
         verbose_name='Koniec korekty letniej',
-        default=None)
+        default=None,
+        null=True)
 
     class Meta:
         verbose_name = 'ustawienia głosowania'
