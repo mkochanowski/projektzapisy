@@ -1,3 +1,4 @@
+from typing import Tuple, List
 from string import whitespace
 from subprocess import getstatusoutput
 
@@ -138,7 +139,7 @@ def poll_cmp(poll1, poll2):
                     return cmp(poll1.title, poll2.title)
 
 
-def generate_rsa_key():
+def generate_rsa_key() -> Tuple[str, str]:
     """
         Generates RSA key - that is, a pair (public key, private key)
         both exported in PEM format
@@ -154,12 +155,21 @@ def generate_rsa_key():
     RSAkey = RSA.importKey(open('test_rsa').read())
     getstatusoutput('rm test_rsa*')
 
-    privateKey = RSAkey.exportKey()
-    publicKey = RSAkey.publickey().exportKey()
+    def key_to_str(bin_key):
+        return bin_key.decode(encoding='ascii', errors='strict')
+
+    # Converting the resulting keys to strings should be a safe operation
+    # as we explicitly specify the PEM format, which is a textual encoding
+    # see https://www.dlitz.net/software/pycrypto/api/current/Crypto.PublicKey.RSA._RSAobj-class.html#exportKey
+    privateKey = key_to_str(RSAkey.exportKey('PEM'))
+    publicKey = key_to_str(RSAkey.publickey().exportKey('PEM'))
     return (publicKey, privateKey)
 
 
-def save_public_keys(polls_public_keys):
+PollKeys = List[Tuple[Poll, str]]
+
+
+def save_public_keys(polls_public_keys: PollKeys):
     for (poll, key) in polls_public_keys:
         print(poll)
         pkey = PublicKey(poll=poll,
@@ -167,7 +177,7 @@ def save_public_keys(polls_public_keys):
         pkey.save()
 
 
-def save_private_keys(polls_private_keys):
+def save_private_keys(polls_private_keys: PollKeys):
     for (poll, key) in polls_private_keys:
         pkey = PrivateKey(poll=poll,
                           private_key=key)
