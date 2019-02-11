@@ -15,10 +15,6 @@ DEFAULT_DAY_BEG = 1          #
 DEFAULT_DAY_END = 31         # Te dane trzeba będzie tak ustawić
 DEFAULT_MONTH_BEG = 1          # żeby były prawdziwe. Na razie tak
 DEFAULT_MONTH_END = 7         # jest wygodnie, chociażby do testów
-DEFAULT_VOTE_BEG = None
-DEFAULT_VOTE_END = None
-DEFAULT_CORRECTION_BEG = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
-DEFAULT_CORRECTION_END = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
 
 
 class SystemState(models.Model):
@@ -38,7 +34,7 @@ class SystemState(models.Model):
                                         null=True, blank=True)
 
     def get_default_year():
-        return "{}/{}".format(DEFAULT_YEAR, DEFAULT_YEAR % 100 + 1)
+        return f"{DEFAULT_YEAR}/{DEFAULT_YEAR % 100 + 1}"
 
     year = models.CharField(max_length=7,
                             default=get_default_year,
@@ -52,43 +48,31 @@ class SystemState(models.Model):
         verbose_name='Maksymalna wartość głosu',
         default=DEFAULT_MAX_VOTE)
 
-    def get_default_vote_beg():
-        return DEFAULT_VOTE_BEG
-
     vote_beg = models.DateField(
         verbose_name='Początek głosowania',
-        default=get_default_vote_beg,
+        default=None,
         null=True)
-
-    def get_default_vote_end():
-        return DEFAULT_VOTE_END
 
     vote_end = models.DateField(
         verbose_name='Koniec głosowania',
-        default=get_default_vote_end,
+        default=None,
         null=True)
-
-    def get_default_correction_beg():
-        return DEFAULT_CORRECTION_BEG
 
     winter_correction_beg = models.DateField(
         verbose_name='Początek korekty zimowej',
-        default=get_default_correction_beg)
-
-    def get_default_correction_end():
-        return DEFAULT_CORRECTION_END
+        default=None)
 
     winter_correction_end = models.DateField(
         verbose_name='Koniec korekty zimowej',
-        default=get_default_correction_end)
+        default=None)
 
     summer_correction_beg = models.DateField(
         verbose_name='Początek korekty letniej',
-        default=get_default_correction_beg)
+        default=None)
 
     summer_correction_end = models.DateField(
         verbose_name='Koniec korekty letniej',
-        default=get_default_correction_end)
+        default=None)
 
     class Meta:
         verbose_name = 'ustawienia głosowania'
