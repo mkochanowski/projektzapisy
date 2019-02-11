@@ -46,11 +46,20 @@ def modinv(a, n):
     return t
 
 
+def convert_key(key):
+    """Zmienia wartości klucza na liczby."""
+
+    return {
+        'n': int(key['n']),
+        'e': int(key['e'])
+    }
+
+
 def try_again():
     """Pyta użytkownika czy próbować ponownie."""
 
     res = input("Próbować jeszcze raz? [T/n]:")
-    if not res or res[0]=='t' or res[0]=='T':
+    if not res or res[0] == 't' or res[0] == 'T':
         return True
     else:
         return False
@@ -62,7 +71,7 @@ class Tickets:
     url = 'https://zapisy.ii.uni.wroc.pl/'
     # Szablon do wypisania kluczy.
     template = ("[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n" +
-        ('-' * 34) + " \n")
+                ('-' * 34) + " \n")
 
     def __init__(self, out_file, backup_file):
         """Tworzy obiekt tworzący karty do głosowania.
@@ -185,11 +194,6 @@ class Tickets:
     def prepare_tickets(self):
         """Generowanie kluczy/kart i zaślepianie/wsadzanie do kopert do podpisania."""
 
-        convert_key = lambda key: {
-            'n': int(key['n']),
-            'e': int(key['e'])
-        }
-        
         for data in self.poll_data:
             poll = {
                 'public_key': convert_key(data['key']),
