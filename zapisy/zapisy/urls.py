@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import path
 from django.views.generic import TemplateView
 from django_cas_ng import views
 
@@ -33,9 +34,6 @@ urlpatterns = [
     url(r'^fereol_admin/courses/import_semester', courses_admin_views.import_semester),
     url(r'^fereol_admin/courses/import_schedule', courses_admin_views.import_schedule),
     url(r'^fereol_admin/courses/refresh_semester', courses_admin_views.refresh_semester),
-    url(r'^fereol_admin/courses/group/change_limit', courses_admin_views.change_group_limit, name='change-group-limit'),
-    url(r'^fereol_admin/courses/group/remove_student', courses_admin_views.remove_student),
-    url(r'^fereol_admin/courses/group/add_student', courses_admin_views.add_student),
     url(r'^offer/', include('apps.offer.proposal.urls')),
     url(r'^prefs/', include('apps.offer.preferences.urls')),
     url(r'^desiderata/', include('apps.offer.desiderata.urls')),
@@ -47,4 +45,8 @@ urlpatterns = [
     url(r'^accounts/login$', views.login, name='cas_ng_login'),
     url(r'^accounts/logout$', views.logout, name='cas_ng_logout'),
     url(r'^accounts/callback$', views.callback, name='cas_ng_proxy_callback'),
+]
+
+urlpatterns += [
+    path('django-rq/', include('django_rq.urls')),
 ]
