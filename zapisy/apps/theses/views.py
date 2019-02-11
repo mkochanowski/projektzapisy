@@ -246,6 +246,7 @@ def filter_theses_queryset_for_user(qs: QuerySet, user: BaseUser):
         return qs.exclude(status__in=NOT_READY_STATUSES)
     return qs
 
+
 class ThesesBoardViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
     permission_classes = (permissions.IsAuthenticated, )
