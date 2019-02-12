@@ -5,6 +5,14 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
+def move_teacher_to_teachers(apps, schema_editor):
+    Group = apps.get_model('courses', 'Group')
+
+    for group in Group.objects.all():
+        if group.teacher:
+            group.teachers.add(group.teacher)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -17,5 +25,15 @@ class Migration(migrations.Migration):
             model_name='group',
             name='teachers',
             field=models.ManyToManyField(blank=True, related_name='_group_teachers_+', to='users.Employee', verbose_name='lista prowadzących'),
+        ),
+        migrations.RunPython(move_teacher_to_teachers),
+        migrations.RemoveField(
+            model_name='group',
+            name='teacher',
+        ),
+        migrations.AlterField(
+            model_name='group',
+            name='teachers',
+            field=models.ManyToManyField(blank=True, to='users.Employee', verbose_name='lista prowadzących'),
         ),
     ]
