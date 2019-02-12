@@ -107,8 +107,7 @@ class Group(models.Model):
 
     def get_teachers_full_names(self):
         """return list of full names for teachers of current group"""
-        queryset = self.teachers.prefetch_related('user')
-        teachers_list = [t.user.get_full_name() for t in queryset if t]
+        teachers_list = [t.user.get_full_name() for t in self.teachers.all() if t]
         return ", ".join(teachers_list) if teachers_list else 'nieznany prowadzący'
 
     def get_all_terms(self):
