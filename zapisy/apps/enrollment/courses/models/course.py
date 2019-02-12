@@ -341,7 +341,7 @@ class CourseEntity(models.Model):
             "exam": self.exam,
             "semester": self.semester,
             "suggested_for_first_year": self.suggested_for_first_year,
-            "teachers": [self.owner.id if self.owner else -1],
+            "teacher": self.owner.id if self.owner else -1,
             "effects": [effect.pk for effect in self.get_all_effects()],
             "tags": [tag.pk for tag in self.get_all_tags()]
         }
