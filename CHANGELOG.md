@@ -1,5 +1,12 @@
 # projektzapisy Changelog
 
+# Version 12.2.19
+
+* New opening times computation (#500).
+* New ECTS course values computation (#501).
+* New enrollment/queues logic (#502).
+* New timetable and prototype (#503).
+
 # Version 31.1.19
 
 * REST API for students votes in offer is introduced to make exporting votes to scheduler easier.
