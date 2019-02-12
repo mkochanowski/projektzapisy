@@ -2,6 +2,7 @@ from datetime import datetime
 
 import factory
 from factory.django import DjangoModelFactory
+import random
 
 from ..models.course import Course, CourseEntity, CourseDescription
 from ..models.group import Group
@@ -96,7 +97,9 @@ class GroupFactory(DjangoModelFactory):
     @factory.post_generation
     def teachers(self, create, extracted, **kwargs):
         if not create:
-            return
+            teachers = EmployeeFactory.create_batch(random.randint(1, 2))
+            for teacher in teachers:
+                self.teachers.add(teacher)
 
         if extracted:
             for employee in extracted:
