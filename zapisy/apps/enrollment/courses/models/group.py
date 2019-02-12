@@ -66,7 +66,6 @@ class Group(models.Model):
     teachers = models.ManyToManyField(
         'users.Employee',
         blank=True,
-        related_name='+',
         verbose_name='lista prowadzących')
     type = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
