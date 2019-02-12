@@ -124,14 +124,14 @@ def course_groups(request, slug):
                                  'groups_with_teachers': groups_with_teachers,
                                  'path': request.path})
     elif request.method == 'POST':
-        for group_id, teachers_ids in request.POST.items():
+        for group_id, teacher_id in request.POST.items():
             if group_id[:6] != "group_":
                 continue
             group_id = group_id[6:]
             group = Group.objects.get(pk=group_id)
-            teachers = [Employee.objects.get(pk=teacher) for teacher in teachers_ids]
-            if set(group.teachers) != set(teachers):
-                group.teachers = teachers
+            teacher = Employee.objects.get(pk=teacher_id)
+            if teacher not in group.teachers.all():
+                group.teachers.add(teacher)
                 group.save()
         return redirect(request.path)
 

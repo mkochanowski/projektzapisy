@@ -171,7 +171,7 @@ class ImportForm(object):
                 gr = Group()
                 gr.course = c
                 gr.type = group['type']
-                gr.teachers_ids = group['teachers']
+                gr.teachers = group['teachers']
                 """
                 group -> termin, sala, osoba
               """
