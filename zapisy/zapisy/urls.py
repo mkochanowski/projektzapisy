@@ -9,6 +9,7 @@ from apps.api.rest.v1.urls import router as api_router_v1
 from apps.enrollment.courses import admin_views as courses_admin_views
 from apps.feeds import LatestNews
 from apps.users import views as users_views
+from zapisy import settings
 
 admin.autodiscover()
 
@@ -44,7 +45,7 @@ urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', admin.site.urls),
     url(r'^accounts/login$', views.login, name='cas_ng_login'),
-    url(r'^accounts/logout$', views.logout, name='cas_ng_logout'),
+    url(r'^accounts/logout$', views.logout, {'next_page': settings.LOGOUT_REDIRECT_URL}, name='cas_ng_logout'),
     url(r'^accounts/callback$', views.callback, name='cas_ng_proxy_callback'),
 ]
 

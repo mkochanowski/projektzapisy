@@ -239,9 +239,11 @@ DATETIME_FORMAT = "j N Y, H:i"
 CAS_SERVER_URL = 'https://login.uni.wroc.pl/cas/'
 CAS_CREATE_USER = False
 CAS_LOGIN_MSG = 'Sukces! Zalogowano przez USOS (login: %s).'
+CAS_LOGOUT_COMPLETELY = False
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
+LOGOUT_REDIRECT_URL= '/'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
