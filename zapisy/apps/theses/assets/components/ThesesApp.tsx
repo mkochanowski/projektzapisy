@@ -254,6 +254,10 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	private onDelete = async () => {
 		try {
 			await ThesisEditing.delete();
+			// Deleting does reload the list
+			if (this.tableInstance) {
+				this.tableInstance.onListReloaded();
+			}
 			(this.props as any).alert.success("Praca została usunięta");
 		} catch (err) {
 			errorWithActionName("usunąć", err);
