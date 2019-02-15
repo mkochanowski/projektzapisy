@@ -51,7 +51,7 @@
         </p>
 
 		{% if students_in_group %}
-			{% include "courses/students_list.html" with students=students_in_group %}
+			{% include "courses/students_list.html" with students=students_in_group|dictsort:"user.last_name" %}
 			{# Translators: tekst przy linku mailto #}
 			{% if request.user.is_staff or request.user.employee %}
 			    <p><strong>{% trans "Wyślij wiadomość do grupy" %}</strong>:

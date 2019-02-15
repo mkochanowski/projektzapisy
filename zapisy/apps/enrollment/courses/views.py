@@ -174,9 +174,9 @@ def group_view(request, group_id):
     except Group.DoesNotExist:
         raise Http404
 
-    records = Record.objects.filter(group_id=group_id).exclude(
-        status=RecordStatus.REMOVED
-    ).select_related('student', 'student__user', 'student__program', 'student__consent')
+    records = Record.objects.filter(
+        group_id=group_id).exclude(status=RecordStatus.REMOVED).select_related(
+            'student', 'student__user', 'student__program', 'student__consent').order_by('created')
     students_in_group = []
     students_in_queue = []
     record: Record
@@ -203,17 +203,19 @@ def group_view(request, group_id):
 def recorded_students_csv(group_id: int, status: RecordStatus) -> HttpResponse:
     """Builds the HttpResponse with list of student enrolled/enqueued in group.
     """
-    students_in_group = Record.objects.filter(
+    order = 'student__user__last_name' if status == RecordStatus.ENROLLED else 'created'
+    records_in_group = Record.objects.filter(
         group_id=group_id, status=status
-    ).select_related('student', 'student__user')
+    ).select_related('student', 'student__user').order_by(order)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="group-{}-{}.csv"'.format(
-        group_id, status.label
+        group_id, status.display
     )
 
     writer = csv.writer(response)
-    for student in students_in_group:
+    for record in records_in_group:
+        student = record.student
         writer.writerow([
             student.user.first_name, student.user.last_name, student.matricula, student.user.email
         ])

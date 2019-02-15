@@ -19,6 +19,12 @@ class Pin(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ("student", "group")
+        indexes = [
+            models.Index(fields=["student", "group"])
+        ]
+
     @classmethod
     def student_pins_in_semester(cls, student: Student, semester: Semester) -> Iterable[Group]:
         """Returns the groups that student has pinned in the semester."""
