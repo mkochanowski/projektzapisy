@@ -50,13 +50,13 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
     """student profile"""
     try:
-        student = Student.objects.select_related('user').get(user_id=user_id)
+        student = Student.objects.select_related('user', 'consent').get(user_id=user_id)
     except Student.DoesNotExist:
         raise Http404
 
     # We will not show the student profile if he decides to hide it.
-    if not BaseUser.is_employee(request.user) and not student.consent_granted:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    if not BaseUser.is_employee(request.user) and not student.consent.granted:
+        return HttpResponseRedirect(reverse('students-list'))
 
     semester = Semester.objects.get_next()
 
@@ -76,7 +76,8 @@ def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
     if request.is_ajax():
         return render(request, 'users/student_profile_contents.html', data)
 
-    active_students = Student.objects.filter(status=0).select_related('user')
+    active_students = Student.get_list(
+        begin='All', restrict_list_consent=not BaseUser.is_employee(request.user))
     data.update({
         'students': active_students,
         'char': "All",
