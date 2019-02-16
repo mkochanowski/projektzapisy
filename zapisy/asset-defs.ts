@@ -7,7 +7,6 @@ export default {
 		{ from: "legacy/vendor/", to: "vendor/" },
 		{ from: "legacy/favicon.ico", to: "favicon.ico" },
 		{ from: "legacy/feed-icon.png", to: "feed-icon.png" },
-      { from: "../apps/grade/assets/grade-client.py", to: "grade-client.py" },
 	],
 	bundles: {
 		"main": [

@@ -3,14 +3,7 @@ import "./katex.less";
 
 import renderMathInElement from "katex/dist/contrib/auto-render";
 
-type UnconstrainedFunction = (...args: any[]) => any;
-export function whenDomLoaded(fn: UnconstrainedFunction): void {
-   if (document.readyState !== "loading") {
-      fn();
-   } else {
-      window.addEventListener("DOMContentLoaded", fn);
-   }
-}
+import { whenDomLoaded } from "common/utils";
 
 whenDomLoaded(() => {
    const element = document.getElementById("od-vote-main-rules")!;
