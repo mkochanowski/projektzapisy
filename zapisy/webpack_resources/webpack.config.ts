@@ -12,6 +12,7 @@ const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const WebpackShellPlugin = require("webpack-shell-plugin");
 
 // Leave one cpu free for the ts type checker...
@@ -299,7 +300,8 @@ const webpackConfig: webpack.Configuration = {
 		],
 		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
 		alias: {
-			"vue$": "vue/dist/vue.runtime.esm.js",
+			vue$: "vue/dist/vue.runtime.esm.js",
+			vuex$: "vuex/dist/vuex.esm.js",
 		},
 	},
 	resolveLoader: {
@@ -344,6 +346,7 @@ const webpackConfig: webpack.Configuration = {
 				{ loader: "babel-loader" },
 			],
 		}),
+		new VueLoaderPlugin(),
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 	],
 };
