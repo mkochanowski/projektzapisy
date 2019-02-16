@@ -8,6 +8,6 @@ export default {
       ],
    },
    rawfiles: [
-      // "grade-client.py",
+      "grade-client.py",
    ],
 };
