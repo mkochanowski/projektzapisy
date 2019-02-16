@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 
 """Przykładowy klient tworzący karty do oceny
 
@@ -7,6 +7,8 @@
     oraz funkcje pomocnicze.
     Uruchomienie pliku rozpoczyna proces tworzenia kart.
 """
+from typing import Union, Iterable, Type, Mapping, Dict, NoReturn
+from io import TextIOBase
 from getpass import getpass
 from sys import stdout, stderr, argv
 from math import gcd
@@ -14,8 +16,10 @@ from random import getrandbits
 from hashlib import sha256
 import requests
 
+Poll = Dict[str, Union[int, Mapping[str, Union[str, int]]]]
 
-def rand(bits):
+
+def rand(bits: int) -> int:
     """Zwraca losową liczbę.
 
     Zwraca bits-bitową losową liczbę całkowitą (bits>=1)
@@ -25,7 +29,7 @@ def rand(bits):
     return getrandbits(bits) | 1 << (bits - 1)
 
 
-def modinv(a, n):
+def modinv(a: int, n: int) -> int:
     """Odwrotność modulo.
 
     Zwraca t,
@@ -46,7 +50,7 @@ def modinv(a, n):
     return t
 
 
-def convert_key(key):
+def convert_key(key: Mapping[str, str]) -> Dict[str, int]:
     """Zmienia wartości klucza na liczby."""
 
     return {
@@ -55,7 +59,7 @@ def convert_key(key):
     }
 
 
-def try_again():
+def try_again() -> bool:
     """Pyta użytkownika czy próbować ponownie."""
 
     res = input("Próbować jeszcze raz? [T/n]:")
@@ -68,31 +72,31 @@ def try_again():
 class Tickets:
     """Główna logika generowania kluczy do oceny zajęć."""
 
-    url = 'https://zapisy.ii.uni.wroc.pl/'
+    url: str = 'https://zapisy.ii.uni.wroc.pl/'
     # Szablon do wypisania kluczy.
-    template = ("[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n" +
-                ('-' * 34) + " \n")
+    template: str = ("[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n" +
+                     ('-' * 34) + " \n")
 
-    def __init__(self, out_file, backup_file):
+    def __init__(self, out_file: Type[TextIOBase], backup_file: Type[TextIOBase]) -> None:
         """Tworzy obiekt tworzący karty do głosowania.
 
         Aby uzyskać karty należy użyć metody run.
 
         Args:
-            out_file: TextIOBase - do tego będą zapisane klucze w finalnym formacie.
-            backup_file: TextIOBase - do tego będą zapisane dane diagnostyczne
+            out_file: do tego będą zapisane klucze w finalnym formacie.
+            backup_file: do tego będą zapisane dane diagnostyczne
                 i surowe dane podpisanych kart.
         """
 
         # Połączenie z serwerem jest obsługiwane przez bibiliotekę requests.
-        self.client = requests.session()
-        self.poll_data = None
-        self.data = dict()
-        self.signed_blind_tickets = None
+        self.client: Type[requests.sessions.Session] = requests.session()
+        self.poll_data: Iterable[Mapping[str, Union[Poll, Mapping[str, int]]]]
+        self.data: Dict[int, Poll] = dict()
+        self.signed_blind_tickets: Iterable[Mapping[str, Union[int, str]]]
         self.out_file = out_file
         self.backup_file = backup_file
 
-    def run(self):
+    def run(self) -> None:
         """Uruchamia tworzenie kart.
 
         Uruchamia metody w odpowiedniej kolejności
@@ -130,7 +134,7 @@ class Tickets:
         self.save()
         print("Gotowe")
 
-    def login(self):
+    def login(self) -> bool:
         """Logowanie"""
 
         # Weź pierwszy CSRF token.
@@ -148,7 +152,7 @@ class Tickets:
         return response.ok and response.text.find(
             '/users/password-change/') != -1
 
-    def get_public_keys(self):
+    def get_public_keys(self) -> bool:
         """Pobranie kluczy publicznych ankiet."""
 
         # Należy wysłać token CSRF.
@@ -170,7 +174,7 @@ class Tickets:
         return False
 
     @staticmethod
-    def generate_ticket(n):
+    def generate_ticket(n: int) -> Dict[str, int]:
         """Tworzy kartę i kopertę."""
 
         bits = n.bit_length()
@@ -183,7 +187,7 @@ class Tickets:
         return {'k': k, 'm': m}
 
     @staticmethod
-    def blind_ticket(ticket, public_key):
+    def blind_ticket(ticket: Mapping[str, int], public_key: Mapping[str, int]) -> int:
         """Zaślepia pojedynczy klucz/ wsadza kartę do koperty."""
 
         m_sha256 = int(sha256(str(ticket['m']).encode('ascii')).hexdigest(), 16)
@@ -191,7 +195,7 @@ class Tickets:
         t = (m_sha256 * k_pow_e) % public_key['n']
         return t
 
-    def prepare_tickets(self):
+    def prepare_tickets(self) -> None:
         """Generowanie kluczy/kart i zaślepianie/wsadzanie do kopert do podpisania."""
 
         for data in self.poll_data:
@@ -209,7 +213,7 @@ class Tickets:
 
         del self.poll_data
 
-    def get_signed_tickets(self):
+    def get_signed_tickets(self) -> bool:
         """Wyślij karty w kopertach do podpisania."""
 
         data = [{
@@ -228,7 +232,7 @@ class Tickets:
             # Zwrócone dane to lista obiektów
             # [{
             #    'status': 'OK'|'ERROR',
-            #    'id': identifier,
+            #    'id': int,
             #    'message'|'signature': string,
             # }]
             # wartość 'message' to informacja o błędzie
@@ -243,7 +247,7 @@ class Tickets:
             return True
         return False
 
-    def unblind_tickets(self):
+    def unblind_tickets(self) -> None:
         """Wyjęcie podpisanych kart z kopert."""
 
         for data in self.signed_blind_tickets:
@@ -259,7 +263,7 @@ class Tickets:
 
         del self.signed_blind_tickets
 
-    def save(self):
+    def save(self) -> None:
         """Zapisanie kopert w ustalonym formacie."""
 
         for id, poll in self.data.items():
@@ -275,37 +279,45 @@ class Tickets:
             self.out_file.write(self.template.format(**data))
 
     @property
-    def csrftoken(self):
+    def csrftoken(self) -> Union[str, NoReturn]:
         """get CSRF Token"""
         if 'csrftoken' in self.client.cookies:
             return self.client.cookies['csrftoken']
         raise Exception("Brak tokenu CSRF")
 
     @property
-    def username(self):
+    def username(self) -> str:
         """get username"""
         return input('Login: ')
 
     @property
-    def password(self):
+    def password(self) -> str:
         """get password"""
         return getpass('Password: ')
 
 
-# Użycie: ./grade-client.py [plik_z_kartami [plik_backup]]
-# plik_z_kartami domyślnie to standardowe wyjście
-# plik_backup domyślnie to standardowe wyjście błędów
+USAGE = """
+Użycie: {} [opcje] [plik_z_kartami [plik_backup]]
+plik_z_kartami domyślnie to standardowe wyjście
+plik_backup domyślnie to standardowe wyjście błędów
+
+Opcje:
+  -h, --help \tWyświetla ten tekst i kończy działanie.
+"""
 if __name__ == "__main__":
-    FILE = stdout
-    BACKUP = stderr
-    if len(argv) > 1:
-        FILE = open(argv[1], 'w')
-    if len(argv) > 2:
-        BACKUP = open(argv[2], 'w')
+    if '-h' in argv or '--help' in argv:
+        print(USAGE.format(argv[0]))
+    else:
+        FILE = stdout
+        BACKUP = stderr
+        if len(argv) > 1:
+            FILE = open(argv[1], 'w')
+        if len(argv) > 2:
+            BACKUP = open(argv[2], 'w')
 
-    Tickets(FILE, BACKUP).run()
+        Tickets(FILE, BACKUP).run()
 
-    if FILE != stdout:
-        FILE.close()
-    if BACKUP != stderr:
-        BACKUP.close()
+        if FILE != stdout:
+            FILE.close()
+        if BACKUP != stderr:
+            BACKUP.close()
