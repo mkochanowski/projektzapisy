@@ -66,8 +66,13 @@ def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
             'group__teacher', 'group__teacher__user', 'group__course',
             'group__course__entity').prefetch_related('group__term', 'group__term__classrooms')
     groups = [r.group for r in records]
-    group_dicts = build_group_list(groups)
 
+    # Highlight groups shared with the viewer in green.
+    viewer_groups = Record.common_groups(request.user, groups)
+    for g in groups:
+        g.is_enrolled = g.pk in viewer_groups
+
+    group_dicts = build_group_list(groups)
     data = {
         'student': student,
         'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
@@ -97,6 +102,12 @@ def employee_profile(request: HttpRequest, user_id: int) -> HttpResponse:
         course__semester_id=semester.pk, teacher=employee).select_related(
             'teacher', 'teacher__user', 'course', 'course__entity').prefetch_related(
                 'term', 'term__classrooms')
+    groups = list(groups)
+
+    # Highlight groups shared with the viewer in green.
+    viewer_groups = Record.common_groups(request.user, groups)
+    for g in groups:
+        g.is_enrolled = g.pk in viewer_groups
 
     group_dicts = build_group_list(groups)
 
