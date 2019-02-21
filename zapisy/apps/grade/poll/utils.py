@@ -44,17 +44,18 @@ def bytes_to_int(x: bytes) -> int:
     return int.from_bytes(x, byteorder='big')
 
 
-def check_signature(ticket: str, ticket_signature: int, public_key):
-    try:
-        ticket = int(ticket)
-        pk = RSA.importKey(public_key.public_key)
-        signature_pow_e = pow(ticket_signature, pk.e, pk.n)
-        ticket_hash = SHA256.new(str(ticket).encode()).hexdigest()
-        ticket_hash_as_int = int(ticket_hash, 16)
+def check_signature(ticket: int, ticket_signature: int, public_key) -> bool:
+    """Checks if ticket and its signature, provided by student are correct.
 
-        return ticket_hash_as_int == signature_pow_e
-    except (TypeError, ValueError):
-        return False
+    Returns:
+        True or False.
+    """
+    pk = RSA.importKey(public_key.public_key)
+    signature_pow_e = pow(ticket_signature, pk.e, pk.n)
+    ticket_hash = SHA256.new(str(ticket).encode()).hexdigest()
+    ticket_hash_as_int = int(ticket_hash, 16)
+
+    return ticket_hash_as_int == signature_pow_e
 
 
 def group_polls_and_tickets_by_course(poll_and_ticket_list):
