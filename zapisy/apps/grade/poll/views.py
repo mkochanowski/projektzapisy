@@ -696,20 +696,20 @@ def tickets_enter(request):
             errors = []
             polls = []
             finished = []
-            for (id, (ticket, signed_ticket)) in ids_and_tickets:
+            for (id, ticket, signed_ticket) in ids_and_tickets:
                 try:
                     poll = Poll.objects.get(pk=id)
                     public_key = PublicKey.objects.get(poll=poll)
                     if check_signature(ticket, signed_ticket, public_key):
                         try:
                             st = SavedTicket.objects.get(poll=poll,
-                                                         ticket=ticket)
+                                                         ticket=str(ticket))
                             if st.finished:
                                 finished.append((poll, ticket, signed_ticket))
                             else:
                                 polls.append((poll, ticket, signed_ticket))
                         except BaseException:
-                            st = SavedTicket(poll=poll, ticket=ticket)
+                            st = SavedTicket(poll=poll, ticket=str(ticket))
                             st.save()
                             polls.append((poll, ticket, signed_ticket))
                     else:
