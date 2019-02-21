@@ -339,23 +339,20 @@ def get_poll_info_as_dict(poll):
     return res
 
 
-def from_plaintext(tickets_plaintext):
-    """
-    Converts plaintext tickets provided by student to list of (id, (ticket, signature)).
-    id and signature are of type int, and ticket is of type string for compatibility with
-    already existing code.
+def from_plaintext(tickets_plaintext: str) -> List[Tuple[int, int, int]]:
+    """Parses plaintext tickets provided by user.
+
+    Returns:
+        List of (id, ticket, signature).
     """
     res = []
     pre_tickets = tickets_plaintext.split(SEPARATOR)
     for ticket_plaintext in pre_tickets:
-        try:
-            ticket_plaintext = ticket_plaintext.split()
-            id_idx = ticket_plaintext.index('id:')
-            id_ = ticket_plaintext[id_idx + 1]
-            ticket = ticket_plaintext[id_idx + 2]
-            signature = ticket_plaintext[id_idx + 3]
-            res.append((int(id_), (ticket, int(signature))))
-        except (ValueError, IndexError):
-            continue
+        ticket_plaintext = ticket_plaintext.split()
+        id_idx = ticket_plaintext.index('id:')
+        id_ = ticket_plaintext[id_idx + 1]
+        ticket = ticket_plaintext[id_idx + 2]
+        signature = ticket_plaintext[id_idx + 3]
+        res.append((int(id_), int(ticket), int(signature)))
 
     return res
