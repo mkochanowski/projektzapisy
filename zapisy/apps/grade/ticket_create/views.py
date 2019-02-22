@@ -54,9 +54,8 @@ def ajax_sign_tickets(request):
         signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
         return JsonResponse({
-            'error' : "Couldn't parse json"
+            'error': "Couldn't parse json"
         })
-
 
     for req in signing_requests:
         if not validate_signing_request(req):
