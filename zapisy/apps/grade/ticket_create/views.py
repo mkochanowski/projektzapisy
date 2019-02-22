@@ -8,7 +8,7 @@ from django.core.cache import cache
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, \
-    validate_signing_requests, get_poll_info_as_dict, get_pubkey_as_dict, \
+    validate_signing_request, get_poll_info_as_dict, get_pubkey_as_dict, \
     match_signing_requests_with_polls, get_signing_response, mark_poll_used
 from apps.users.decorators import employee_required, student_required
 
@@ -46,18 +46,31 @@ def ajax_get_rsa_keys(request):
 @require_POST
 @student_required
 def ajax_sign_tickets(request):
-    """
-    Reads tickets sent by the user, signs them and marks them as already
+    """Reads tickets sent by the user, signs them and marks them as already
     used, so user cannot sign them twice. Responds with generated signatures.
     """
     students_polls = Poll.get_all_polls_for_student(request.user.student)
     try:
         signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
-        return HttpResponse('Wrong request')
+        return JsonResponse({
+            'error' : "Couldn't parse json"
+        })
 
-    signing_requests = validate_signing_requests(signing_requests)
-    matched_requests = match_signing_requests_with_polls(signing_requests, request.user)
+
+    for req in signing_requests:
+        if not validate_signing_request(req):
+            return JsonResponse({
+                'error': 'Invalid request'
+            })
+        req['ticket'] = int(req['ticket'])
+
+    try:
+        matched_requests = match_signing_requests_with_polls(signing_requests, request.user)
+    except KeyError:
+        return JsonResponse({
+            'error': "Couldn't match provided id with poll"
+        })
 
     response = []
     for signing_request, poll in matched_requests:
