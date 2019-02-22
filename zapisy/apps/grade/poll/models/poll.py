@@ -13,6 +13,7 @@ from apps.enrollment.records import models as records_models
 from .section import SectionOrdering
 from .saved_ticket import SavedTicket
 from .origin import Origin
+from typing import Dict, List
 
 
 class Poll(models.Model):
@@ -245,13 +246,25 @@ class Poll(models.Model):
         return courses, general
 
     @staticmethod
-    def get_all_polls_for_student(student):
+    def get_all_polls_for_student(student: Student) -> List:
         groups = records_models.Record.objects.filter(
             student=student, status=records_models.RecordStatus.ENROLLED).select_related('group').values_list(
                 'group__id', flat=True)
 
         return [x for x in Poll.get_current_polls(
             student=student) if not x.group or x.group.id in groups]
+
+    @staticmethod
+    def get_all_polls_for_student_as_dict(student: Student) -> Dict:
+        groups = records_models.Record.objects.filter(
+            student=student, status=records_models.RecordStatus.ENROLLED).select_related('group').values_list(
+                'group__id', flat=True)
+
+        return {
+            poll.pk: poll
+            for poll in Poll.get_current_polls(student=student)
+            if not poll.group or poll.group.id in groups
+        }
 
     @staticmethod
     def get_all_polls_for_group(group, semester=None):
