@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from string import whitespace
 from subprocess import getstatusoutput
 
@@ -7,8 +7,10 @@ from Crypto.Random.random import getrandbits, \
     randint
 
 from django.utils.safestring import SafeText
+from django.contrib.auth.models import User
 
 from apps.grade.poll.models import Poll
+from apps.users.models import Student
 from apps.grade.ticket_create.exceptions import InvalidPollException, TicketUsed
 from apps.grade.ticket_create.models import PublicKey, \
     PrivateKey, \
@@ -249,7 +251,20 @@ def ticket_check_and_sign(user, poll, ticket):
     return signed
 
 
-def get_signing_response(user, poll, signing_request):
+def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
+    """Responds to signing request
+
+    Returns:
+        Dictionary with keys:
+            'status': 'ERROR'
+            'message': <error_msg>
+            'id': <signing_request_id>
+        when something goes wrong, or
+        Dictionary with keys
+            'status': 'OK'
+            'signature': <ticket_signature>
+            'id': <signing_request_id>
+    """
     try:
         signed_ticket = ticket_check_and_sign(user, poll, signing_request['ticket'])
         error_msg = None
@@ -273,35 +288,41 @@ def get_signing_response(user, poll, signing_request):
 
 
 def match_signing_requests_with_polls(signing_requests, user):
-    """
-    For each signing request, matches it with poll corresponding to provided id, checking
+    """For each signing request, matches it with poll corresponding to provided id, checking
     if ticket for this poll wasn't already signed.
+
+    Raises:
+        KeyError: When there is not match between signing request and students polls.
     """
     matched_requests = []
-    student_polls = Poll.get_all_polls_for_student(user.student)
+    student_polls = Poll.get_all_polls_for_student_as_dict(user.student)
     for req in signing_requests:
-        for poll in student_polls:
-            if req['id'] == poll.pk:
-                try:
-                    check_ticket_not_signed(user, poll)
-                    matched_requests.append((req, poll))
-                except TicketUsed:
-                    pass
+        poll = student_polls[req['id']]
+
+        if req['id'] == poll.pk:
+            try:
+                check_ticket_not_signed(user, poll)
+                matched_requests.append((req, poll))
+            except TicketUsed:
+                pass
     return matched_requests
 
 
-def validate_signing_requests(signing_requests):
-    res = []
-    for req in signing_requests:
-        try:
-            ticket_as_int = int(req['ticket'])
-            if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
-                raise ValueError
-            req['ticket'] = ticket_as_int
-            res.append(req)
-        except (ValueError, TypeError):
-            continue
-    return res
+def validate_signing_request(signing_request: Dict) -> bool:
+    """Checks if values provided in signing request are correct.
+
+    Returns:
+        True or False
+    """
+    try:
+        if 'id' not in signing_request or 'ticket' not in signing_request:
+            return False
+        ticket_as_int = int(signing_request['ticket'])
+        if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
+            return False
+        return True
+    except (ValueError, TypeError):
+        return False
 
 
 def to_plaintext(vtl):
@@ -324,7 +345,7 @@ def to_plaintext(vtl):
     return SafeText(str(res))
 
 
-def get_poll_info_as_dict(poll):
+def get_poll_info_as_dict(poll: Poll):
     res = {}
     res['title'] = poll.title
     if poll.group is not None:
@@ -347,6 +368,10 @@ def from_plaintext(tickets_plaintext: str) -> List[Tuple[int, int, int]]:
     """
     res = []
     pre_tickets = tickets_plaintext.split(SEPARATOR)
+
+    if pre_tickets[-1].strip() == '':
+        pre_tickets = pre_tickets[:-1]
+
     for ticket_plaintext in pre_tickets:
         ticket_plaintext = ticket_plaintext.split()
         id_idx = ticket_plaintext.index('id:')
