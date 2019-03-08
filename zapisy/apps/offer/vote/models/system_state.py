@@ -107,7 +107,6 @@ class SystemState(models.Model):
             return SystemState.get_state(current_date.year - 1)
         return current_state
 
-
     @staticmethod
     def create_default_state(year=None):
         """

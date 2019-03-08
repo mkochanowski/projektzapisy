@@ -4,6 +4,7 @@ from apps.enrollment.courses.models.course import CourseEntity
 from apps.offer.vote.models import SingleVote
 from apps.offer.vote.models.system_state import SystemState
 
+
 class VoteFormset(object):
     def __init__(self, post, *args, **kwargs):
         from django.forms.models import modelformset_factory
@@ -29,7 +30,8 @@ class VoteFormset(object):
             tag = 'unknown'
             query['semester'] = 'u'
         proposals = CourseEntity.simple.filter(**query)
-        votes = SingleVote.get_votes_for_proposal(student, proposals, state=state)
+        votes = SingleVote.get_votes_for_proposal(
+            student, proposals, state=state)
         if self.correction:
             votes = votes.extra(
                 where=[
@@ -98,7 +100,8 @@ class VoteFormsets():
             self.points_limit = 0
 
             if state.is_summer_correction_active():
-                self.points_limit += SingleVote.limit_in_summer_correction(student, state)
+                self.points_limit += SingleVote.limit_in_summer_correction(
+                    student, state)
                 self.summer = VoteFormset(post,
                                           student=student,
                                           tag='summer',
@@ -106,7 +109,8 @@ class VoteFormsets():
                                           correction=True)
 
             if state.is_winter_correction_active():
-                self.points_limit += SingleVote.limit_in_winter_correction(student, state)
+                self.points_limit += SingleVote.limit_in_winter_correction(
+                    student, state)
                 self.winter = VoteFormset(post,
                                           student=student,
                                           tag='winter',
