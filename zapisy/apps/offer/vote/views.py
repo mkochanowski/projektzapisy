@@ -23,7 +23,7 @@ def vote(request):
     from apps.offer.vote.vote_form import VoteFormsets
 
     student = request.user.student
-    state = SystemState.get_state()
+    state = SystemState.get_latest_vote()
 
     if not state.is_system_active():
         raise Http404
@@ -60,7 +60,7 @@ def vote_main(request):
     """
         Vote main page
     """
-    sytem_state = SystemState.get_state()
+    sytem_state = SystemState.get_latest_vote()
     data = {'isVoteActive': sytem_state.is_system_active(), 'max_points': sytem_state.max_points,
             'semester': Semester.get_current_semester()}
     return render(request, 'offer/vote/index.html', data)
@@ -71,8 +71,9 @@ def vote_view(request):
     """
         View of once given vote
     """
-    votes = SingleVote.get_votes(request.user.student)
-    is_voting_active = SystemState.get_state(date.today().year).is_system_active()
+    current_state = SystemState.get_latest_vote()
+    votes = SingleVote.get_votes(request.user.student, state=current_state)
+    is_voting_active = current_state.is_system_active()
 
     return TemplateResponse(request, 'offer/vote/view.html', locals())
 
@@ -86,8 +87,7 @@ def vote_summary(request):
     winter = []
     unknown = []
 
-    year = date.today().year
-    state = SystemState.get_state(year)
+    state = SystemState.get_latest_vote()
 
     subs = CourseEntity.get_vote()
     subs = SingleVote.add_vote_count(subs, state)

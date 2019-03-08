@@ -65,14 +65,12 @@ class SingleVote (models.Model):
                 a[str(v.student_id)] = {}
 
     @staticmethod
-    def get_votes(voter, year=None, state=None,):
+    def get_votes(voter, state=None):
         """
             Gets user votes in specified year
         """
         if not state:
-            if not year:
-                year = date.today().year
-            state = SystemState.get_state(year)
+            state = SystemState.get_latest_vote()
 
         return SingleVote.objects.filter(
             student=voter,
@@ -94,17 +92,14 @@ class SingleVote (models.Model):
         )
 
     @staticmethod
-    def get_points_and_voters(proposal, year=None, state=None):
+    def get_points_and_voters(proposal, state=None):
         """
             Gets proposal points and voters count in specified year
         """
         if not state:
-            if not year:
-                year = date.today().year
-            current_state = SystemState.get_state(year)
-        else:
-            current_state = state
-        votes = SingleVote.objects.filter(entity=proposal, state=current_state, correction__gte=1)\
+            state = SystemState.get_latest_vote()
+
+        votes = SingleVote.objects.filter(entity=proposal, state=state, correction__gte=1)\
             .select_related('student', 'student__user', 'entity')
 
         value = 0
@@ -116,7 +111,7 @@ class SingleVote (models.Model):
         return value, voters, votes
 
     @staticmethod
-    def make_votes(student, year=None, state=None, tag='summer'):
+    def make_votes(student, state=None, tag='summer'):
         """
             Makes 'zero' vote for student - only for proposal without
             vote
@@ -129,19 +124,16 @@ class SingleVote (models.Model):
         if tag == 'summer':
             semester = state.semester_summer
 
-        year = year if year else date.today().year
-
         proposals = CourseEntity.objects.filter(status=CourseEntity.STATUS_TO_VOTE, deleted=False)
-        current_state = SystemState.get_state(year)
 
         old_votes = SingleVote.objects.\
-            filter(student=student, state=current_state).\
+            filter(student=student, state=state).\
             values_list('entity__id', flat=True).order_by('entity__id')
 
         new_votes = []
         for proposal in proposals:
             if proposal.id not in old_votes:
-                kwargs = {'student': student, 'entity': proposal, 'state': current_state}
+                kwargs = {'student': student, 'entity': proposal, 'state': state}
                 if correction:
                     try:
                         kwargs['course'] = Course.objects.get(semester=semester, entity=proposal)
@@ -153,15 +145,14 @@ class SingleVote (models.Model):
             SingleVote.objects.bulk_create(new_votes)
 
     @staticmethod
-    def get_votes_for_proposal(voter, proposals, year=None):
+    def get_votes_for_proposal(voter, proposals, state=None):
         #        """
         #            Gets user votes in specified year for proposal set
         #        """
-        if not year:
-            year = date.today().year
-        current_state = SystemState.get_state(year)
+        if not state:
+            state = SystemState.get_latest_vote()
 
-        return SingleVote.objects.filter(student=voter, state=current_state, entity__in=proposals)\
+        return SingleVote.objects.filter(student=voter, state=state, entity__in=proposals)\
             .select_related('entity',
                             'entity__owner',
                             'entity__owner__user',

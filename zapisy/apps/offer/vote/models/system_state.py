@@ -95,6 +95,20 @@ class SystemState(models.Model):
             return SystemState.create_default_state(year)
 
     @staticmethod
+    def get_latest_vote(current_date=None):
+        """
+            Gets the state of the latest active or
+            completed voting
+        """
+        if not current_date:
+            current_date = date.today()
+        current_state = SystemState.get_state(current_date.year)
+        if current_state.vote_beg > current_date:
+            return SystemState.get_state(current_date.year - 1)
+        return current_state
+
+
+    @staticmethod
     def create_default_state(year=None):
         """
             Creates system state from default variables

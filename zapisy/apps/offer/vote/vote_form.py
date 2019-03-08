@@ -2,7 +2,7 @@ from django.db.models import Sum
 
 from apps.enrollment.courses.models.course import CourseEntity
 from apps.offer.vote.models import SingleVote
-
+from apps.offer.vote.models.system_state import SystemState
 
 class VoteFormset(object):
     def __init__(self, post, *args, **kwargs):
@@ -12,6 +12,9 @@ class VoteFormset(object):
         state = kwargs.pop('state', None)
         semester_id = None
         self.correction = kwargs.pop('correction', False)
+
+        if not state:
+            state = SystemState.get_latest_vote()
 
         query = {'status': CourseEntity.STATUS_TO_VOTE,
                  'deleted': False}
@@ -26,7 +29,7 @@ class VoteFormset(object):
             tag = 'unknown'
             query['semester'] = 'u'
         proposals = CourseEntity.simple.filter(**query)
-        votes = SingleVote.get_votes_for_proposal(student, proposals)
+        votes = SingleVote.get_votes_for_proposal(student, proposals, state=state)
         if self.correction:
             votes = votes.extra(
                 where=[

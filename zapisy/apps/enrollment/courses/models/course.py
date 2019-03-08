@@ -53,13 +53,10 @@ class DefaultCourseManager(models.Manager):
 
 
 class StatisticsManager(models.Manager):
-    def in_year(self, year=None):
+    def in_year(self):
         from apps.offer.vote.models import SystemState
 
-        if not year:
-            year = date.today().year
-
-        state = SystemState.get_state(year)
+        state = SystemState.get_latest_vote()
 
         # TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
         #  status powinno byc  z dziedziczenia
@@ -423,13 +420,11 @@ class CourseEntity(models.Model):
     def is_in_voting(self):
         return self.status == CourseEntity.STATUS_TO_VOTE
 
-    def get_all_voters(self, year=None):
+    def get_all_voters(self):
         from apps.offer.vote.models.single_vote import SingleVote
         from apps.offer.vote.models.system_state import SystemState
 
-        if not year:
-            year = date.today().year
-        current_state = SystemState.get_state(year)
+        current_state = SystemState.get_latest_vote()
 
         votes = SingleVote.objects.filter(
             value__gte=1, state=current_state, entity=self).select_related(
