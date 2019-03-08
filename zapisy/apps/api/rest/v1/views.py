@@ -18,6 +18,7 @@ from .serializers import (ClassroomSerializer, DesiderataOtherSerializer,
 
 class SemesterViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
+    permission_classes = (StaffPermission,)
     queryset = Semester.objects.order_by('-semester_beginning')
     serializer_class = SemesterSerializer
 
@@ -31,6 +32,7 @@ class ClassroomViewSet(viewsets.ModelViewSet):
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'patch']
+    permission_classes = (StaffPermission,)
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
@@ -53,6 +55,7 @@ class DesiderataOtherViewSet(viewsets.ModelViewSet):
 
 class SpecialReservationViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
+    permission_classes = (StaffPermission,)
     queryset = SpecialReservation.objects.all()
     serializer_class = SpecialReservationSerializer
     filter_fields = '__all__'
