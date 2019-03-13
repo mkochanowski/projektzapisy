@@ -29,19 +29,23 @@ class CourseEntityViewSet(viewsets.ModelViewSet):
     """Allows modifying CourseEntity `usos_kod` field."""
     http_method_names = ['patch']
     permission_classes = (IsAdminUser,)
-    queryset = CourseEntity.objects.select_related('type')
+    queryset = CourseEntity.objects.select_related('type').prefetch_related(
+        'effects', 'pointsofcourseentities_set', 'pointsofcourseentities_set__program')
     serializer_class = serializers.CourseEntitySerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     """Lists all courses.
 
-    To only show courses in a given semester, query:
-        /api/v1/?semester={semester_id}
+    To only show courses in a given semester, query
+    `/api/v1/?semester={semester_id}`
     """
     http_method_names = ['get']
     permission_classes = (IsAdminUser,)
-    queryset = Course.objects.select_related('entity', 'entity__type', 'semester')
+    queryset = Course.objects.select_related(
+        'entity', 'entity__type', 'information').prefetch_related(
+            'entity__effects', 'entity__pointsofcourseentities_set',
+            'entity__pointsofcourseentities_set__program')
     filter_fields = ['semester']
     serializer_class = serializers.CourseSerializer
     pagination_class = StandardResultsSetPagination
