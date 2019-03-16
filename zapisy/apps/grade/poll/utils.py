@@ -4,7 +4,6 @@ import csv
 import unidecode
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-from Crypto.Signature import pkcs1_15
 from apps.grade.poll.models import Poll, Section, SectionOrdering, \
     OpenQuestion, SingleChoiceQuestion, \
     OpenQuestionOrdering, \
