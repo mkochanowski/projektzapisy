@@ -15,6 +15,7 @@ from .saved_ticket import SavedTicket
 from .origin import Origin
 from typing import Dict, List
 
+
 class Poll(models.Model):
 
     author = models.ForeignKey(
