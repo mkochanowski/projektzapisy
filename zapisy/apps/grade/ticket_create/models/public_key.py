@@ -2,6 +2,7 @@ from django.db import models
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 
+
 class PublicKey(models.Model):
     '''Public key of a poll, encoded in PEM format.'''
     poll = models.ForeignKey('poll.Poll', verbose_name='ankieta', on_delete=models.CASCADE)
