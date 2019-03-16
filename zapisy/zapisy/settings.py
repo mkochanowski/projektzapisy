@@ -74,17 +74,25 @@ LOGGING = {
     },
     'handlers': {
         'logfile': {
-            # optionally raise to INFO to not fill the log file too quickly
-            'level': 'DEBUG',  # DEBUG or higher goes to the log file
+            'level': 'INFO',  # INFO or higher goes to the log file. DEBUG polluted the logs way too much.
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/djangoproject.log',
-            'maxBytes': 50 * 10 ** 6,  # will 50 MB do?
-            'backupCount': 3,  # keep this many extra historical files
+            'maxBytes': 50 * 1024 * 1024,  # will 50 MB do?
+            'backupCount': 5,  # keep this many extra historical files
             'formatter': 'timestampthread'
         },
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
+        },
+        'rq_logfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'timestampthread',
+            'filename': 'logs/rqworker.log',
+            'encoding': 'UTF-8',
+            'maxBytes': 50 * 1024 * 1024,  # 50 MB
+            'backupCount': 5,  # keep this many extra historical files
         },
     },
     'loggers': {
@@ -94,6 +102,10 @@ LOGGING = {
         },
         'apps': {
             'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+        'rq.worker': {
+            'handlers': ['rq_logfile'],
             'level': 'DEBUG',
         },
     },
@@ -220,8 +232,6 @@ INSTALLED_APPS = (
     'el_pagination',
     'apps.notifications',
     'django_cas_ng',
-
-    'test_app',
     'django_rq',
     'webpack_loader',
 )

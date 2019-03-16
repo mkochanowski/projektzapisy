@@ -2,6 +2,9 @@ import * as path from "path";
 import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
+import { without } from "lodash";
+
+import "core-js";
 
 import { getVueCssLoaders, parseBool } from "./webpack-utils";
 import * as webpack from "webpack";
@@ -12,25 +15,32 @@ const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
 
 // Leave one cpu free for the ts type checker...
 const happyThreadPool = HappyPack.ThreadPool({
-	// ...but make sure we spawn at least one thread
-	size: Math.max(os.cpus().length - 1, 1)
+    // ...but make sure we spawn at least one thread
+    size: Math.max(os.cpus().length - 1, 1)
 });
+
+// Exit gracefully, not by throwing exceptions, to avoid enormous
+// stack traces regurgitated into the console
+function fatalError(msg: string): void {
+    console.error(msg);
+    process.exit(1);
+}
 
 let DEV: boolean;
 switch (process.env.NODE_ENV) {
-	case "development":
-		DEV = true;
-		break;
-	case "production":
-		DEV = false;
-		break;
-	default:
-		throw new Error(`Bad NODE_ENV ${process.env.NODE_ENV}`);
+    case "development":
+        DEV = true;
+        break;
+    case "production":
+        DEV = false;
+        break;
+    default:
+        fatalError(`Bad NODE_ENV ${process.env.NODE_ENV}`);
 }
 
 const BUNDLE_OUTPUT_DIR = "compiled_assets";
@@ -39,109 +49,151 @@ const ASSET_DEF_FILENAME = "asset-defs.ts";
 const ASSET_DEF_SEARCH_DIR = "apps";
 
 type RawfileDef = {
-	from: string,
-	to: string
+    from: string,
+    to: string
 };
 
 type AssetDefs = {
-	bundles?: {
-		[key: string]: string[],
-	},
-	rawfiles?: Array<RawfileDef | string>
+    bundles?: {
+        [key: string]: string[] | string,
+    },
+    rawfiles?: Array<RawfileDef | string>
 };
 
 type FinalAssetDefs = {
-	bundles?: {
-		[key: string]: string[],
-	},
-	rawfiles?: RawfileDef[],
+    bundles?: {
+        [key: string]: string[],
+    },
+    rawfiles?: RawfileDef[],
 };
 
 function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
-	defs.bundles = defs.bundles || {};
-	defs.rawfiles = defs.rawfiles || [];
-	Object.assign(defs.bundles, newDefs.bundles);
-	defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles || []);
-	return defs;
+    defs.bundles = defs.bundles || {};
+    defs.rawfiles = defs.rawfiles || [];
+    Object.assign(defs.bundles, newDefs.bundles);
+    defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles || []);
+    return defs;
 }
 
 function getFileInputPath(packageDir: string, packageFilePath: string): string {
-	if (path.isAbsolute(packageFilePath)) {
-		return packageFilePath;
-	}
-	// All relative paths are assumed to be in ASSET_DIR, so check if it exists
-	// and throw a friendly message if it doesn't
-	const packageAssetDirPath = path.resolve(packageDir, ASSET_DIR);
-	if (!fs.existsSync(packageAssetDirPath)) {
-		throw new Error(
-			`${packageAssetDirPath} does not exist. ` +
-			`Create it and put your assets for this app there.`);
-	} else if (!fs.lstatSync(packageAssetDirPath).isDirectory()) {
-		throw new Error(
-			`${packageAssetDirPath} is not a directory. ` +
-			`It should be a directory containing all your assets for this app`);
-	}
-	return path.resolve(packageDir, ASSET_DIR, packageFilePath);
+    if (path.isAbsolute(packageFilePath)) {
+        return packageFilePath;
+    }
+    // All relative paths are assumed to be in ASSET_DIR, so check if it exists
+    // and throw a friendly message if it doesn't
+    const packageAssetDirPath = path.resolve(packageDir, ASSET_DIR);
+    if (!fs.existsSync(packageAssetDirPath)) {
+        throw new Error(
+            `${packageAssetDirPath} does not exist. ` +
+            `Create it and put your assets for this app there.`);
+    } else if (!fs.lstatSync(packageAssetDirPath).isDirectory()) {
+        throw new Error(
+            `${packageAssetDirPath} is not a directory. ` +
+            `It should be a directory containing all your assets for this app`);
+    }
+    return path.resolve(packageDir, ASSET_DIR, packageFilePath);
 }
 
 function processDefs(defs: AssetDefs, packageName: string, packageDir: string): FinalAssetDefs {
-	const result: FinalAssetDefs = {
-		bundles: {},
-		rawfiles: [],
-	};
-	for (const bundle in defs.bundles || {}) {
-		const fullName = packageName.length ? `${packageName}-${bundle}` : bundle;
-		result.bundles![fullName] = defs.bundles![bundle].map(filepath => {
-			return getFileInputPath(packageDir, filepath);
-		});
-	}
-	result.rawfiles = (defs.rawfiles || []).map(rawfileDef => {
-		if (typeof rawfileDef === "string") {
-			rawfileDef = {
-				from: rawfileDef,
-				to: rawfileDef,
-			};
-		}
-		const getRawfileOutputPath = (rawfilePath: string) => {
-			return path.resolve(BUNDLE_OUTPUT_DIR, packageName, rawfilePath);
-		};
-		return {
-			from: getFileInputPath(packageDir, rawfileDef.from),
-			to: getRawfileOutputPath(rawfileDef.to),
-		};
-	});
-	return result;
+    const type = typeof defs;
+    if (type !== "object") {
+        throw new Error(`defs object expected, but found a ${type}`);
+    }
+    const otherKeys = without(Object.keys(defs), "rawfiles", "bundles");
+    if (otherKeys.length) {
+        throw new Error(
+            `unknown properties: ${otherKeys.join(", ")}. ` +
+            "Should only specify bundles and rawfiles."
+        );
+    }
+    if (!defs.bundles && !defs.rawfiles) {
+        throw new Error("neither bundles nor rawfiles defined");
+    }
+
+    const result: FinalAssetDefs = {
+        bundles: {},
+        rawfiles: [],
+    };
+    for (const bundle in defs.bundles || {}) {
+        const fullName = packageName.length ? `${packageName}-${bundle}` : bundle;
+        let bundleFiles = defs.bundles![bundle];
+        if (!Array.isArray(bundleFiles)) {
+            throw new Error(`bad file defs for bundle ${bundle} - should be an array of filenames`);
+        }
+        result.bundles![fullName] = bundleFiles.map(filepath => {
+            if (typeof filepath !== "string") {
+                throw new Error(
+                    `in defs for bundle ${bundle}: found "${filepath}", but expected a filepath (string)`
+                );
+            }
+            return getFileInputPath(packageDir, filepath);
+        });
+    }
+    result.rawfiles = (defs.rawfiles || []).map(rawfileDef => {
+        if (typeof rawfileDef === "string") {
+            rawfileDef = {
+                from: rawfileDef,
+                to: rawfileDef,
+            };
+        } else if (typeof rawfileDef === "object") {
+            const keys = Object.keys(rawfileDef);
+            if (keys.length !== 2 || !("from" in rawfileDef) || !("to" in rawfileDef)) {
+                const str = JSON.stringify(rawfileDef, undefined, "    ");
+                throw new Error(
+                    `invalid rawfile def ${str} - should only contain "to" and "from" keys`
+                );
+            }
+        }
+        const getRawfileOutputPath = (rawfilePath: string) => {
+            return path.resolve(BUNDLE_OUTPUT_DIR, packageName, rawfilePath);
+        };
+        return {
+            from: getFileInputPath(packageDir, rawfileDef.from),
+            to: getRawfileOutputPath(rawfileDef.to),
+        };
+    });
+    return result;
 }
 
 function readAsssetDefsFromFile(filepath: string): AssetDefs {
-	const dirPath = path.dirname(filepath);
-	const dirName = path.basename(dirPath);
-	const defs: AssetDefs = require(path.resolve(filepath)).default;
-	const packageName = dirName !== "." ? dirName : "";
-	return processDefs(defs, packageName, dirPath);
+    try {
+        const dirPath = path.dirname(filepath);
+        const dirName = path.basename(dirPath);
+        const packageName = dirName !== "." ? dirName : "";
+        const defs: AssetDefs = require(path.resolve(filepath)).default;
+        return processDefs(defs, packageName, dirPath);
+    } catch (err) {
+        fatalError(
+            `Failed to parse ${filepath}: ${err.toString()}\n` +
+            "For info see https://github.com/iiuni/projektzapisy/wiki/Pliki-statyczne-w-Systemie-Zapis%C3%B3w"
+        );
+    }
 }
 
 function getAllAssetDefs() {
-	const result: FinalAssetDefs = {
-		bundles: {},
-		rawfiles: [],
-	};
-	if (fs.existsSync(ASSET_DEF_FILENAME)) {
-		const defs = readAsssetDefsFromFile(ASSET_DEF_FILENAME);
-		mergeAssetDefs(result, defs);
-	}
-	const searchPath = path.join(ASSET_DEF_SEARCH_DIR, "**", ASSET_DEF_FILENAME);
-	for (const defFile of glob.sync(searchPath)) {
-		const defs = readAsssetDefsFromFile(defFile);
-		mergeAssetDefs(result, defs);
-	}
-	return result;
+    const result: FinalAssetDefs = {
+        bundles: {},
+        rawfiles: [],
+    };
+    if (fs.existsSync(ASSET_DEF_FILENAME)) {
+        const defs = readAsssetDefsFromFile(ASSET_DEF_FILENAME);
+        mergeAssetDefs(result, defs);
+    }
+    const searchPath = path.join(ASSET_DEF_SEARCH_DIR, "**", ASSET_DEF_FILENAME);
+    for (const defFile of glob.sync(searchPath)) {
+        const defs = readAsssetDefsFromFile(defFile);
+        mergeAssetDefs(result, defs);
+    }
+    return result;
 }
 
 function buildCopyCommandsForRawfiles(rawfiles: RawfileDef[]): string[] {
-	return (rawfiles || []).map(r => {
-		return `cp -r ${r.from} ${r.to}`;
-	});
+    return (rawfiles || []).flatMap(r => {
+        return [
+            `mkdir -p ${path.dirname(r.to)}`,
+            `cp -r ${r.from} ${r.to}`,
+        ];
+    });
 }
 
 const allAssetDefs = getAllAssetDefs();
@@ -352,12 +404,12 @@ const webpackConfig: webpack.Configuration = {
 };
 
 if (parseBool(process.env.ANALYZE)) {
-	console.info("Will perform bundle analysis");
-	webpackConfig.plugins.push(new BundleAnalyzerPlugin({
-		analyzerMode: "server",
-		analyzerHost: "0.0.0.0",
-		analyzerPort: "8000",
-	}));
+    console.info("Will perform bundle analysis");
+    webpackConfig.plugins.push(new BundleAnalyzerPlugin({
+        analyzerMode: "server",
+        analyzerHost: "0.0.0.0",
+        analyzerPort: "8000",
+    }));
 }
 
 module.exports = webpackConfig;
