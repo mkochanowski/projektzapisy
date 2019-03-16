@@ -700,7 +700,7 @@ def tickets_enter(request):
                 try:
                     poll = Poll.objects.get(pk=id)
                     public_key = PublicKey.objects.get(poll=poll)
-                    if check_signature(ticket, signed_ticket, public_key):
+                    if public_key.verify_signature(ticket, signed_ticket):
                         try:
                             st = SavedTicket.objects.get(poll=poll,
                                                          ticket=str(ticket))
@@ -825,7 +825,7 @@ def poll_answer(request, slug, pid):
     data['next'] = get_next(poll_cands, finished_cands, int(pid))
     data['prev'] = get_prev(poll_cands, finished_cands, int(pid))
 
-    if ticket and signed_ticket and check_signature(ticket, signed_ticket, public_key):
+    if ticket and signed_ticket and public_key.verify_signature(ticket, signed_ticket):
         st = SavedTicket.objects.get(ticket=str(ticket), poll=poll)
 
         if request.method == "POST" and not st.finished:
