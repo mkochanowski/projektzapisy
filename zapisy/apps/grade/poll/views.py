@@ -16,7 +16,6 @@ from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.ticket_create.utils import from_plaintext
-from apps.grade.ticket_create.models import PublicKey
 from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQuestion, \
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
@@ -699,8 +698,8 @@ def tickets_enter(request):
             for (id, ticket, signed_ticket) in ids_and_tickets:
                 try:
                     poll = Poll.objects.get(pk=id)
-                    public_key = PublicKey.objects.get(poll=poll)
-                    if public_key.verify_signature(ticket, signed_ticket):
+                    key = poll.signingkey
+                    if key.verify_signature(ticket, signed_ticket):
                         try:
                             st = SavedTicket.objects.get(poll=poll,
                                                          ticket=str(ticket))
@@ -785,7 +784,7 @@ def poll_answer(request, slug, pid):
         return render(request, 'grade/poll/user_is_authenticated.html', {})
 
     poll = Poll.objects.get(pk=pid)
-    public_key = PublicKey.objects.get(poll=poll)
+    key = poll.signingkey
 
     (ticket, signed_ticket) = get_ticket_and_signed_ticket_from_session(request.session, slug, pid)
 
@@ -825,7 +824,7 @@ def poll_answer(request, slug, pid):
     data['next'] = get_next(poll_cands, finished_cands, int(pid))
     data['prev'] = get_prev(poll_cands, finished_cands, int(pid))
 
-    if ticket and signed_ticket and public_key.verify_signature(ticket, signed_ticket):
+    if ticket and signed_ticket and key.verify_signature(ticket, signed_ticket):
         st = SavedTicket.objects.get(ticket=str(ticket), poll=poll)
 
         if request.method == "POST" and not st.finished:

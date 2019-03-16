@@ -9,12 +9,12 @@ from Crypto.Random.random import getrandbits, \
 from django.utils.safestring import SafeText
 from django.contrib.auth.models import User
 
+from apps.enrollment.courses.models.semester import Semester
+
 from apps.grade.poll.models import Poll
 from apps.users.models import Student
 from apps.grade.ticket_create.exceptions import InvalidPollException, TicketUsed
-from apps.grade.ticket_create.models import PublicKey, \
-    PrivateKey, \
-    UsedTicketStamp
+from apps.grade.ticket_create.models import SigningKey, UsedTicketStamp
 from functools import cmp_to_key
 
 KEY_BITS = 1024
@@ -90,68 +90,14 @@ def poll_cmp(poll1, poll2):
                     return cmp(poll1.title, poll2.title)
 
 
-def generate_rsa_key() -> Tuple[str, str]:
-    """
-        Generates RSA key - that is, a pair (public key, private key)
-        both exported in PEM format
-    """
-
-    # wersja bezpieczniejsza
-    #key_length = 1024
-    #RSAkey     = RSA.generate(key_length)
-
-    # wersja szybsza
-    # do poprawki: tworzenie i usuwanie pliku test_rsa...
-    getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
-    RSAkey = RSA.importKey(open('test_rsa').read())
-    getstatusoutput('rm test_rsa*')
-
-    def key_to_str(bin_key):
-        return bin_key.decode(encoding='ascii', errors='strict')
-
-    # Converting the resulting keys to strings should be a safe operation
-    # as we explicitly specify the PEM format, which is a textual encoding
-    # see https://www.dlitz.net/software/pycrypto/api/current/Crypto.PublicKey.RSA._RSAobj-class.html#exportKey
-    privateKey = key_to_str(RSAkey.exportKey('PEM'))
-    publicKey = key_to_str(RSAkey.publickey().exportKey('PEM'))
-    return (publicKey, privateKey)
-
-
-PollKeys = List[Tuple[Poll, str]]
-
-
-def save_public_keys(polls_public_keys: PollKeys):
-    for (poll, key) in polls_public_keys:
-        print(poll)
-        pkey = PublicKey(poll=poll,
-                         public_key=key)
-        pkey.save()
-
-
-def save_private_keys(polls_private_keys: PollKeys):
-    for (poll, key) in polls_private_keys:
-        pkey = PrivateKey(poll=poll,
-                          private_key=key)
-        pkey.save()
-
-
-def generate_keys_for_polls(semester=None):
-    from apps.enrollment.courses.models.semester import Semester
+def generate_keys_for_polls(semester: Semester = None):
     if not semester:
         semester = Semester.get_current_semester()
     poll_list = Poll.get_polls_without_keys(semester)
-    pub_list = []
-    priv_list = []
-    i = 1
-    for el in poll_list:
-        (pub, priv) = generate_rsa_key()
-        pub_list.append(pub)
-        priv_list.append(priv)
-        i = i + 1
-    save_public_keys(list(zip(poll_list, pub_list)))
-    save_private_keys(list(zip(poll_list, priv_list)))
-    print(i - 1)
-    return
+    for poll in poll_list:
+        pem_rsa_key = SigningKey.generate_rsa_key()
+        key = SigningKey(poll=poll, private_key=pem_rsa_key)
+        key.save()
 
 
 def group_polls_by_course(poll_list):
@@ -190,18 +136,8 @@ def group_polls_by_course(poll_list):
     return res
 
 
-def generate_keys(poll_list):
-    keys = []
-
-    for poll in poll_list:
-        key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
-        keys.append((str(key.n), str(key.e)))
-
-    return keys
-
-
 def get_pubkey_as_dict(poll):
-    key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
+    key = RSA.importKey(SigningKey.objects.get(poll=poll).private_key)
     return {
         'n': str(key.n),
         'e': str(key.e),
@@ -246,7 +182,7 @@ def mark_poll_used(user, poll):
 def ticket_check_and_sign(user, poll, ticket):
     check_poll_visiblity(user, poll)
     check_ticket_not_signed(user, poll)
-    key = PrivateKey.objects.get(poll=poll)
+    key = SigningKey.objects.get(poll=poll)
     signed = key.sign_ticket(ticket)
     return signed
 
