@@ -1,7 +1,5 @@
 from django.contrib import admin
-from apps.grade.ticket_create.models import PublicKey, \
-    PrivateKey, \
-    UsedTicketStamp, StudentGraded
+from apps.grade.ticket_create.models import SigningKey, UsedTicketStamp, StudentGraded
 
 
 class StudentGradedAdmin(admin.ModelAdmin):
@@ -28,13 +26,12 @@ class UsedTicketStampAdmin(admin.ModelAdmin):
                      'student__matricula',)
 
 
-class PrivateKeyAdmin(admin.ModelAdmin):
+class SigningKeyAdmin(admin.ModelAdmin):
 
     list_display = ('poll', )
     search_fields = ('poll__title',)
 
 
-admin.site.register(PublicKey)
-admin.site.register(PrivateKey, PrivateKeyAdmin)
+admin.site.register(SigningKey, SigningKeyAdmin)
 admin.site.register(UsedTicketStamp, UsedTicketStampAdmin)
 admin.site.register(StudentGraded, StudentGradedAdmin)
