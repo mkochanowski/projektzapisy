@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.core.cache import cache
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
+from apps.grade.ticket_create.models import SigningKey
 from apps.grade.ticket_create.utils import generate_keys_for_polls, \
     validate_signing_request, get_poll_info_as_dict, get_pubkey_as_dict, \
     match_signing_requests_with_polls, get_signing_response, mark_poll_used
@@ -97,5 +98,5 @@ def tickets_generate(request):
 @employee_required
 def keys_generate(request):
     data = {}
-    data['keys_to_create'] = Poll.count_polls_without_keys()
+    data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
     return render(request, 'grade/ticket_create/keys_generate.html', data)
