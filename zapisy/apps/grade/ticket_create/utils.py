@@ -35,61 +35,6 @@ def flatten(x):
     return result
 
 
-def cmp(x, y):
-    if x < y:
-        return -1
-    if x == y:
-        return 0
-    return 1
-
-
-def poll_cmp(poll1, poll2):
-    if poll1.group:
-        if poll2.group:
-            c = cmp(poll1.group.course.name, poll2.group.course.name)
-            if c == 0:
-                c = cmp(poll1.group.type, poll2.group.type)
-                if c == 0:
-                    if poll1.studies_type:
-                        if poll2.studies_type:
-                            c = cmp(poll1.studies_type, poll2.studies_type)
-                            if c == 0:
-                                return cmp(poll1.title, poll2.title)
-                            else:
-                                return c
-                        else:
-                            return 1
-                    else:
-                        if poll2.studies_type:
-                            return -1
-                        else:
-                            return cmp(poll1.title, poll2.title)
-                else:
-                    return c
-            else:
-                return c
-        else:
-            return 1
-    else:
-        if poll2.group:
-            return -1
-        else:
-            if poll1.studies_type:
-                if poll2.studies_type:
-                    c = cmp(poll1.studies_type, poll2.studies_type)
-                    if c == 0:
-                        return cmp(poll1.title, poll2.title)
-                    else:
-                        return c
-                else:
-                    return 1
-            else:
-                if poll2.studies_type:
-                    return -1
-                else:
-                    return cmp(poll1.title, poll2.title)
-
-
 def generate_keys_for_polls(semester: Semester = None):
     if not semester:
         semester = Semester.get_current_semester()
@@ -98,50 +43,6 @@ def generate_keys_for_polls(semester: Semester = None):
         pem_rsa_key = SigningKey.generate_rsa_key()
         key = SigningKey(poll=poll, private_key=pem_rsa_key)
         key.save()
-
-
-def group_polls_by_course(poll_list):
-    if poll_list == []:
-        return []
-
-    poll_list.sort(key=cmp_to_key(poll_cmp))
-
-    res = []
-    act_polls = []
-    act_group = poll_list[0].group
-
-    for poll in poll_list:
-        if not act_group:
-            if not poll.group:
-                act_polls.append(poll)
-            else:
-                act_group = poll.group
-                res.append(act_polls)
-                act_polls = [poll]
-        else:
-            if poll.group:
-                if act_group.course == poll.group.course:
-                    act_polls.append(poll)
-                else:
-                    act_group = poll.group
-                    res.append(act_polls)
-                    act_polls = [poll]
-            else:
-                act_group = poll.group
-                res.append(act_polls)
-                act_polls = [poll]
-
-    res.append(act_polls)
-
-    return res
-
-
-def get_pubkey_as_dict(poll):
-    key = RSA.importKey(SigningKey.objects.get(poll=poll).private_key)
-    return {
-        'n': str(key.n),
-        'e': str(key.e),
-    }
 
 
 def check_poll_visiblity(user, poll):
@@ -242,58 +143,3 @@ def match_signing_requests_with_polls(signing_requests, user):
             except TicketUsed:
                 pass
     return matched_requests
-
-
-def validate_signing_request(signing_request: Dict) -> bool:
-    """Checks if values provided in signing request are correct.
-
-    Returns:
-        True or False
-    """
-    try:
-        if 'id' not in signing_request or 'ticket' not in signing_request:
-            return False
-        ticket_as_int = int(signing_request['ticket'])
-        if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
-            return False
-        return True
-    except (ValueError, TypeError):
-        return False
-
-
-def get_poll_info_as_dict(poll: Poll):
-    res = {}
-    res['title'] = poll.title
-    if poll.group is not None:
-        res['course_name'] = poll.group.course.name
-        res['type'] = poll.group.get_type_display()
-        res['teacher_name'] = poll.group.get_teacher_full_name()
-    if poll.studies_type:
-        res['studies_type'] = poll.studies_type
-
-    res['id'] = poll.pk
-
-    return res
-
-
-def from_plaintext(tickets_plaintext: str) -> List[Tuple[int, int, int]]:
-    """Parses plaintext tickets provided by user.
-
-    Returns:
-        List of (id, ticket, signature).
-    """
-    res = []
-    pre_tickets = tickets_plaintext.split(SEPARATOR)
-
-    if pre_tickets[-1].strip() == '':
-        pre_tickets = pre_tickets[:-1]
-
-    for ticket_plaintext in pre_tickets:
-        ticket_plaintext = ticket_plaintext.split()
-        id_idx = ticket_plaintext.index('id:')
-        id_ = ticket_plaintext[id_idx + 1]
-        ticket = ticket_plaintext[id_idx + 2]
-        signature = ticket_plaintext[id_idx + 3]
-        res.append((int(id_), int(ticket), int(signature)))
-
-    return res
