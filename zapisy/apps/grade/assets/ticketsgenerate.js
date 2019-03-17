@@ -105,24 +105,31 @@ var TicketCreate = function() {
     }))(this);
 
     this.to_plaintext = function() {
-        var res = '';
+        var res = {
+            tickets: []
+        };
         var that = this;
         $.each(this.unblindt_array, function(index, ticket) {
             var poll_info = that.poll_info_array[index];
-            res += '[' + poll_info.title + '] ';
             if (!poll_info.course_name) {
-                res += 'Ankieta ogólna &#10;';
+                res.tickets.push({
+                    name: 'Ankieta ogólna',
+                    id: poll_info.id,
+                    ticket: ticket,
+                    signature: that.unblindst_array[index]
+                });
             } else {
-                res += poll_info.course_name + ' &#10;';
-                res += poll_info.type + ': ';
-                res += poll_info.teacher_name + ' &#10;';
+                res.tickets.push({
+                    name: poll_info.course_name,
+                    type: poll_info.type,
+                    teacher: poll_info.teacher_name,
+                    id: poll_info.id,
+                    ticket: ticket,
+                    signature: that.unblindst_array[index]
+                });
             }
-            res += 'id: ' + poll_info.id + ' &#10;';
-            res += ticket + ' &#10;';
-            res += that.unblindst_array[index] + ' &#10;';
-            res += '-'.repeat(34) + ' &#10;';
         });
-        return res;
+        return JSON.stringify(res, null, 2);
     };
 
 

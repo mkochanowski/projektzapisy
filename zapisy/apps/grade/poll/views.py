@@ -16,6 +16,7 @@ from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.ticket_create.utils import from_plaintext
+from apps.grade.poll.serializers import TicketsListSerializer
 from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQuestion, \
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
@@ -682,11 +683,16 @@ def tickets_enter(request):
             else:
                 tickets_plaintext = form.cleaned_data['ticketsfield']
             try:
-                ids_and_tickets = from_plaintext(tickets_plaintext)
+                raw_tickets = json.loads(tickets_plaintext)
+                valid_ser = TicketsListSerializer(data=raw_tickets)
+                if not valid_ser.is_valid():
+                    raise ValueError
+                tickets = valid_ser.validated_data
+                
             except BaseException:
-                ids_and_tickets = []
+                tickets = None
 
-            if not ids_and_tickets:
+            if not tickets:
                 messages.error(request, "Podano niepoprawne bilety.")
                 data['form'] = form
                 data['grade'] = grade
@@ -695,7 +701,10 @@ def tickets_enter(request):
             errors = []
             polls = []
             finished = []
-            for (id, ticket, signed_ticket) in ids_and_tickets:
+            for item in tickets['tickets']:
+                id = item['id']
+                ticket= item['ticket']
+                signed_ticket = item['signature']
                 try:
                     poll = Poll.objects.get(pk=id)
                     key = poll.signingkey
