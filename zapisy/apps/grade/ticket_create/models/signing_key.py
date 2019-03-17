@@ -44,15 +44,8 @@ class SigningKey(models.Model):
     def generate_rsa_key() -> str:
         """Generates RSA key, exported in PEM format"""
 
-        # wersja bezpieczniejsza
-        #key_length = 1024
-        #RSAkey     = RSA.generate(key_length)
-
-        # wersja szybsza
-        # do poprawki: tworzenie i usuwanie pliku test_rsa...
-        getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
-        RSAkey = RSA.importKey(open('test_rsa').read())
-        getstatusoutput('rm test_rsa*')
+        key_length = 1024
+        RSAkey     = RSA.generate(key_length)
 
         # Converting the resulting keys to strings should be a safe operation
         # as we explicitly specify the PEM format, which is a textual encoding
