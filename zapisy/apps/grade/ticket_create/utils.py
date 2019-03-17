@@ -261,26 +261,6 @@ def validate_signing_request(signing_request: Dict) -> bool:
         return False
 
 
-def to_plaintext(vtl):
-    res = ""
-    for p, t, st in vtl:
-        res += '[' + p.title + ']'
-        if not p.group:
-            res += 'Ankieta ogólna &#10;'
-        else:
-            res += str(p.group.course.name) + " &#10;"
-            res += str(p.group.get_type_display()) + ": "
-            res += str(p.group.get_teacher_full_name()) + " &#10;"
-        if p.studies_type:
-            res += 'typ studiów: ' + str(p.studies_type) + " &#10;"
-
-        res += 'id: ' + str(p.pk) + ' &#10;'
-        res += str(t) + " &#10;"
-        res += str(st) + " &#10;"
-        res += SEPARATOR + " &#10;"
-    return SafeText(str(res))
-
-
 def get_poll_info_as_dict(poll: Poll):
     res = {}
     res['title'] = poll.title
