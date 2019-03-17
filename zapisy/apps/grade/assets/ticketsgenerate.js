@@ -145,9 +145,11 @@ var TicketCreate = function() {
     // tickets, then send them to the server for signing
     this.step2 = (that => (data => {
         $("#progressbar").progressbar("option", "value", 30);
-        $.each(data, that.tickets_generator);
+        $.each(data['poll_data'], that.tickets_generator);
 
-        let signing_requests = JSON.stringify(that.signing_requests);
+        let signing_requests = JSON.stringify({
+            signing_requests: that.signing_requests
+        });
         $.ajax({
             type: "POST",
             url: "/grade/ticket/ajax_sign_tickets",

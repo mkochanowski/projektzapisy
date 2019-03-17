@@ -131,6 +131,21 @@ class Poll(models.Model):
             result.append(section.all_answers(self))
         return result
 
+    def serialize_for_signing_protocol(self):
+        res = {}
+        res['title'] = self.title
+        if self.group is not None:
+            res['course_name'] = self.group.course.name
+            res['type'] = self.group.get_type_display()
+            res['teacher_name'] = self.group.get_teacher_full_name()
+        if self.studies_type:
+            res['studies_type'] = self.studies_type
+
+        res['id'] = self.pk
+
+        return res
+
+
     @staticmethod
     def get_polls_for_semester(semester=None):
         if not semester:

@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.core.cache import cache
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
+from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
 from apps.grade.ticket_create.models import SigningKey
 from apps.grade.ticket_create.utils import generate_keys_for_polls, \
     validate_signing_request, get_poll_info_as_dict, get_pubkey_as_dict, \
@@ -37,11 +38,13 @@ def ajax_get_rsa_keys(request):
     response_data = []
     for poll in students_polls:
         poll_data = {
-            'key': get_pubkey_as_dict(poll),
-            'poll_info': get_poll_info_as_dict(poll),
+            'key': poll.signingkey.serialize_for_signing_protocol(),
+            'poll_info': poll.serialize_for_signing_protocol(),
         }
         response_data.append(poll_data)
-    return JsonResponse(response_data, safe=False)
+    return JsonResponse({
+        'poll_data': response_data,
+    })
 
 
 @require_POST
@@ -58,15 +61,14 @@ def ajax_sign_tickets(request):
             'error': "Couldn't parse json"
         })
 
-    for req in signing_requests:
-        if not validate_signing_request(req):
-            return JsonResponse({
-                'error': 'Invalid request'
-            })
-        req['ticket'] = int(req['ticket'])
-
+    valid_ser = SigningRequestsListSerializer(data=signing_requests)
+    if not valid_ser.is_valid():
+        return JsonResponse({
+            'error': 'Invalid request'
+        })
     try:
-        matched_requests = match_signing_requests_with_polls(signing_requests, request.user)
+        matched_requests = match_signing_requests_with_polls(
+            valid_ser.validated_data['signing_requests'], request.user)
     except KeyError:
         return JsonResponse({
             'error': "Couldn't match provided id with poll"

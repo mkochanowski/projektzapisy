@@ -40,6 +40,15 @@ class SigningKey(models.Model):
 
         return ticket_hash_as_int == signature_pow_e
 
+    def serialize_for_signing_protocol(self):
+        '''Extracts public parts of the key, needed for ticket signing protocol'''
+        key = RSA.importKey(self.private_key)
+        return {
+            'n': str(key.n),
+            'e': str(key.e),
+        }
+
+
     @staticmethod
     def generate_rsa_key() -> str:
         """Generates RSA key, exported in PEM format"""
