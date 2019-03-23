@@ -92,8 +92,8 @@ def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
 
 
 def match_signing_requests_with_polls(signing_requests, user):
-    """For each signing request, matches it with poll corresponding to provided id, checking
-    if ticket for this poll wasn't already signed.
+    """For each signing request, matches it with poll corresponding to provided id, ensuring
+    that it will match only the polls user is allowed to vote in.
 
     Raises:
         KeyError: When there is not match between signing request and students polls.
@@ -102,11 +102,5 @@ def match_signing_requests_with_polls(signing_requests, user):
     student_polls = Poll.get_all_polls_for_student_as_dict(user.student)
     for req in signing_requests:
         poll = student_polls[req['id']]
-
-        if req['id'] == poll.pk:
-            try:
-                check_ticket_not_signed(user, poll)
-                matched_requests.append((req, poll))
-            except TicketUsed:
-                pass
+        matched_requests.append((req, poll))
     return matched_requests
