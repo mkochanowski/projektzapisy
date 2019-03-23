@@ -52,7 +52,6 @@ def ajax_sign_tickets(request):
     """Reads tickets sent by the user, signs them and marks them as already
     used, so user cannot sign them twice. Responds with generated signatures.
     """
-    students_polls = Poll.get_all_polls_for_student(request.user.student)
     try:
         signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
@@ -87,7 +86,6 @@ def ajax_sign_tickets(request):
 def tickets_generate(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
-        students_polls = Poll.get_all_polls_for_student(request.user.student)
         polls_lists, general_polls = Poll.get_polls_list(request.user.student)
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
         return render(request, 'grade/ticket_create/tickets_generate.html', data)

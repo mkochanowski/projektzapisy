@@ -20,7 +20,7 @@ from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQues
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
 from apps.grade.poll.forms import TicketsForm, PollForm
-from apps.grade.poll.utils import check_signature, prepare_data, group_polls_and_tickets_by_course, \
+from apps.grade.poll.utils import prepare_data, group_polls_and_tickets_by_course, \
     create_slug, get_next, get_prev, get_ticket_and_signed_ticket_from_session, \
     group_polls_by_course, group_polls_by_teacher, getGroups, declination_poll, \
     declination_section, declination_template, csv_prepare, generate_csv_title, get_objects, \
