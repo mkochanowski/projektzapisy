@@ -16,6 +16,7 @@ class SigningKey(models.Model):
     '''
     poll = models.OneToOneField('poll.Poll', verbose_name='ankieta', on_delete=models.CASCADE)
     private_key = models.TextField(verbose_name='klucz prywatny')
+    students = models.ManyToManyField('users.Student', related_name='signingkeys')
 
     class Meta:
         verbose_name = 'klucz prywatny'
@@ -48,13 +49,12 @@ class SigningKey(models.Model):
             'e': str(key.e),
         }
 
-
     @staticmethod
     def generate_rsa_key() -> str:
         """Generates RSA key, exported in PEM format"""
 
         key_length = 1024
-        RSAkey     = RSA.generate(key_length)
+        RSAkey = RSA.generate(key_length)
 
         # Converting the resulting keys to strings should be a safe operation
         # as we explicitly specify the PEM format, which is a textual encoding

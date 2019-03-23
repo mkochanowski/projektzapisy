@@ -15,7 +15,6 @@ from apps.grade.poll.models import Poll, Section, SectionOrdering, \
     MultipleChoiceQuestionAnswer, \
     OpenQuestionAnswer, Option, Template, \
     TemplateSections, Origin
-from apps.grade.ticket_create.utils import flatten
 from apps.grade.poll.exceptions import NoTitleException, NoPollException, \
     NoSectionException
 
@@ -28,6 +27,20 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
 from functools import reduce, cmp_to_key
 from collections import defaultdict
+
+
+def flatten(x):
+    result = []
+    for el in x:
+        if isinstance(el, list):
+            if hasattr(el, "__iter__") and not isinstance(el, str):
+                result.extend(flatten(el))
+            else:
+                result.append(el)
+        else:
+            result.append(el)
+
+    return result
 
 
 def poll_and_ticket_cmp(pollTuple1, pollTuple2):

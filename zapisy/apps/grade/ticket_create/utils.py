@@ -14,25 +14,8 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models import Poll
 from apps.users.models import Student
 from apps.grade.ticket_create.exceptions import InvalidPollException, TicketUsed
-from apps.grade.ticket_create.models import SigningKey, UsedTicketStamp
+from apps.grade.ticket_create.models import SigningKey
 from functools import cmp_to_key
-
-KEY_BITS = 1024
-SEPARATOR = '----------------------------------'
-
-
-def flatten(x):
-    result = []
-    for el in x:
-        if isinstance(el, list):
-            if hasattr(el, "__iter__") and not isinstance(el, str):
-                result.extend(flatten(el))
-            else:
-                result.append(el)
-        else:
-            result.append(el)
-
-    return result
 
 
 def generate_keys_for_polls(semester: Semester = None):
@@ -64,8 +47,7 @@ def check_ticket_not_signed(user, poll):
         TicketUsed: If the user has already used the ticket for the poll.
         Student.DoesNotExist: If the user in question is not a student.
     """
-    u = UsedTicketStamp.objects.filter(student=user.student, poll=poll)
-    if u:
+    if poll.signingkey.students.filter(pk=user.student.pk).exists():
         raise TicketUsed
 
 
@@ -75,9 +57,7 @@ def mark_poll_used(user, poll):
     Raises:
         Student.DoesNotExist: If the user in question is not a student.
     """
-    u = UsedTicketStamp(student=user.student,
-                        poll=poll)
-    u.save()
+    poll.signingkey.students.add(user.student)
 
 
 def ticket_check_and_sign(user, poll, ticket):
