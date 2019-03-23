@@ -52,20 +52,7 @@ def check_ticket_not_signed(user, poll):
 
 
 def mark_poll_used(user, poll):
-    """Saves the user's stamp for the poll.
-
-    Raises:
-        Student.DoesNotExist: If the user in question is not a student.
-    """
     poll.signingkey.students.add(user.student)
-
-
-def ticket_check_and_sign(user, poll, ticket):
-    check_poll_visiblity(user, poll)
-    check_ticket_not_signed(user, poll)
-    key = SigningKey.objects.get(poll=poll)
-    signed = key.sign_ticket(ticket)
-    return signed
 
 
 def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
@@ -82,13 +69,11 @@ def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
             'signature': <ticket_signature>
             'id': <signing_request_id>
     """
-    try:
-        signed_ticket = ticket_check_and_sign(user, poll, signing_request['ticket'])
-        error_msg = None
-    except InvalidPollException:
-        error_msg = "Nie jesteś przypisany do tej ankiety"
-    except TicketUsed:
+    error_msg = None
+    if poll.signingkey.student_used_key(user.student):
         error_msg = "Bilet już pobrano"
+    elif not poll.is_student_entitled_to_poll(user.student):
+        error_msg = "Nie jesteś przypisany do tej ankiety"
 
     if error_msg:
         return {
@@ -97,6 +82,8 @@ def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
             'id': signing_request['id'],
         }
     else:
+        key = SigningKey.objects.get(poll=poll)
+        signed_ticket = key.sign_ticket(signing_request['ticket'])
         return {
             'status': 'OK',
             'id': signing_request['id'],

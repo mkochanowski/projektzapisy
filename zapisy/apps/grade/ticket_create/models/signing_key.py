@@ -5,9 +5,12 @@ from Crypto.Signature import pkcs1_15
 from subprocess import getstatusoutput
 
 from apps.enrollment.courses.models.semester import Semester
+from apps.users.models import Student
 
 from django.db import models
 from django.apps import apps
+
+from typing import Dict
 
 
 class SigningKey(models.Model):
@@ -41,13 +44,17 @@ class SigningKey(models.Model):
 
         return ticket_hash_as_int == signature_pow_e
 
-    def serialize_for_signing_protocol(self):
+    def serialize_for_signing_protocol(self) -> Dict[str, str]:
         '''Extracts public parts of the key, needed for ticket signing protocol'''
         key = RSA.importKey(self.private_key)
         return {
             'n': str(key.n),
             'e': str(key.e),
         }
+
+    def student_used_key(self, student: Student) -> bool:
+        '''Checks if student already used this key to sign his ticket'''
+        return self.students.filter(pk=student.pk).exists()
 
     @staticmethod
     def generate_rsa_key() -> str:
