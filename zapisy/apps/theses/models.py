@@ -90,37 +90,3 @@ class Thesis(models.Model):
     class Meta:
         verbose_name = "praca dyplomowa"
         verbose_name_plural = "prace dyplomowe"
-
-
-class ThesisVote(ChoicesEnum):
-    NONE = 1, "brak głosu"
-    REJECTED = 2, "odrzucona"
-    ACCEPTED = 3, "zaakceptowana"
-
-
-def vote_to_string(vote_value: int) -> str:
-    for value, vote_string in ThesisVote.choices():
-        if value == vote_value:
-            return vote_string
-    return ""
-
-
-class ThesisVoteBinding(models.Model):
-    thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE, related_name="votes")
-    # should be a member of the theses board group
-    voter = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="thesis_votes")
-    value = models.SmallIntegerField(choices=ThesisVote.choices())
-
-    def __str__(self) -> str:
-        return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
-
-
-class ThesesSystemSettings(models.Model):
-    num_required_votes = models.SmallIntegerField()
-
-    def __str__(self):
-        return "Ustawienia systemu"
-
-    class Meta:
-        verbose_name = "ustawienia systemu prac dyplomowych"
-        verbose_name_plural = "ustawienia systemu prac dyplomowych"

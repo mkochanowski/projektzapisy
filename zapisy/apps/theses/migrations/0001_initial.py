@@ -14,17 +14,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ThesesSystemSettings',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('num_required_votes', models.SmallIntegerField()),
-            ],
-            options={
-                'verbose_name': 'ustawienia systemu prac dyplomowych',
-                'verbose_name_plural': 'ustawienia systemu prac dyplomowych'
-            },
-        ),
-        migrations.CreateModel(
             name='Thesis',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -44,14 +33,5 @@ class Migration(migrations.Migration):
                 'verbose_name': 'praca dyplomowa',
                 'verbose_name_plural': 'prace dyplomowe',
             },
-        ),
-        migrations.CreateModel(
-            name='ThesisVoteBinding',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('value', models.SmallIntegerField(choices=[(1, 'brak głosu'), (2, 'odrzucona'), (3, 'zaakceptowana')])),
-                ('thesis', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='votes', to='theses.Thesis')),
-                ('voter', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='thesis_votes', to='users.Employee')),
-            ],
         ),
     ]
