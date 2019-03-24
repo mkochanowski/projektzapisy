@@ -112,7 +112,7 @@ def generate_base_queryset() -> QuerySet:
             "advisor__user__first_name", Value(" "), "advisor__user__last_name"
         )
     ).annotate(_is_archived=Case(
-        When(status=ThesisStatus.DEFENDED.value, then=True),
+        When(status=ThesisStatus.DEFENDED, then=True),
         default=Value(False),
         output_field=BooleanField()
     ))
@@ -172,7 +172,7 @@ def sort_queryset(qs: QuerySet, sort_column: str, sort_dir: str) -> QuerySet:
 def available_thesis_filter(qs: QuerySet) -> QuerySet:
     """Returns only theses that are considered "available" from the specified queryset"""
     return qs.exclude(
-        status=ThesisStatus.IN_PROGRESS.value
+        status=ThesisStatus.IN_PROGRESS
     ).exclude(_is_archived=True).filter(reserved_until__isnull=True)
 
 
@@ -180,16 +180,16 @@ def available_thesis_filter(qs: QuerySet) -> QuerySet:
 # i.e. if the user asks for all engineer theses, we assume they want
 # all theses suitable for engineer degrees, so bachelors+engineers should
 # be returned as well
-ENGINEERS_KINDS = tuple(k.value for k in (
+ENGINEERS_KINDS = (
     ThesisKind.ENGINEERS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
-))
-BACHELORS_KINDS = tuple(k.value for k in(
+)
+BACHELORS_KINDS = (
     ThesisKind.BACHELORS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
-))
+)
 BACHELORS_OR_ENGINEERS_KINDS = tuple(set(ENGINEERS_KINDS + BACHELORS_KINDS))
-ISIM_KINDS = (k.value for k in (
+ISIM_KINDS = (
     ThesisKind.ISIM, ThesisKind.BACHELORS_ENGINEERS_ISIM
-))
+)
 
 
 def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
@@ -201,7 +201,7 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
     elif thesis_type == ThesisTypeFilter.ARCHIVED:
         return qs.filter(_is_archived=True)
     elif thesis_type == ThesisTypeFilter.MASTERS:
-        return qs.filter(kind=ThesisKind.MASTERS.value)
+        return qs.filter(kind=ThesisKind.MASTERS)
     elif thesis_type == ThesisTypeFilter.ENGINEERS:
         return qs.filter(kind__in=ENGINEERS_KINDS)
     elif thesis_type == ThesisTypeFilter.BACHELORS:
@@ -211,7 +211,7 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
     elif thesis_type == ThesisTypeFilter.ISIM:
         return qs.filter(kind__in=ISIM_KINDS)
     elif thesis_type == ThesisTypeFilter.AVAILABLE_MASTERS:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS.value))
+        return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_ENGINEERS:
         return available_thesis_filter(qs.filter(kind__in=ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS:
@@ -232,8 +232,8 @@ def filter_theses_queryset_for_only_mine(qs: QuerySet, user: BaseUser):
 
 
 NOT_READY_STATUSES = (
-    ThesisStatus.BEING_EVALUATED.value,
-    ThesisStatus.RETURNED_FOR_CORRECTIONS.value
+    ThesisStatus.BEING_EVALUATED,
+    ThesisStatus.RETURNED_FOR_CORRECTIONS
 )
 
 

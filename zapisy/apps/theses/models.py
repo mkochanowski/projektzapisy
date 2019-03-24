@@ -1,6 +1,7 @@
 from enum import Enum
 from datetime import datetime
 
+from choicesenum import ChoicesEnum
 from django.db import models
 
 from apps.users.models import Employee, Student
@@ -8,42 +9,23 @@ from apps.users.models import Employee, Student
 MAX_THESIS_TITLE_LEN = 300
 
 
-class ThesisKind(Enum):
-    MASTERS = 0
-    ENGINEERS = 1
-    BACHELORS = 2
-    ISIM = 3
+class ThesisKind(ChoicesEnum):
+    MASTERS = 0, "mgr"
+    ENGINEERS = 1, "inż"
+    BACHELORS = 2, "lic"
+    ISIM = 3, "isim"
     # Certain theses will be appropriate for both bachelor and engineer degrees
-    BACHELORS_ENGINEERS = 4
-    BACHELORS_ENGINEERS_ISIM = 5
+    BACHELORS_ENGINEERS = 4, "lic+inż"
+    BACHELORS_ENGINEERS_ISIM = 5, "lic+inż+isim"
 
 
-THESIS_KIND_CHOICES = (
-    (ThesisKind.MASTERS.value, "mgr"),
-    (ThesisKind.ENGINEERS.value, "inż"),
-    (ThesisKind.BACHELORS.value, "lic"),
-    (ThesisKind.ISIM.value, "isim"),
-    (ThesisKind.BACHELORS_ENGINEERS.value, "lic+inż"),
-    (ThesisKind.BACHELORS_ENGINEERS_ISIM.value, "lic+inż+isim"),
-)
-
-
-class ThesisStatus(Enum):
-    BEING_EVALUATED = 1
-    RETURNED_FOR_CORRECTIONS = 2
-    ACCEPTED = 3
-    IN_PROGRESS = 4
-    DEFENDED = 5
+class ThesisStatus(ChoicesEnum):
+    BEING_EVALUATED = 1, "weryfikowana przez komisję"
+    RETURNED_FOR_CORRECTIONS = 2, "zwrócona do poprawek"
+    ACCEPTED = 3, "zaakceptowana"
+    IN_PROGRESS = 4, "w realizacji"
+    DEFENDED = 5, "obroniona"
     DEFAULT = BEING_EVALUATED
-
-
-THESIS_STATUS_CHOICES = (
-    (ThesisStatus.BEING_EVALUATED.value, "weryfikowana przez komisję"),
-    (ThesisStatus.RETURNED_FOR_CORRECTIONS.value, "zwrócona do poprawek"),
-    (ThesisStatus.ACCEPTED.value, "zaakceptowana"),
-    (ThesisStatus.IN_PROGRESS.value, "w realizacji"),
-    (ThesisStatus.DEFENDED.value, "obroniona"),
-)
 
 
 class Thesis(models.Model):
@@ -61,8 +43,8 @@ class Thesis(models.Model):
         Employee, on_delete=models.PROTECT, blank=True,
         null=True, related_name="thesis_auxiliary_advisor",
     )
-    kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
-    status = models.SmallIntegerField(choices=THESIS_STATUS_CHOICES)
+    kind = models.SmallIntegerField(choices=ThesisKind.choices())
+    status = models.SmallIntegerField(choices=ThesisStatus.choices())
     reserved_until = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
     student = models.ForeignKey(
@@ -76,7 +58,7 @@ class Thesis(models.Model):
     modified_date = models.DateTimeField(auto_now_add=True)
 
     def is_archived(self):
-        return self.status == ThesisStatus.DEFENDED.value
+        return self.status == ThesisStatus.DEFENDED
 
     def __str__(self) -> str:
         return self.title
@@ -92,9 +74,9 @@ class Thesis(models.Model):
         """
         current_status = ThesisStatus(self.status)
         if current_status == ThesisStatus.ACCEPTED and (self.student or self.student_2):
-            self.status = ThesisStatus.IN_PROGRESS.value
+            self.status = ThesisStatus.IN_PROGRESS
         elif current_status == ThesisStatus.IN_PROGRESS and not self.student and not self.student_2:
-            self.status = ThesisStatus.ACCEPTED.value
+            self.status = ThesisStatus.ACCEPTED
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -110,21 +92,14 @@ class Thesis(models.Model):
         verbose_name_plural = "prace dyplomowe"
 
 
-class ThesisVote(Enum):
-    NONE = 1
-    REJECTED = 2
-    ACCEPTED = 3
-
-
-THESIS_VOTE_CHOICES = (
-    (ThesisVote.NONE.value, "brak głosu"),
-    (ThesisVote.REJECTED.value, "odrzucona"),
-    (ThesisVote.ACCEPTED.value, "zaakceptowana"),
-)
+class ThesisVote(ChoicesEnum):
+    NONE = 1, "brak głosu"
+    REJECTED = 2, "odrzucona"
+    ACCEPTED = 3, "zaakceptowana"
 
 
 def vote_to_string(vote_value: int) -> str:
-    for value, vote_string in THESIS_VOTE_CHOICES:
+    for value, vote_string in ThesisVote.choices():
         if value == vote_value:
             return vote_string
     return ""
@@ -134,7 +109,7 @@ class ThesisVoteBinding(models.Model):
     thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE, related_name="votes")
     # should be a member of the theses board group
     voter = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="thesis_votes")
-    value = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
+    value = models.SmallIntegerField(choices=ThesisVote.choices())
 
     def __str__(self) -> str:
         return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
