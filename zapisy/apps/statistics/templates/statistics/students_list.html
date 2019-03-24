@@ -1,18 +1,19 @@
 {% extends "statistics/base.html" %}
 
-{% block students_active %} class="active"{% endblock %}
+{% block students_active %}active{% endblock %}
 
-{% block content %}
-    <table>
-        <thead>
+{% block all-content %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="text-muted">
             <tr>
-                <th>Imię</th>
-                <th>Nazwisko</th>
-                <th>Ostatnio</th>
-                <th>Index</th>
-                <th>ECTS</th>
-                <th>Punkty w semestrze</th>
-                <th>T0</th>
+                <th scope="col">Imię</th>
+                <th scope="col">Nazwisko</th>
+                <th scope="col">Ostatnie logowanie</th>
+                <th scope="col">Index</th>
+                <th scope="col">ECTS</th>
+                <th scope="col">T0</th>
+                <th scope="col">Najwcześniejsza możliwość zapisu</th>
             </tr>
         </thead>
         <tbody>
@@ -23,10 +24,11 @@
                     <td>{{ student.user.last_login }}</td>
                     <td>{{ student.matricula }}</td>
                     <td>{{ student.ects }}</td>
-                    <td>{{ student.semester_points }}</td>
-                    <td>{{ student.t0_min|date:"d E Y, G:i" }}</td>
+                    <td>{{ student.min_t0|date:"d E Y, G:i" }}</td>
+                    <td>{{ student.min_opening_time|date:"d E Y, G:i" }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
 {% endblock %}

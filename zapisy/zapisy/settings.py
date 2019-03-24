@@ -74,17 +74,25 @@ LOGGING = {
     },
     'handlers': {
         'logfile': {
-            # optionally raise to INFO to not fill the log file too quickly
-            'level': 'DEBUG',  # DEBUG or higher goes to the log file
+            'level': 'INFO',  # INFO or higher goes to the log file. DEBUG polluted the logs way too much.
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/djangoproject.log',
-            'maxBytes': 50 * 10 ** 6,  # will 50 MB do?
-            'backupCount': 3,  # keep this many extra historical files
+            'maxBytes': 50 * 1024 * 1024,  # will 50 MB do?
+            'backupCount': 5,  # keep this many extra historical files
             'formatter': 'timestampthread'
         },
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
+        },
+        'rq_logfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'timestampthread',
+            'filename': 'logs/rqworker.log',
+            'encoding': 'UTF-8',
+            'maxBytes': 50 * 1024 * 1024,  # 50 MB
+            'backupCount': 5,  # keep this many extra historical files
         },
     },
     'loggers': {
@@ -94,6 +102,10 @@ LOGGING = {
         },
         'apps': {
             'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+        'rq.worker': {
+            'handlers': ['rq_logfile'],
             'level': 'DEBUG',
         },
     },
@@ -200,6 +212,7 @@ INSTALLED_APPS = (
     'pipeline',
     'apps.enrollment.courses',
     'apps.enrollment.records',
+    'apps.enrollment.timetable',
     'apps.statistics',
     'apps.news',
     'apps.offer.preferences',
@@ -216,11 +229,10 @@ INSTALLED_APPS = (
     'apps.schedulersync',
     'django_extensions',
     'django_filters',
-    'el_pagination',
+    'bootstrap_pagination',
+    'crispy_forms',
     'apps.notifications',
     'django_cas_ng',
-
-    'test_app',
     'django_rq',
     'webpack_loader',
 )
@@ -244,14 +256,18 @@ LOGIN_REDIRECT_URL = '/users/'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-# settings for enrollment
-# ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
+# Settings for enrollment.
+# Bonus minutes per one ECTS credit. This setting affects T0 times computation.
 ECTS_BONUS = 5
-ECTS_LIMIT = 35
+# Limits concerning the amount of ECTS points a student can sign up to in a
+# semester. For the first part of enrollment cycle, the INITIAL_LIMIT holds.
+# Then, after abolition time, students can enroll into some additional courses.
+ECTS_INITIAL_LIMIT = 35
 ECTS_FINAL_LIMIT = 45
 
 VOTE_LIMIT = 60
 
+# MSc Computer Science Program will have id=1 in database table users_program.
 M_PROGRAM = 1
 LETURE_TYPE = '1'
 QUEUE_PRIORITY_LIMIT = 5
@@ -309,6 +325,8 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 COMPRESS_OFFLINE = env.bool('COMPRESS_OFFLINE', default=False)
 COMPRESS_ENABLED = env.bool('COMPRESS_ENABLED', default=False)
 COMPRESS_OFFLINT_TIMEOUT = env.int('COMPRESS_OFFLINT_TIMEOUT', default=0)
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'

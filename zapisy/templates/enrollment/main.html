@@ -9,14 +9,14 @@
 {% endblock %}
 
 {% block bread %}
-    <li><a href="/">{% trans "Strona główna" %}</a></li>
-    <li>{% trans "Zapisy" %}</li>
+    <li class="breadcrumb-item"><a href="/">{% trans "Strona główna" %}</a></li>
+    <li class="breadcrumb-item">{% trans "Zapisy" %}</li>
 {% endblock %}
 
 {% block content %}
     <div id="mainPage-container">
         <div>
-            <a href="{% url 'enrollment-main' %}">{% trans "System zapisów" %}</a>
+            <a href="{% url 'course-list' %}">{% trans "System zapisów" %}</a>
             <span>{% trans "System zapisów na zajęcia w Instytucie Informatyki Uniwersytetu Wrocławskiego" %}.</span>
         </div>
     </div>

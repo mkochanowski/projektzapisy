@@ -6,14 +6,14 @@ Aby rozpocząć pracę w projekcie przejdź przez instrukcję:
 https://github.com/iiuni/projektzapisy/wiki/Developer's-environment-setup
 
 Jeżeli zamierzasz zajmować się rzeczami związanymi z _frontendem_, warto zapoznać się też z systemem plików statycznych:
-https://github.com/iiuni/projektzapisy/wiki/Pliki-statyczne-w-Systemie-Zapis%C3%B3w
+https://github.com/iiuni/projektzapisy/wiki/Pliki-statyczne-w-Systemie-Zapisów
 
 ### Narzędzia
 
 * **Slack** - nasz główny komunikator: https://projektzapisy.slack.com/
 * **Redmine** - publiczny tracker błędów: https://tracker-zapisy.ii.uni.wroc.pl/projects/zapisy-tracker/issues
 * **Rollbar** - tracker błędów pojawiających się na produkcji: https://rollbar.com/IIUniversityofWroclaw/System-Zapisow/
-* **CircleCI** - continuous integration: https://circleci.com/gh/lewymati/projektzapisy
+* **Travis CI** - continuous integration: https://travis-ci.org/iiuni/projektzapisy
 
 ### Workflow pracy
 
@@ -21,7 +21,7 @@ https://github.com/iiuni/projektzapisy/wiki/Pliki-statyczne-w-Systemie-Zapis%C3%
 2. Pracujemy na swoim branchu - tworzymy go z brancha `master-dev`.
 3. Po ukończeniu tworzymy Pull Requesta z bazowym branchem `master-dev`.
 4. Wybieramy w PR dwie osoby, do zrobienia Code Review.
-5. Po akceptacji dwóch osób możemy samodzielnie kliknąć Merge.
+5. Zaakceptowane Pull Requesty będą merge'owane przez prowadzących projekt.
 6. Co jakiś czas (około dwóch tygodni-miesiąca) robiony jest deploy na produkcję. Branch `master` przechowuje wersję produkcyjną.
 
 ### Wskazówki

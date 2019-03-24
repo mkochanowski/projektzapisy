@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">{% trans "Imię" %}</th>
+        <th scope="col">{% trans "Nazwisko" %}</th>
+        <th scope="col">{% trans "Nr indeksu" %}</th>
+        <th scope="col">{% trans "Rodzaj studiów" %}</th>
+        <th scope="col">{% trans "Semestr" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for student in students %}
+        <tr>
+            <td>{% if can_user_see_all_students_here or student.consent_granted %}<a href="{% url 'student-profile' student.user.id %}" class="person">
+                {{ student.user.first_name }}</a>{% endif %}</td>
+            <td>{% if can_user_see_all_students_here or student.consent_granted %}<a href="{% url 'student-profile' student.user.id %}" class="person">
+                {{ student.user.last_name }}</a>{% endif %}</td>
+            <td>{{ student.matricula }}</td>
+            <td>
+                {{ student.program }}
+            </td>
+            <td>{{ student.semestr }}</td>
+        </tr>
+
+    {% empty %}
+        {% trans "Brak zapisanych osób" %}.
+    {% endfor %}
+    </tbody>
+</table>

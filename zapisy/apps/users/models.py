@@ -7,9 +7,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models import QuerySet
+from django.core.validators import MaxLengthValidator
 
 from apps.users.exceptions import NonUserException
-from apps.users.managers import GettersManager, T0Manager
 
 # The TYPE_CHECKING constant is always False at runtime, so the import won't be evaluated,
 # but mypy (and other type-checking tools) will evaluate the contents of that block.
@@ -107,7 +107,7 @@ class Employee(BaseUser):
         verbose_name="Użytkownik",
         related_name='employee',
         on_delete=models.CASCADE)
-    consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
+    consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True, validators=[MaxLengthValidator(4200)])
     homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(
@@ -115,6 +115,7 @@ class Employee(BaseUser):
         choices=EMPLOYEE_STATUS_CHOICES,
         verbose_name="Status")
     title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
+    usos_id = models.PositiveIntegerField(verbose_name="ID w USOSie", null=True, blank=True)
 
     def has_privileges_for_group(self, group_id: int) -> bool:
         """
@@ -125,7 +126,7 @@ class Employee(BaseUser):
 
         try:
             group = Group.objects.get(pk=group_id)
-            return group.teacher == self or self in group.course.teachers.all() or self.user.is_staff
+            return group.teacher == self or group.course.owner == self or self.user.is_staff
         except Group.DoesNotExist:
             logger.error(
                 'Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' %
@@ -206,7 +207,8 @@ class Student(BaseUser):
     algorytmy_l = models.BooleanField(default=False)
     programowanie_l = models.BooleanField(default=False)
 
-    objects: GettersManager = GettersManager()
+    usos_id = models.PositiveIntegerField(
+        null=True, blank=True, unique=True, verbose_name='Kod studenta w systemie USOS')
 
     def is_active(self) -> bool:
         return self.status == 0
@@ -244,58 +246,6 @@ class Student(BaseUser):
     def participated_in_last_grades(self) -> int:
         from apps.grade.ticket_create.models.student_graded import StudentGraded
         return StudentGraded.objects.filter(student=self, semester__in=[45, 239]).count()
-
-    def get_t0_interval(self) -> datetime.timedelta:
-        """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
-        if hasattr(self, '_counted_t0'):
-            return self._counted_t0
-
-        base = self.ects * settings.ECTS_BONUS
-        points_for_one_day = 720  # =12h*60m
-        points_for_one_night = 720
-        number_of_nights_to_add = base / points_for_one_day
-        minutes = base + number_of_nights_to_add * points_for_one_night
-        minutes += self.records_opening_bonus_minutes
-        grade = self.participated_in_last_grades() * 1440
-        self._counted_t0 = datetime.timedelta(
-            minutes=minutes + grade + 120) + datetime.timedelta(days=3)
-        return self._counted_t0
-
-    def get_points(self, semester: 'Semester' = None) -> int:
-        # Trailing underscore is here to avoid flake8 error while inner imports are a workaround for circular imports
-        from apps.enrollment.courses.models.semester import Semester as Semester_
-        from apps.enrollment.courses.models.points import StudentPointsView
-        from apps.enrollment.records.models import Record
-        if not semester:
-            semester = Semester_.objects.get_next()
-
-        records = Record.objects.filter(
-            student=self,
-            group__course__semester=semester,
-            status=1).values_list(
-            'group__course__entity_id',
-            flat=True).distinct()
-
-        return StudentPointsView.get_points_for_entities(self, records)
-
-    def get_points_with_course(self, course: 'Course', semester: 'Semester' = None) -> int:
-        # Trailing underscore is here to avoid flake8 error while inner imports are a workaround for circular imports
-        from apps.enrollment.courses.models.semester import Semester as Semester_
-        from apps.enrollment.courses.models.points import StudentPointsView
-        from apps.enrollment.records.models import Record
-        if not semester:
-            semester = Semester_.objects.get_next()
-
-        records = Record.objects.filter(
-            student=self,
-            group__course__semester=semester,
-            status=1).values_list(
-            'group__course__entity_id',
-            flat=True).distinct()
-        if course.entity_id not in records:
-            records = list(records) + [course.entity_id]
-
-        return StudentPointsView.get_points_for_entities(self, records)
 
     @classmethod
     def get_active_students(cls) -> QuerySet:
@@ -355,19 +305,6 @@ class Program(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class OpeningTimesView(models.Model):
-    student = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE,
-                                   related_name='opening_times')
-    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
-    semester = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
-    opening_time = models.DateTimeField()
-
-    objects = T0Manager()
-
-    class Meta:
-        app_label = 'users'
 
 
 class PersonalDataConsent(models.Model):
