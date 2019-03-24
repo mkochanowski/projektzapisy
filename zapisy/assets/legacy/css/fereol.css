@@ -366,12 +366,3 @@ table ul.voted-courses {
   font-size: 11px;
   color: grey;
 }
-
-/*
-  A helper class that can be applied to divs in order
-  to visually center their content in the enclosing container
-*/
-.centering_div {
-  width: 100%;
-  text-align: center;
-}
