@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group
 from django import forms
 import django.forms.models
 from django.contrib.auth import admin as django_auth_admin
+from django.db.models import QuerySet
 import csv
 
 from apps.users.models import (
