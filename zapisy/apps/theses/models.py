@@ -53,9 +53,9 @@ class Thesis(models.Model):
     student_2 = models.ForeignKey(
         Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student_2",
     )
-    added_date = models.DateTimeField(auto_now_add=True)
+    added = models.DateTimeField(auto_now_add=True)
     # A thesis is _modified_ when its status changes
-    modified_date = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now_add=True)
 
     def is_archived(self):
         return self.status == ThesisStatus.DEFENDED
@@ -83,7 +83,7 @@ class Thesis(models.Model):
         self.adjust_status()
         if self.status != self.__original_status:
             # If the status changed, update modified date
-            self.modified_date = datetime.now()
+            self.modified = datetime.now()
         super().save(*args, **kwargs)
         self.__original_status = self.status
 
