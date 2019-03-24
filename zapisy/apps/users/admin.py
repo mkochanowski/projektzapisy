@@ -4,7 +4,6 @@ from django.contrib.auth.models import User, Group
 from django import forms
 import django.forms.models
 from django.contrib.auth import admin as django_auth_admin
-from django.db.models import QuerySet
 import csv
 
 from apps.users.models import (
@@ -119,12 +118,18 @@ class EmployeeInline(admin.StackedInline):
 
 
 class UserAdmin(django_auth_admin.UserAdmin):
-    def user_groups(self, user):
+    def show_user_groups(self, user: User):
+        """Django requires that all fields are model attributes or admin callables,
+        so we need this extra method
+        """
         return ', '.join(group.name for group in user.groups.all())
-    user_groups.short_description = 'Grupy'
+    show_user_groups.short_description = 'Grupy'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('groups')
 
     inlines = [StudentInline, EmployeeInline]
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'user_groups')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'show_user_groups')
     list_filter = ('is_active', 'is_staff')
 
 
