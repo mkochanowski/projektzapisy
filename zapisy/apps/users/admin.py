@@ -2,9 +2,8 @@ from django.http import HttpResponse, HttpRequest
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django import forms
-from django.contrib.auth.admin import (
-    UserAdmin as DjangoUserAdmin, GroupAdmin as DjangoGroupAdmin
-)
+import django.forms.models
+from django.contrib.auth import admin as django_auth_admin
 from django.db.models import QuerySet
 import csv
 
@@ -119,7 +118,7 @@ class EmployeeInline(admin.StackedInline):
     max_num = 1
 
 
-class UserAdmin(DjangoUserAdmin):
+class UserAdmin(django_auth_admin.UserAdmin):
     def user_groups(self, user):
         return ', '.join(group.name for group in user.groups.all())
     user_groups.short_description = 'Grupy'
@@ -129,21 +128,21 @@ class UserAdmin(DjangoUserAdmin):
     list_filter = ('is_active', 'is_staff')
 
 
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
-
-
-admin.site.register(Employee, EmployeeAdmin)
-admin.site.register(Student, StudentAdmin)
-admin.site.register(Program, ProgramAdmin)
+class GroupUsersChoiceField(forms.ModelMultipleChoiceField):
+    """A simple subclass of Django's standard ModelMultipleChoiceField
+    that additionally formats users as both their full names and logins,
+    if the full name is defined; otherwise we return just the login
+    """
+    def label_from_instance(self, obj: User):
+        full_name = obj.get_full_name()
+        return f'{full_name} ({obj.username})' if full_name else obj.username
 
 
 class GroupAdminForm(forms.ModelForm):
-    """
-    ModelForm that adds an additional multiple select field for managing
+    """ModelForm that adds an additional multiple select field for managing
     the users in the group.
     """
-    users = forms.ModelMultipleChoiceField(
+    users = GroupUsersChoiceField(
         User.objects.all(),
         widget=admin.widgets.FilteredSelectMultiple('Users', False),
         required=False,
@@ -156,21 +155,34 @@ class GroupAdminForm(forms.ModelForm):
             self.initial['users'] = initial_users
 
     def save(self, *args, **kwargs):
+        # Set commit to true so that the model corresponding to this form is definitely
+        # created and saved in the DB, which lets use use many-to-many relationships
+        # immediately (in particular, the users in this group)
+        # See https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#the-save-method
+        # If commit is ever False, Django will overwrite save_m2m with its own method;
+        # we don't want that to happen, as our custom logic would never be triggered
+        # See BaseModelForm.save() in Django sources
         kwargs['commit'] = True
         return super(GroupAdminForm, self).save(*args, **kwargs)
 
     def save_m2m(self):
-        self.instance.user_set.clear()
-        self.instance.user_set.add(*self.cleaned_data['users'])
+        # Populate the model instance with the users from the admin form widget
+        self.instance.user_set.set(self.cleaned_data['users'])
 
 
-class GroupAdmin(DjangoGroupAdmin):
-    """
-    Customized GroupAdmin class that uses the customized form to allow
+class GroupAdmin(django_auth_admin.GroupAdmin):
+    """Customized GroupAdmin class that uses the customized form to allow
     management of users within a group.
     """
     form = GroupAdminForm
 
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+admin.site.register(Employee, EmployeeAdmin)
+admin.site.register(Student, StudentAdmin)
+admin.site.register(Program, ProgramAdmin)
 
 admin.site.unregister(Group)
 admin.site.register(Group, GroupAdmin)
