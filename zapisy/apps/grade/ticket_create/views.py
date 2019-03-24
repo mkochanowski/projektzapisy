@@ -8,7 +8,6 @@ from django.core.cache import cache
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
-from apps.grade.ticket_create.models import SigningKey
 from apps.grade.ticket_create.utils import generate_keys_for_polls, \
     match_signing_requests_with_polls, get_signing_response, mark_poll_used
 from apps.users.decorators import employee_required, student_required

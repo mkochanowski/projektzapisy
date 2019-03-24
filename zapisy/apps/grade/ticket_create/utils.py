@@ -2,20 +2,12 @@ from typing import Tuple, List, Dict
 from string import whitespace
 from subprocess import getstatusoutput
 
-from Crypto.PublicKey import RSA
-from Crypto.Random.random import getrandbits, \
-    randint
-
-from django.utils.safestring import SafeText
 from django.contrib.auth.models import User
 
 from apps.enrollment.courses.models.semester import Semester
 
 from apps.grade.poll.models import Poll
-from apps.users.models import Student
-from apps.grade.ticket_create.exceptions import InvalidPollException, TicketUsed
 from apps.grade.ticket_create.models import SigningKey
-from functools import cmp_to_key
 
 
 def generate_keys_for_polls(semester: Semester = None):
@@ -26,29 +18,6 @@ def generate_keys_for_polls(semester: Semester = None):
         pem_rsa_key = SigningKey.generate_rsa_key()
         key = SigningKey(poll=poll, private_key=pem_rsa_key)
         key.save()
-
-
-def check_poll_visiblity(user, poll):
-    """Checks, whether user is a student entitled to the poll.
-
-    Raises:
-        InvalidPollException: If the user in question is not entitled to the
-            poll.
-        Student.DoesNotExist: If the user in question is not a student.
-    """
-    if not poll.is_student_entitled_to_poll(user.student):
-        raise InvalidPollException
-
-
-def check_ticket_not_signed(user, poll):
-    """Checks, if the user is a student with a yet unused ticket for the poll.
-
-    Raises:
-        TicketUsed: If the user has already used the ticket for the poll.
-        Student.DoesNotExist: If the user in question is not a student.
-    """
-    if poll.signingkey.students.filter(pk=user.student.pk).exists():
-        raise TicketUsed
 
 
 def mark_poll_used(user, poll):
