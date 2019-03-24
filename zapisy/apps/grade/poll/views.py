@@ -15,7 +15,7 @@ from apps.grade.poll.models.last_visit import LastVisit
 from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.enrollment.courses.models.semester import Semester
-from apps.grade.poll.serializers import TicketsListSerializer
+from apps.grade.ticket_create.serializers import TicketsListSerializer
 from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQuestion, \
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
