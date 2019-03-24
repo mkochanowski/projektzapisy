@@ -18,8 +18,7 @@ def is_thesis_staff(user: BaseUser) -> bool:
 
 def can_add_thesis(user: BaseUser) -> bool:
     """Is the given user permitted to add new thesis objects?"""
-    user_type = get_user_type(user)
-    return user_type != ThesisUserType.STUDENT
+    return get_user_type(user) in (ThesisUserType.ADMIN, ThesisUserType.REGULAR_EMPLOYEE)
 
 
 def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
