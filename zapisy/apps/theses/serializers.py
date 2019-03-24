@@ -50,15 +50,6 @@ class ThesesPersonSerializer(serializers.Serializer):
         except (TypeError, ValueError):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
-    def run_validators(self, value):
-        """DRF 3.8.2 to 3.9.0 have a bug that prevents returning non-dict types
-        from to_internal_value, see
-        https://github.com/encode/django-rest-framework/issues/6053
-        this is fixed in 3.9.1 but as of writing this that version is not yet
-        available; this workaround should be removed when upgrading
-        """
-        super(serializers.Serializer, self).run_validators(value)
-
 
 def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
     """
