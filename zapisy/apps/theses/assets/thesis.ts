@@ -2,8 +2,11 @@
  * @file Defines the Thesis class and associated types
  */
 import * as moment from "moment";
+
 import { Employee, Student, Person } from "./users";
-import { ThesisKind, ThesisStatus } from "./protocol_types";
+import { ThesisKind, ThesisStatus, ThesisVote } from "./protocol_types";
+import { ThesisVoteDetails, SingleVote } from "./votes";
+import { Users } from "./app_logic/users";
 import { nullableValuesEqual } from "./utils";
 
 export const MAX_THESIS_TITLE_LEN = 300;
@@ -24,6 +27,8 @@ export class Thesis {
 	public student: Student | null;
 	public secondStudent: Student | null;
 	public modifiedDate: moment.Moment;
+	public votes: ThesisVoteDetails;
+	public rejectionReason: string;
 
 	/** Construct a new thesis object with default values */
 	public constructor() {
@@ -38,6 +43,13 @@ export class Thesis {
 		this.student = null;
 		this.secondStudent = null;
 		this.modifiedDate = moment();
+		const entries = Users.thesesBoard.map(e => [e.id, new SingleVote()]);
+		this.votes = new ThesisVoteDetails(new Map(entries as Array<[number, SingleVote]>));
+		this.rejectionReason = "";
+	}
+
+	public toString() {
+		return this.title;
 	}
 
 	/**
@@ -67,7 +79,7 @@ export class Thesis {
 			this.isEqual(other),
 			"Thesis::areValuesEqual only makes sense for two theses with the same ID",
 		);
-		return (
+		if (!(
 			this.title === other.title &&
 			this.description === other.description &&
 			nullableValuesEqual(this.advisor, other.advisor, personCompare) &&
@@ -77,8 +89,11 @@ export class Thesis {
 			this.kind === other.kind &&
 			this.isReservationDateSame(other.reservedUntil) &&
 			this.status === other.status &&
-			this.modifiedDate.isSame(other.modifiedDate)
-		);
+			this.modifiedDate.isSame(other.modifiedDate) &&
+			this.getVoteDetails().isEqual(other.getVoteDetails()) &&
+			this.rejectionReason === other.rejectionReason
+		)) { return false; }
+		return true;
 	}
 
 	public isReservationDateSame(otherDate: moment.Moment | null) {
@@ -87,6 +102,29 @@ export class Thesis {
 
 	public getMaxReservationDate() {
 		return moment().add(MAX_RESERVATION_YEARS, "years");
+	}
+
+	public getVoteDetails() {
+		return this.votes;
+	}
+
+	public getDefaultRejectionReason() {
+		const voteDetails = this.getVoteDetails();
+		const votes = Array.from(voteDetails.getAllVotes().values());
+		const rejectionReasons = votes.filter(vote =>
+			vote.value === ThesisVote.Rejected && vote.reason
+		).map(vote => vote.reason);
+		return rejectionReasons.join("\n\n");
+	}
+
+	public isUngraded(): boolean {
+		if (!Users.isUserMemberOfBoard()) {
+			return false;
+		}
+		const voteDetails = this.getVoteDetails();
+		return voteDetails.getVoteForMember(
+			Users.currentUser.person as Employee
+		).value === ThesisVote.None;
 	}
 }
 

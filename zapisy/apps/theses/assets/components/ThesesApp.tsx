@@ -25,6 +25,7 @@ import { Thesis } from "../thesis";
 import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
+import { Users } from "../app_logic/users";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { macosifyKeys } from "../utils";
 import { confirmationDialog } from "./Dialogs/ConfirmationDialog";
@@ -122,6 +123,7 @@ class ThesesAppInternal extends React.Component<Props, State> {
 				onTitleChange={this.onTitleChanged}
 				titleValue={List.params.title}
 				state={AppMode.applicationState}
+				displayUngraded={Users.isUserMemberOfBoard()}
 				stringFilterBeingChanged={List.stringFilterBeingChanged}
 			/>
 			{shouldShowNewBtn
@@ -167,10 +169,14 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		console.assert(!!ThesisEditing.thesis);
 		return <ThesisDetails
 			thesis={ThesisEditing.thesis!.modified}
+			thesesBoard={Users.thesesBoard}
 			original={ThesisEditing.thesis!.original}
 			appState={AppMode.applicationState}
 			hasUnsavedChanges={ThesisEditing.hasUnsavedChanges}
 			mode={AppMode.workMode!}
+			user={Users.currentUser}
+			isBoardMember={Users.isUserMemberOfBoard()}
+			isStaff={Users.isUserStaff()}
 			hasTitleError={this.state.hasTitleError}
 			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}
@@ -264,8 +270,26 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		}
 	}
 
+	private confirmWipeVote() {
+		if (!ThesisEditing.shouldShowWipeVotesWarning()) {
+			return Promise.resolve(true);
+		}
+		return confirmationDialog({
+			title: "Uwaga",
+			message: (
+				"Zmiana tytułu spowoduje wykasowanie wszystkich głosów " +
+				"i rozpoczęcie głosowania od nowa. Czy kontynuować?"
+			),
+			yesText: "Tak, zmień tytuł",
+			noText: "Nie, wróć",
+		});
+	}
+
 	private onSave = async () => {
 		try {
+			if (!await this.confirmWipeVote()) {
+				return;
+			}
 			const oldWorkMode = AppMode.workMode;
 			await ThesisEditing.save();
 			// Saving does reload the list

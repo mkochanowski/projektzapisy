@@ -17,21 +17,25 @@ export class Person {
 	}
 }
 
-// The next two classes have the same shape (for now at least), but
-// they are disparate types and should not be interchangeable, but thanks
-// to TS's structural typing they are. To get around that
-// we add a hidden private property to make the types incompatible
-// tslint:disable:variable-name
 /**
  * Represents a university employee in the thesis system
  */
 export class Employee extends Person {
-	// @ts-ignore
-	private __nominal: void;
+	public username: string;
+
+	public constructor(id: number, displayName: string, username?: string) {
+		super(id, displayName);
+		this.username = username || "";
+	}
 }
 /**
  * Represents a student in the thesis system
  */
+// Person and Student have the same shape (for now at least), but
+// they are disparate types and should not be interchangeable, but thanks
+// to TS's structural typing they are. To get around that
+// we add a hidden private property to make the types incompatible
+// tslint:disable:variable-name
 export class Student extends Person {
 	// @ts-ignore
 	private __nominal: void;

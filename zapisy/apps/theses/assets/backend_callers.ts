@@ -91,9 +91,10 @@ function sortDirToBackendStr(dir: SortDirection) {
  * @param params The filtering and sorting params
  * @param offset The start row index
  * @param limit How many theses to fetch starting at `offset`
+ * @param thesesBoard All current members of the theses board - needed for deserialization
  */
 export async function getThesesList(
-	params: ThesesProcessParams, offset: number, limit: number,
+	params: ThesesProcessParams, offset: number, limit: number
 ) {
 	const paginatedResults: PaginatedThesesResult = await getData(
 		`${BASE_API_URL}/theses/`,
@@ -128,12 +129,24 @@ export async function getCurrentUser(): Promise<AppUser> {
 	return deserializeCurrentUser(await getData(`${BASE_API_URL}/current_user/`));
 }
 
+/** Find out if the current user has master rejecter rights */
+export function getIsRejecter(): Promise<boolean> {
+	return getData(`${BASE_API_URL}/is_master_rejecter/`);
+}
+
 /**
  * Get the theses board as an Employee list
  */
 export async function getThesesBoard(): Promise<Employee[]> {
 	const members = await getData(`${BASE_API_URL}/theses_board/`);
 	return compact(members.map(deserializeBoardMember));
+}
+
+/**
+ * Get the number of ungraded theses for the current board member
+ */
+export async function getNumUngraded() {
+	return Number(await getData(`${BASE_API_URL}/num_ungraded/`));
 }
 
 export const enum PersonType {

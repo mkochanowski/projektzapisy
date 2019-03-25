@@ -1,6 +1,7 @@
 /**
  * @file Theses app permission checks, mostly analogous to permissions.py
  */
+import { Employee } from "./users";
 import { ThesisStatus } from "./protocol_types";
 import { Thesis } from "./thesis";
 import { Users } from "./app_logic/users";
@@ -13,6 +14,19 @@ export function canAddThesis() {
 }
 
 /**
+ * Determine whether the current app user can cast a vote as the specified user
+ * @param user The user to cast a vote as
+ */
+export function canCastVoteAsUser(user: Employee) {
+	return (
+		Users.isUserAdmin() ||
+		Users.isUserMemberOfBoard() && Users.currentUser.person.isEqual(user)
+	);
+}
+
+/**
+ * Determine whether the specified user "owns" the specified thesis
+ * @param user The app user
  * Determine whether the current user "owns" the specified thesis
  * @param thesis The thesis
  */
@@ -51,6 +65,21 @@ export function canModifyThesis(thesis: Thesis) {
 // The functions below will only be used if the one above returns true,
 // so they don't need to repeat their checks
 
+const UNVOTEABLE_STATUSES = [
+	ThesisStatus.Accepted,
+	ThesisStatus.InProgress,
+	ThesisStatus.Defended
+];
+/**
+ * Determine whether the current app user can change votes for the specified thesis
+ * This only accounts for the thesis status, to check if a user
+ * can vote as some other user, use `canCastVoteAsUser`
+ * @param thesis The thesis to vote for
+ */
+export function canChangeThesisVote(thesis: Thesis) {
+	return Users.isUserAdmin() || !UNVOTEABLE_STATUSES.includes(thesis.status);
+}
+
 /**
  * Determine if the specified user is permitted to change the title of the specified thesis
  * @param thesis The thesis
@@ -65,6 +94,10 @@ export function canChangeTitle(thesis: Thesis) {
 	);
 }
 
+const INDETERMINATE_STATUSES = [
+	ThesisStatus.BeingEvaluated, ThesisStatus.ReturnedForCorrections,
+];
+
 /**
  * Determine if a user of the specified
  * type can change an existing thesis' status to the specified new status
@@ -72,7 +105,9 @@ export function canChangeTitle(thesis: Thesis) {
 export function canChangeStatusTo(thesis: Thesis, newStatus: ThesisStatus) {
 	const oldStatus = thesis.status;
 	return (
-		Users.isUserStaff() ||
+		Users.isUserAdmin() ||
+		Users.isUserRejecter() && INDETERMINATE_STATUSES.includes(thesis.status) ||
+		Users.isUserMemberOfBoard() && newStatus !== ThesisStatus.ReturnedForCorrections ||
 		oldStatus === ThesisStatus.InProgress && newStatus === ThesisStatus.Defended
 	);
 }
@@ -81,5 +116,19 @@ export function canChangeStatusTo(thesis: Thesis, newStatus: ThesisStatus) {
  * Determine if the specified user is allowed to set any advisor on any thesis
  */
 export function canSetArbitraryAdvisor() {
+	return Users.isUserStaff();
+}
+
+/** Should the official rejection reason be disclosed to the app user? */
+export function canSeeThesisRejectionReason(thesis: Thesis) {
+	return (
+		Users.isUserStaff() ||
+		isOwnerOfThesis(thesis) ||
+		!!thesis.advisor && thesis.advisor.isEqual(Users.currentUser.person)
+	);
+}
+
+/** Should the votes for a thesis be disclosed to the current user? */
+export function canSeeThesisVotes() {
 	return Users.isUserStaff();
 }

@@ -132,9 +132,13 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				value={this.props.thesis.title}
 				maxLength={MAX_THESIS_TITLE_LEN}
 				readOnly={titleReadOnly}
-				onChange={ev => this.props.onTitleChanged(ev.target.value)}
+				onChange={this.onTitleChanged}
 			/></td>
 		</tr>;
+	}
+
+	private onTitleChanged = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+		this.props.onTitleChanged(ev.target.value);
 	}
 
 	private renderKind(readOnly: boolean) {

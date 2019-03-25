@@ -5,6 +5,7 @@ import update from "immutability-helper";
 import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
 import * as moment from "moment";
+import { cloneDeep } from "lodash";
 
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
@@ -13,13 +14,17 @@ import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle, macosifyKeys } from "../../utils";
 import { ThesisWorkMode, ApplicationState } from "../../app_types";
-import { canModifyThesis, canDeleteThesis } from "../../permissions";
+import {
+	canModifyThesis, canDeleteThesis, canSeeThesisRejectionReason, canChangeStatusTo, canSeeThesisVotes,
+} from "../../permissions";
 import { Thesis } from "../../thesis";
-import { Employee, Student } from "../../users";
+import { AppUser, Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
 import { AppMode } from "../../app_logic/app_mode";
 import { confirmationDialog } from "../Dialogs/ConfirmationDialog";
 import { formatTitle } from "../util";
+import { SingleVote } from "../../votes";
+import { showMasterRejectionDialog } from "../Dialogs/MasterRejectionDialog";
 
 const ActionButton = React.memo(Button.extend`
 	&:disabled:hover {
@@ -28,27 +33,32 @@ const ActionButton = React.memo(Button.extend`
 	&:disabled {
 		color: grey;
 		cursor: default;
-	}../Dialogs/Dialogs
+	}
 	min-height: initial;
 	height: 25px;
 `);
 
 const DetailsSectionWrapper = styled.div`
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	border: 1px solid black;
+	padding: 15px;
 `;
 
 const MainDetailsContainer = styled.div`
-	border: 1px solid black;
-	padding: 15px;
 	display: flex;
 	flex-direction: row;
 	width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
-	width: 790px;
+	width: 100%;
+`;
+
+const VotesPlaceholder = styled.div`
+	height: 100%;
 `;
 
 const RightDetailsContainer = styled.div`
@@ -64,15 +74,25 @@ const ButtonsContainer = styled.div`
 	grid-gap: 10px;
 `;
 
+const RejectionReasonContainer = styled.textarea`
+	width: 100%;
+	height: 100px;
+	box-sizing: border-box;
+`;
+
 const DEFAULT_THESIS_RESERVATION_YEARS = 2;
 
 type Props = {
 	thesis: Thesis;
 	original: Thesis;
+	thesesBoard: Employee[];
 	appState: ApplicationState;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
 	hasTitleError: boolean;
+	user: AppUser;
+	isBoardMember: boolean;
+	isStaff: boolean;
 	onThesisModified: (thesis: Thesis) => void;
 	onDeletionRequested: () => Promise<void>;
 	onSaveRequested: () => Promise<void>;
@@ -98,6 +118,16 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		Mousetrap.unbind("del");
 	}
 
+	private shouldRenderRightPanel() {
+		return (
+			this.shouldRenderVotes() ||
+			this.shouldRenderRejectButton() ||
+			this.shouldRenderResetButton() ||
+			this.shouldRenderDeleteButton() ||
+			this.shouldRenderSaveButton()
+		);
+	}
+
 	public render() {
 		return <DetailsSectionWrapper>
 			{this.props.appState === ApplicationState.Saving
@@ -108,8 +138,12 @@ export class ThesisDetails extends React.PureComponent<Props> {
 				style={AppMode.isPerformingBackendOp() ? getDisabledStyle() : {}}
 			>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
-				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
+				{this.shouldRenderRightPanel()
+					? <RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
+					: null
+				}
 			</MainDetailsContainer>
+			{this.renderRejectionReasonIfApplicable()}
 		</DetailsSectionWrapper>;
 	}
 
@@ -138,10 +172,26 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		</>;
 	}
 
+	private shouldRenderVotes() {
+		return canSeeThesisVotes();
+	}
+
 	private renderThesisRightPanel() {
 		return <>
-			<ThesisVotes/>
+			{this.shouldRenderVotes() ? <ThesisVotes
+				thesis={this.props.thesis}
+				original={this.props.original}
+				thesesBoard={this.props.thesesBoard}
+				isStaff={this.props.isStaff}
+				isBoardMember={this.props.isBoardMember}
+				user={this.props.user}
+				workMode={this.props.mode}
+				hasUnsavedChanges={this.props.hasUnsavedChanges}
+				onChange={this.onVoteChanged}
+				save={this.handleSave}
+			/> : this.renderVotesPlaceholder()}
 			<ButtonsContainer>
+				{this.renderRejectButton()}
 				{this.renderResetButton()}
 				{this.renderDeleteButton()}
 				{this.renderSaveButton()}
@@ -149,8 +199,46 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		</>;
 	}
 
+	private renderVotesPlaceholder() {
+		return <VotesPlaceholder />;
+	}
+
+	private shouldRenderRejectButton() {
+		return canChangeStatusTo(this.props.original, ThesisStatus.ReturnedForCorrections);
+	}
+
+	private renderRejectButton() {
+		if (!this.shouldRenderRejectButton()) {
+			return null;
+		}
+		const { hasUnsavedChanges } = this.props;
+		const alreadyReturned = this.props.original.status === ThesisStatus.ReturnedForCorrections;
+		let tooltip = "Zwróć pracę do poprawek";
+		if (alreadyReturned) {
+			tooltip = "Praca została już zwrócona do poprawek";
+		} else if (hasUnsavedChanges) {
+			tooltip = "Wprowadzono niezapisane zmiany";
+		}
+		return <ActionButton
+			onClick={this.onReject}
+			disabled={hasUnsavedChanges || alreadyReturned}
+			title={tooltip}
+		>Do poprawek</ActionButton>;
+	}
+
+	private onReject = async () => {
+		const didChange = await this.onStatusChanged(ThesisStatus.ReturnedForCorrections);
+		if (didChange) {
+			this.handleSave();
+		}
+	}
+
+	private shouldRenderResetButton() {
+		return this.props.mode === ThesisWorkMode.Editing && canModifyThesis(this.props.original);
+	}
+
 	private renderResetButton() {
-		if (!canModifyThesis(this.props.original)) {
+		if (!this.shouldRenderResetButton()) {
 			return null;
 		}
 		const { hasUnsavedChanges } = this.props;
@@ -161,8 +249,12 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		>Wyczyść</ActionButton>;
 	}
 
+	private shouldRenderDeleteButton() {
+		return this.props.mode === ThesisWorkMode.Editing && canDeleteThesis(this.props.original);
+	}
+
 	private renderDeleteButton() {
-		if (this.props.mode === ThesisWorkMode.Adding || !canDeleteThesis(this.props.original)) {
+		if (!this.shouldRenderDeleteButton()) {
 			return null;
 		}
 		return <ActionButton
@@ -171,8 +263,12 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		>Usuń</ActionButton>;
 	}
 
+	private shouldRenderSaveButton() {
+		return canModifyThesis(this.props.original);
+	}
+
 	private renderSaveButton() {
-		if (!canModifyThesis(this.props.original)) {
+		if (!this.shouldRenderSaveButton()) {
 			return null;
 		}
 		const { hasUnsavedChanges } = this.props;
@@ -189,6 +285,22 @@ export class ThesisDetails extends React.PureComponent<Props> {
 
 	private getActionDescription() {
 		return this.props.mode === ThesisWorkMode.Adding ? "Dodaj nową pracę" : "Zapisz zmiany";
+	}
+
+	private renderRejectionReasonIfApplicable() {
+		if (
+			this.props.original.status !== ThesisStatus.ReturnedForCorrections ||
+			!canSeeThesisRejectionReason(this.props.original)
+		) {
+			return null;
+		}
+		return <>
+			<hr />
+			<RejectionReasonContainer
+				readOnly
+				defaultValue={this.props.original.rejectionReason}
+			/>
+		</>;
 	}
 
 	private handleDelete = async () => {
@@ -240,8 +352,32 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		this.updateThesisState({ reservedUntil: { $set: newDate } });
 	}
 
-	private onStatusChanged = (newStatus: ThesisStatus): void => {
+	private onStatusChanged = async (newStatus: ThesisStatus) => {
+		// update UI right away for nice feedback
 		this.updateThesisState({ status: { $set: newStatus } });
+		const originalStatus = this.props.original.status;
+		if (
+			originalStatus !== ThesisStatus.ReturnedForCorrections &&
+			newStatus === ThesisStatus.ReturnedForCorrections
+		) {
+			const { thesis } = this.props;
+			const msg = "Podaj podsumowanie uwag do tematu w polu poniżej. " +
+				"Informacja ta zostanie wysłana do promotora pracy.";
+			try {
+				const finalRejectionReason = await showMasterRejectionDialog({
+					message: msg,
+					cancelText: "Anuluj",
+					acceptText: "Potwierdź",
+					initialReason: thesis.rejectionReason || thesis.getDefaultRejectionReason()
+				});
+				this.updateThesisState({ rejectionReason: { $set: finalRejectionReason } });
+				return true;
+			} catch (_) {
+				// restore old status
+				this.updateThesisState({ status: { $set: originalStatus } });
+				return false;
+			}
+		}
 	}
 
 	private onTitleChanged = (newTitle: string): void => {
@@ -280,5 +416,11 @@ export class ThesisDetails extends React.PureComponent<Props> {
 
 	private onDescriptionChanged = (newDesc: string): void => {
 		this.updateThesisState({ description: { $set: newDesc } });
+	}
+
+	private onVoteChanged = (voter: Employee, newValue: SingleVote): void => {
+		const newVotes = cloneDeep(this.props.thesis.getVoteDetails());
+		newVotes.setVote(voter, newValue);
+		this.updateThesisState({ votes: { $set: newVotes } });
 	}
 }

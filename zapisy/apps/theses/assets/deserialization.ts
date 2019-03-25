@@ -1,14 +1,19 @@
 import * as moment from "moment";
 
-import { ThesisKind, ThesisStatus, UserType } from "./protocol_types";
+import { ThesisKind, ThesisStatus, UserType, VoteMap } from "./protocol_types";
 import { Thesis } from "./thesis";
 import { Employee, Student, AppUser } from "./users";
+import { ThesisVoteDetails, SingleVote } from "./votes";
 import { Users } from "./app_logic/users";
 
 type PersonInJson = {
 	id: number;
 	name: string;
 };
+type StudentInJson = PersonInJson;
+type EmployeeInJson = { username: string } & PersonInJson;
+
+type ThesisVotesInJson = VoteMap;
 
 /**
  * This is the format in which we receive theses from the backend
@@ -25,18 +30,20 @@ export type ThesisInJson = {
 	student?: PersonInJson;
 	student_2?: PersonInJson;
 	modified_date: string;
+	votes?: ThesisVotesInJson;
+	reason?: string;
 };
 
 type CurrentUserInJson = {
-	user: PersonInJson;
+	person: EmployeeInJson | StudentInJson;
 	type: UserType;
 };
 
-export function deserializeEmployee(json: PersonInJson) {
-	return new Employee(json.id, json.name);
+export function deserializeEmployee(json: EmployeeInJson) {
+	return new Employee(json.id, json.name, json.username);
 }
 
-export function deserializeStudent(json: PersonInJson) {
+export function deserializeStudent(json: StudentInJson) {
 	return new Student(json.id, json.name);
 }
 
@@ -53,14 +60,29 @@ export function deserializeThesis(json: ThesisInJson) {
 	result.student = json.student ? deserializeStudent(json.student) : null;
 	result.secondStudent = json.student_2 ? deserializeStudent(json.student_2) : null;
 	result.modifiedDate = moment(json.modified_date);
+	if (json.votes) {
+		result.votes = deserializeVotes(json.votes);
+	}
+	if (json.reason) {
+		result.rejectionReason = json.reason;
+	}
 	return result;
 }
 
+function deserializeVotes(votes: ThesisVotesInJson) {
+	const entries = Object
+		.entries(votes)
+		.map(([idStr, vote]) => (
+			[Number(idStr), new SingleVote(vote.value, vote.reason)]
+		)) as Array<[number, SingleVote]>;
+	return new ThesisVoteDetails(new Map(entries));
+}
+
 export function deserializeCurrentUser(json: CurrentUserInJson) {
-	const deserializer = json.type === UserType.Student
-		? deserializeStudent
-		: deserializeEmployee;
-	return new AppUser(deserializer(json.user), json.type);
+	const person = json.type === UserType.Student
+		? deserializeStudent(json.person)
+		: deserializeEmployee(json.person as EmployeeInJson);
+	return new AppUser(person, json.type);
 }
 
 type BoardMemberIn = number;

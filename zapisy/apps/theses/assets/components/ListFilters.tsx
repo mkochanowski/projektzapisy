@@ -26,7 +26,17 @@ const typeFilters = [
 	ThesisTypeFilter.AvailableISIM,
 ].map(type => ({ val: type, displayName: thesisTypeFilterToString(type) }));
 
+const filtersWithUngraded = [
+	{
+		val: ThesisTypeFilter.Ungraded,
+		displayName: thesisTypeFilterToString(ThesisTypeFilter.Ungraded),
+	},
+	...typeFilters,
+];
+
 type Props = {
+	displayUngraded: boolean;
+
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
 	typeValue: ThesisTypeFilter;
 
@@ -103,7 +113,9 @@ export class ListFilters extends React.PureComponent<Props> {
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
 				onChange={this.handleTypeChange}
-				optionInfo={typeFilters}
+				optionInfo={
+					this.props.displayUngraded ? filtersWithUngraded : typeFilters
+				}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
 				enabled={isNormalState}

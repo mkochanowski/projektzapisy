@@ -2,7 +2,7 @@ import { observable, action, flow } from "mobx";
 import { CancellablePromise } from "mobx/lib/api/flow";
 
 import { roundUp, wait } from "common/utils";
-import { getThesesList } from "../backend_callers";
+import { getThesesList, getNumUngraded } from "../backend_callers";
 import { Thesis } from "../thesis";
 import { ThesesProcessParams, SortColumn, SortDirection, ApplicationState } from "../app_types";
 import { ThesisTypeFilter } from "../protocol_types";
@@ -59,6 +59,9 @@ class C {
 	private stringFilterPromise: CancellablePromise<any> | null = null;
 
 	public initialize = flow(function*(this: C) {
+		if (yield this.getNumUngraded()) {
+			this.params.type = ThesisTypeFilter.Ungraded;
+		}
 		if (Users.isUserEmployee() && !Users.isUserMemberOfBoard()) {
 			// employees are most likely only interested in their own theses
 			this.params.onlyMine = true;
@@ -66,12 +69,37 @@ class C {
 		yield this.loadNewTheses();
 	});
 
+	public shouldSelectUngradedThesis() {
+		return this.params.type === ThesisTypeFilter.Ungraded && this.theses.length > 0;
+	}
+
+	/** Get the number of ungraded theses for the current user.
+	 * Returns 0 if the user is not a member of the theses board.
+	 */
+	public async getNumUngraded() {
+		return Users.isUserMemberOfBoard() ? getNumUngraded() : 0;
+	}
+
 	public indexOfThesis(thesis: Thesis) {
 		return this.theses.findIndex(thesis.isEqual);
 	}
 
 	public getThesisById(id: number): Thesis | null {
 		return this.theses.find(t => t.id === id) || null;
+	}
+
+	public findUngraded(): Thesis | null {
+		return this.theses.find(t => t.isUngraded()) || null;
+	}
+
+	/** After saving we might want to switch away from the ungraded theses filter
+	 * if it would make the list empty
+	 */
+	public adjustFiltersPostSave(numUngraded: number) {
+		if (!numUngraded && this.params.type === ThesisTypeFilter.Ungraded) {
+			// switch away to the default, this list would be empty
+			this.params.type = ThesisTypeFilter.Default;
+		}
 	}
 
 	@action

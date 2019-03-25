@@ -1,5 +1,9 @@
 import { observable, flow } from "mobx";
-import { getCurrentUser, getThesesBoard, getEmployees, FAKE_USER } from "../backend_callers";
+
+import {
+	getCurrentUser, getThesesBoard, getEmployees,
+	FAKE_USER, getIsRejecter,
+} from "../backend_callers";
 import { Employee, AppUser } from "../users";
 import { UserType } from "../protocol_types";
 
@@ -7,15 +11,19 @@ class C {
 	@observable public employees: Employee[] = [];
 	@observable public thesesBoard: Employee[] = [];
 	@observable public currentUser: AppUser = FAKE_USER;
+	@observable public isRejecter: boolean = false;
 
 	public initialize = flow(function*(this: C) {
 		this.employees = yield getEmployees();
 		this.currentUser = yield getCurrentUser();
 		this.thesesBoard = yield getThesesBoard();
+		this.isRejecter = yield getIsRejecter();
 	});
 
 	/** Determine whether the current user a member of the theses board */
-	public isUserMemberOfBoard() {
+	// We can memoize the result - this won't change during
+	// the app's lifetime, and calculating it does involve list search
+	public isUserMemberOfBoard = () => {
 		return !!this.thesesBoard.find(this.currentUser.person.isEqual);
 	}
 
@@ -38,6 +46,10 @@ class C {
 
 	public isUserStudent() {
 		return this.currentUser.type === UserType.Student;
+	}
+
+	public isUserRejecter() {
+		return this.isRejecter;
 	}
 
 	public getEmployeeById(id: number) {

@@ -2,10 +2,12 @@
  * @file Defines types we'll be sending to the backend and provides
  * functions to serialize local objects to those types
  */
-import { ThesisKind, ThesisStatus } from "./protocol_types";
+import { ThesisKind, ThesisStatus, VoteMap, ThesisVote, ProtocolVote } from "./protocol_types";
 import { Thesis, MAX_THESIS_TITLE_LEN } from "./thesis";
 import { Person } from "./users";
 import { Moment } from "moment";
+import { canChangeThesisVote } from "./permissions";
+import { SingleVote } from "./votes";
 
 /**
  * The representation of a new thesis object sent to the backend
@@ -20,6 +22,8 @@ type ThesisAddOutSerialized = {
 	status?: ThesisStatus;
 	student?: number | null;
 	student_2?: number | null;
+	votes?: VoteMap;
+	reason?: string;
 };
 
 /**
@@ -28,6 +32,13 @@ type ThesisAddOutSerialized = {
 type ThesisModOutSerialized = {
 	id: number;
 } & ThesisAddOutSerialized;
+
+/** Serializes a single thesis vote */
+function serializeVote(vote: SingleVote): ProtocolVote {
+	return vote.value === ThesisVote.Rejected
+		? { value: vote.value, reason: vote.reason }
+		: { value: vote.value };
+}
 
 /**
  * Given a new thesis object, convert it to a representation
@@ -55,6 +66,19 @@ export function serializeNewThesis(thesis: Thesis): ThesisAddOutSerialized {
 	}
 	if (thesis.reservedUntil) {
 		result.reserved_until = serializeReservationDate(thesis.reservedUntil);
+	}
+	if (thesis.status === ThesisStatus.ReturnedForCorrections) {
+		result.reason = thesis.rejectionReason;
+	}
+	if (canChangeThesisVote(thesis)) {
+		const details = thesis.getVoteDetails();
+		const votes = details.getAllVotes();
+		result.votes = {};
+		for (const [voter, vote] of votes) {
+			if (vote.value !== ThesisVote.None) {
+				result.votes[voter.id] = serializeVote(vote);
+			}
+		}
 	}
 	return result;
 }
@@ -113,6 +137,22 @@ export function serializeThesisDiff(orig: Thesis, mod: Thesis): ThesisModOutSeri
 	}
 	if (orig.status !== mod.status) {
 		result.status = mod.status;
+	}
+	if (mod.status === ThesisStatus.ReturnedForCorrections) {
+		result.reason = mod.rejectionReason;
+	}
+
+	if (canChangeThesisVote(orig)) {
+		const diff: { [_: number]: ProtocolVote } = {};
+		const origVotes = orig.getVoteDetails(); const modVotes = mod.getVoteDetails();
+		for (const [emp, vote] of modVotes.getAllVotes()) {
+			if (!origVotes.getVoteForMember(emp).isEqual(vote)) {
+				diff[emp.id] = serializeVote(vote);
+			}
+		}
+		if (Object.keys(diff).length) {
+			result.votes = diff;
+		}
 	}
 
 	return result;

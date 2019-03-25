@@ -1,28 +1,7 @@
 import * as React from "react";
 import { confirmAlert } from "react-confirm-alert";
-import styled from "styled-components";
 import * as Mousetrap from "mousetrap";
-import { BaseButton, DialogContainer, ButtonsContainer } from "./Base";
-
-const DangerButton = styled(BaseButton)`
-	color: #fff;
-	background-color: #d9534f;
-	border-color: #d43f3a;
-	margin-left: 10px;
-
-	&:hover {
-		color: #fff;
-		filter: brightness(1.1);
-	}
-`;
-
-const SafeButton = styled(BaseButton)`
-	color: #6f6f6f;
-	&:hover {
-		color: #6f6f6f;
-		filter: brightness(0.9);
-	}
-`;
+import { DialogContainer, ButtonsContainer, SafeButton, DangerButton } from "./Base";
 
 export type ConfirmationProps = {
 	title?: string;
@@ -60,12 +39,8 @@ class ConfirmDialogUI extends React.PureComponent<ConfirmDialogUIProps> {
 			{props.title ? <h2>{props.title}</h2> : null}
 			{props.message}
 			<ButtonsContainer>
-				<SafeButton type="button" className="btn" onClick={this.onNo}>
-					{props.noText}
-				</SafeButton>
-				<DangerButton type="button" className="btn" onClick={this.onYes}>
-					{props.yesText}
-				</DangerButton>
+				<SafeButton onClick={this.onNo} text={props.noText} />
+				<DangerButton onClick={this.onYes} text={props.yesText} />
 			</ButtonsContainer>
 		</DialogContainer>;
 	}

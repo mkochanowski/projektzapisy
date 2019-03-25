@@ -16,6 +16,20 @@ export function getDisabledStyle(): React.CSSProperties {
 }
 
 /**
+ * Updates the top-menu indicator (the Django template formats it properly,
+ * but the theses app uses asynchronous requests to save votes, so it needs to
+ * be done here as well
+ */
+export function adjustDomForUngraded(numUngraded: number): void {
+	const elem = document.getElementById("num_ungraded_theses");
+	if (!elem) {
+		console.error("adjustDomForUngraded: element not found");
+		return;
+	}
+	elem.textContent = numUngraded ? ` (${numUngraded})` : "";
+}
+
+/**
  * Format a given moment instance to a date string.
  */
 export function formatDate(m: Moment): string {

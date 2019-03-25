@@ -13,13 +13,17 @@ from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
 from apps.users.models import Student, Employee, BaseUser
-from .models import Thesis, ThesisStatus, ThesisKind
+from .models import (
+    Thesis, ThesisStatus, ThesisKind,
+    get_num_ungraded_for_emp, filter_ungraded_for_emp
+)
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
+from .permissions import is_thesis_staff
 from .users import (
     wrap_user, get_theses_board, get_user_type,
-    get_theses_user_full_name, ThesisUserType,
-    is_student
+    get_theses_user_full_name, is_theses_board_member, is_student,
+    is_master_rejecter, ThesisUserType
 )
 
 """Names of processing parameters in query strings"""
@@ -49,6 +53,7 @@ class ThesisTypeFilter(Enum):
     AVAILABLE_BACHELORS = 10
     AVAILABLE_BACHELORS_OR_ENGINEERS = 11
     AVAILABLE_ISIM = 12
+    UNGRADED = 13
 
     DEFAULT = EVERYTHING
 
@@ -97,6 +102,17 @@ class ThesesViewSet(viewsets.ModelViewSet):
         )
         return sort_queryset(filtered, sort_column, sort_dir)
 
+    def get_serializer_context(self):
+        """When serializing votes for a thesis, we need to know the user type
+        determining it for every thesis would be expensive as it requires
+        a DB hit, so it's a good idea to do it here and pass it to the serializer
+        """
+        result = super().get_serializer_context()
+        wrapped_user = wrap_user(self.request.user)
+        result["user"] = wrapped_user
+        result["is_staff"] = is_thesis_staff(wrapped_user)
+        return result
+
 
 def generate_base_queryset() -> QuerySet:
     """Return theses queryset with the appropriate fields prefetched (see below)
@@ -107,12 +123,15 @@ def generate_base_queryset() -> QuerySet:
         *fields_for_prefetching("student_2"),
         *fields_for_prefetching("advisor"),
         *fields_for_prefetching("auxiliary_advisor"),
+    ).prefetch_related(
+        "votes",
+        "votes__voter"
     ).annotate(
         _advisor_name=Concat(
             "advisor__user__first_name", Value(" "), "advisor__user__last_name"
         )
     ).annotate(_is_archived=Case(
-        When(status=ThesisStatus.DEFENDED, then=True),
+        When(status=ThesisStatus.DEFENDED.value, then=True),
         default=Value(False),
         output_field=BooleanField()
     ))
@@ -138,7 +157,7 @@ def filter_queryset(
     thesis_type: ThesisTypeFilter, title: str, advisor_name: str, only_mine: bool,
 ) -> QuerySet:
     """Filter the specified theses queryset based on the passed conditions"""
-    result = filter_theses_queryset_for_type(qs, thesis_type)
+    result = filter_theses_queryset_for_type(qs, user, thesis_type)
     result = filter_theses_queryset_for_user(result, user)
     if only_mine:
         result = filter_theses_queryset_for_only_mine(result, user)
@@ -192,7 +211,16 @@ ISIM_KINDS = (
 )
 
 
-def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
+def ungraded_theses_filter(queryset, user: Employee):
+    """Returns only theses that are ungraded by the currently logged in board member"""
+    if not is_theses_board_member(user):
+        raise exceptions.NotFound()
+    return filter_ungraded_for_emp(queryset, user)
+
+
+def filter_theses_queryset_for_type(
+    qs: QuerySet, user: Employee, thesis_type: ThesisTypeFilter,
+) -> QuerySet:
     """Returns only theses matching the specified type filter from the specified queryset"""
     if thesis_type == ThesisTypeFilter.EVERYTHING:
         return qs
@@ -201,7 +229,7 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
     elif thesis_type == ThesisTypeFilter.ARCHIVED:
         return qs.filter(_is_archived=True)
     elif thesis_type == ThesisTypeFilter.MASTERS:
-        return qs.filter(kind=ThesisKind.MASTERS)
+        return qs.filter(kind=ThesisKind.MASTERS.value)
     elif thesis_type == ThesisTypeFilter.ENGINEERS:
         return qs.filter(kind__in=ENGINEERS_KINDS)
     elif thesis_type == ThesisTypeFilter.BACHELORS:
@@ -211,7 +239,7 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
     elif thesis_type == ThesisTypeFilter.ISIM:
         return qs.filter(kind__in=ISIM_KINDS)
     elif thesis_type == ThesisTypeFilter.AVAILABLE_MASTERS:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS))
+        return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS.value))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_ENGINEERS:
         return available_thesis_filter(qs.filter(kind__in=ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS:
@@ -220,6 +248,8 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
         return available_thesis_filter(qs.filter(kind__in=BACHELORS_OR_ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_ISIM:
         return available_thesis_filter(qs.filter(kind__in=ISIM_KINDS))
+    elif thesis_type == ThesisTypeFilter.UNGRADED:
+        return ungraded_theses_filter(qs, user)
     # Should never get here
     return qs
 
@@ -272,6 +302,24 @@ def get_current_user(request):
     wrapped_user = wrap_user(request.user)
     serializer = serializers.CurrentUserSerializer(wrapped_user)
     return Response(serializer.data)
+
+
+@api_view(http_method_names=["get"])
+@permission_classes((permissions.IsAuthenticated,))
+def get_is_master_rejecter(request):
+    """Allows the front end to determine whether the current user has master rejecter rights"""
+    wrapped_user = wrap_user(request.user)
+    return Response(is_master_rejecter(wrapped_user))
+
+
+@api_view(http_method_names=["get"])
+@permission_classes((permissions.IsAuthenticated,))
+def get_num_ungraded(request):
+    """Allows the front end to query the number of ungraded theses for the current user"""
+    wrapped_user = wrap_user(request.user)
+    if not is_theses_board_member(wrapped_user):
+        raise exceptions.NotFound()
+    return Response(get_num_ungraded_for_emp(wrapped_user))
 
 
 @login_required

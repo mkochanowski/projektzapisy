@@ -8,6 +8,8 @@ import { ThesisWorkMode, ApplicationState } from "../app_types";
 import { AppMode } from "./app_mode";
 import { List } from "./theses_list";
 import { Users } from "./users";
+import { ThesisTypeFilter } from "../protocol_types";
+import { adjustDomForUngraded } from "../utils";
 import { canSetArbitraryAdvisor } from "../permissions";
 import { Employee } from "../users";
 
@@ -21,6 +23,14 @@ type CompositeThesis = {
 
 class C {
 	@observable thesis: CompositeThesis | null = null;
+
+	@action
+	public initialize() {
+		if (List.shouldSelectUngradedThesis()) {
+			// automatically select a thesis to grade if any
+			this.selectThesis(List.theses[0]);
+		}
+	}
 
 	/**
 	 * Set the specified thesis as selected
@@ -114,6 +124,24 @@ class C {
 		}
 	});
 
+	/**
+	 * Determine whether to confirm modifying a thesis because
+	 * the votes will be wiped
+	 */
+	public shouldShowWipeVotesWarning() {
+		const { thesis } = this;
+		if (!thesis) {
+			return false;
+		}
+		return (
+			!Users.isUserAdmin() &&
+			AppMode.workMode === ThesisWorkMode.Editing &&
+			thesis.original.advisor &&
+			thesis.original.advisor.isEqual(Users.currentUser.person) &&
+			thesis.original.title.trim() !== thesis.modified.title.trim()
+		);
+	}
+
 	private preSaveAsserts() {
 		const { thesis } = this;
 		if (thesis === null) {
@@ -169,11 +197,15 @@ class C {
 
 			const id = yield handler(thesis);
 
+			const numUngraded = yield List.getNumUngraded();
+			List.adjustFiltersPostSave(numUngraded);
+
 			// Reload without losing the current position
 			yield List.reloadTheses();
 
-			const toSelect = List.getThesisById(id);
+			const toSelect = thesisToSelectAfterAction(thesis.modified, id);
 			this.selectThesis(toSelect);
+			adjustDomForUngraded(numUngraded);
 		} finally {
 			AppMode.applicationState = ApplicationState.Normal;
 		}
@@ -191,6 +223,25 @@ function addNewThesis(thesis: CompositeThesis) {
 
 function compositeThesisForThesis(t: Thesis | null) {
 	return t ? { original: t, modified: cloneDeep(t) } : null;
+}
+
+function thesisToSelectAfterAction(modifiedThesis: Thesis, savedId: number) {
+	const shouldSelectOtherUngraded = (
+		Users.isUserMemberOfBoard() &&
+		List.params.type === ThesisTypeFilter.Ungraded &&
+		// don't switch away from this thesis if it's not graded still
+		!modifiedThesis.isUngraded()
+	);
+
+	return (
+		shouldSelectOtherUngraded && List.findUngraded() ||
+		// We'll want to find the thesis we just saved
+		// Note that it _could_ technically be absent from the new list
+		// but the odds are absurdly low (it would have to be deleted by someone
+		// else or the admin in the time between those two requests above)
+		List.getThesisById(savedId) ||
+		null
+	);
 }
 
 export const ThesisEditing = new C();

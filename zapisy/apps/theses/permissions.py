@@ -5,9 +5,10 @@ from typing import Optional
 
 from apps.users.models import Employee, BaseUser
 
-from .models import Thesis, ThesisStatus
+from .models import Thesis, ThesisStatus, UNVOTEABLE_STATUSES
 from .users import (
-    ThesisUserType, get_user_type, is_theses_board_member, is_admin, is_regular_employee
+    ThesisUserType, get_user_type, is_theses_board_member,
+    is_admin, is_regular_employee, is_master_rejecter,
 )
 
 
@@ -18,7 +19,8 @@ def is_thesis_staff(user: BaseUser) -> bool:
 
 def can_add_thesis(user: BaseUser) -> bool:
     """Is the given user permitted to add new thesis objects?"""
-    return get_user_type(user) in (ThesisUserType.ADMIN, ThesisUserType.REGULAR_EMPLOYEE)
+    user_type = get_user_type(user)
+    return user_type != ThesisUserType.STUDENT
 
 
 def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
@@ -74,7 +76,9 @@ def can_change_status_to(user: BaseUser, thesis: Thesis, new_status: ThesisStatu
     of the specified thesis to the new specified status?"""
     old_status = ThesisStatus(thesis.status)
     return (
-        is_thesis_staff(user) or
+        is_admin(user) or
+        is_master_rejecter(user) or
+        is_theses_board_member(user) and new_status != ThesisStatus.RETURNED_FOR_CORRECTIONS or
         old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.DEFENDED
     )
 
@@ -82,3 +86,31 @@ def can_change_status_to(user: BaseUser, thesis: Thesis, new_status: ThesisStatu
 def can_set_advisor(user: BaseUser, advisor: Optional[Employee]) -> bool:
     """Is the specified user permitted to set the given advisor (may be None)?"""
     return is_thesis_staff(user) or user == advisor
+
+
+def can_cast_vote_as_user(caster: Employee, user: Employee) -> bool:
+    """Can the specified user cast a vote in the other user's name?"""
+    return is_admin(caster) or is_theses_board_member(user) and caster == user
+
+
+def can_change_vote_for_thesis(user: Employee, thesis: Thesis) -> bool:
+    """Can the specified user change votes for the specified thesis?"""
+    return (
+        is_admin(user) or
+        is_theses_board_member(user) and ThesisStatus(thesis.status) not in UNVOTEABLE_STATUSES
+    )
+
+
+def can_see_thesis_rejection_reason(thesis: Thesis, is_staff: bool, user: BaseUser):
+    """Should the official rejection reason be disclosed to the specified user?
+    As an optimization, is_staff is passed directly so that we don't need to check
+    that in this function (this will be called for every serialized thesis)
+    """
+    return is_staff or thesis.advisor == user or thesis.auxiliary_advisor == user
+
+
+def can_see_thesis_votes(is_staff: bool):
+    """Should the votes for a thesis be disclosed to this user?
+    As above, this takes a bool argument as an optimization
+    """
+    return is_staff
