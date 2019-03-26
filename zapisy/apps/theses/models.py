@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from choicesenum import ChoicesEnum
+from choicesenum.django.fields import EnumIntegerField
 from django.db import models
 
 from apps.users.models import Employee, Student
@@ -24,7 +25,6 @@ class ThesisStatus(ChoicesEnum):
     ACCEPTED = 3, "zaakceptowana"
     IN_PROGRESS = 4, "w realizacji"
     DEFENDED = 5, "obroniona"
-    DEFAULT = BEING_EVALUATED
 
 
 class Thesis(models.Model):
@@ -42,8 +42,8 @@ class Thesis(models.Model):
         Employee, on_delete=models.PROTECT, blank=True,
         null=True, related_name="thesis_auxiliary_advisor",
     )
-    kind = models.SmallIntegerField(choices=ThesisKind.choices())
-    status = models.SmallIntegerField(choices=ThesisStatus.choices())
+    kind = EnumIntegerField(enum=ThesisKind, default=ThesisKind.MASTERS)
+    status = EnumIntegerField(enum=ThesisStatus, default=ThesisStatus.BEING_EVALUATED)
     reserved_until = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
     student = models.ForeignKey(
