@@ -28,7 +28,10 @@ export const InputWithLabel = React.memo(function(props: Props) {
 				<input
 					type={"text"}
 					value={props.inputText}
-					style={{ width: props.inputWidth != null ? props.inputWidth : "auto" }}
+					style={{
+						width: props.inputWidth != null ? props.inputWidth : "auto",
+						paddingLeft: "5px",
+					}}
 					readOnly={props.inputType === InputType.ReadOnly}
 					disabled={props.inputType === InputType.Disabled}
 				/>

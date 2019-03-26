@@ -19,6 +19,7 @@ const PersonIndicatorInput = styled(ReadOnlyInput)`
 	height: 36px;
 	width: 100%;
 	box-sizing: border-box;
+	padding-left: 10px;
 `;
 
 // This uses django-autocomplete-light's endpoint to fetch a list of
