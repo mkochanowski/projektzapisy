@@ -43,7 +43,7 @@ const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
 const RESERVED_COLUMN_WIDTH = 80;
 const TITLE_COLUMN_WIDTH = 630;
-const ADVISOR_COLUMN_WIDTH = 230;
+const ADVISOR_COLUMN_WIDTH = 360;
 
 /*
 While react-virtualized is a very nice library, this is one aspect
