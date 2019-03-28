@@ -140,17 +140,17 @@
                                         {% endif %}
                                         <div class="form-group">
                                             <label>Login</label>
-                                            <input type="text" class="form-control" id="id_login" name="username"
-                                                    placeholder="Użytkownik" required
+                                            <input type="text" class="form-control"
+                                                    placeholder="Użytkownik"
                                                     oninvalid="this.setCustomValidity('Nazwa użytkownika jest wymagana')"
-                                                    oninput="this.setCustomValidity('')">
+                                                    required>
                                         </div>
                                         <div class="form-group">
                                             <label>Hasło</label>
-                                            <input type="password" class="form-control" id="id_password"
-                                                    {# name="password" placeholder="Hasło" required
+                                            <input type="password" class="form-control"
+                                                    name="password" placeholder="Hasło"
                                                     oninvalid="this.setCustomValidity('Hasło jest wymagane')"
-                                                    oninput="this.setCustomValidity('')">
+                                                    required>
                                         </div>
         
                                         <div class="form-check">
