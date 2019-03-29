@@ -25,10 +25,6 @@ class GROUP_TYPE_CHOICES(ChoicesEnum):
     repetytorium = 9
     projekt = 10
 
-# GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
-#                       ('5', 'ćwiczenio-pracownia'),
-#                       ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
-#                       ('9', 'repetytorium'), ('10', 'projekt')]
 
 GROUP_EXTRA_CHOICES = [('', ''),
                        ("pierwsze 7 tygodni", "pierwsze 7 tygodni"),
