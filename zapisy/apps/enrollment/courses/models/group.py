@@ -14,6 +14,8 @@ from apps.enrollment.courses.models.course import Course
 from apps.users.models import Employee
 
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseGroup.groupTypes
+
+
 class GROUP_TYPE_CHOICES(ChoicesEnum):
     wykład = 1
     ćwiczenia = 2
