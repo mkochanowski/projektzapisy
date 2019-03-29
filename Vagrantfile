@@ -7,8 +7,6 @@
 # you're doing.
 Vagrant.configure(2) do |config|
   config.ssh.shell = "bash"
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.box_url = "https://app.vagrantup.com/ubuntu/boxes/bionic64"
   config.vm.provision :shell, path: "env/apt.sh"
   config.vm.provision :shell, path: "env/apache_setup.sh"
   config.vm.provision :shell, path: "env/postgre_setup.sh"
@@ -23,17 +21,24 @@ Vagrant.configure(2) do |config|
   config.vm.network :forwarded_port, guest: 8000, host: 8000
   config.vm.network :forwarded_port, guest: 5432, host: 15432
 
-  config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "docker" do |d, override|
+    override.vm.box = "tknerr/baseimage-ubuntu-18.04"
+  end
+
+  config.vm.provider "virtualbox" do |vb, override|
+    override.vm.box = "ubuntu/bionic64"
+    override.vm.box_url = "https://app.vagrantup.com/ubuntu/boxes/bionic64"
+
     # Customize the amount of memory on the VM:
     vb.memory = "1024"
     # The folder "node_modules" will live somewhere else and only be mounted
     # in /vagrant/zapisy to avoid the issue with symlinks on Windows.
-    config.vm.provision "shell", inline: <<-SHELL
+    override.vm.provision "shell", inline: <<-SHELL
       echo "Preparing local node_modules folder…"
       mkdir -p /vagrant_node_modules
       chown vagrant:vagrant /vagrant_node_modules
     SHELL
-    config.vm.provision "shell", run: "always", inline: <<-SHELL
+    override.vm.provision "shell", run: "always", inline: <<-SHELL
       mkdir -p /vagrant/zapisy/node_modules
       mount --bind /vagrant_node_modules /vagrant/zapisy/node_modules
     SHELL

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
 APP_DB_USER=fereol
 APP_DB_PASS=fereolpass
 APP_DB_NAME=fereol
