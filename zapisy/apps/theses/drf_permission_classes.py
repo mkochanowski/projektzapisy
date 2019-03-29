@@ -1,8 +1,8 @@
 """Defines a custom DRF permission class for the theses endpoint"""
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
+from apps.users.models import wrap_user
 from .permissions import can_modify_thesis, can_add_thesis, can_delete_thesis
-from .users import wrap_user
 
 
 class ThesisPermissions(BasePermission):

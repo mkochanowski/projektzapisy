@@ -10,9 +10,9 @@ from typing import Dict, Any, Optional
 from rest_framework import serializers, exceptions
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
-from apps.users.models import Employee, Student, BaseUser
+from apps.users.models import Employee, Student, BaseUser, wrap_user
 from .models import Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN
-from .users import wrap_user, get_user_type, get_theses_user_full_name
+from .users import get_user_type, get_theses_user_full_name
 from .permissions import (
     can_set_advisor, can_set_status_for_new, can_change_status_to, can_change_title
 )
@@ -64,7 +64,7 @@ def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
     qs = Thesis.objects.filter(title=title.strip())
     if instance:
         qs = qs.exclude(pk=instance.pk)
-    if qs.count():
+    if qs.exists():
         raise ThesisNameConflict()
 
 

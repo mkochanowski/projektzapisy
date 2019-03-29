@@ -12,12 +12,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
-from apps.users.models import Student, Employee, BaseUser
+from apps.users.models import Student, Employee, BaseUser, wrap_user
 from .models import Thesis, ThesisStatus, ThesisKind
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .users import (
-    wrap_user, get_theses_board, get_user_type,
+    get_theses_board, get_user_type,
     get_theses_user_full_name, ThesisUserType,
     is_student
 )

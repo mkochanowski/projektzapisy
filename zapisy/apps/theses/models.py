@@ -28,6 +28,25 @@ class ThesisStatus(ChoicesEnum):
 
 
 class Thesis(models.Model):
+    """Represents a thesis in the theses system.
+    A Thesis instance can represent a thesis in many different
+    configurations (an idea submitted by an employee, a work in progress
+    by a student, or a thesis defended years ago). This is accomplished
+    through various possible combinations of mainly the 'status' and 'student'
+    fields, as described in more detail below.
+
+    A thesis is first added typically by a regular university employee;
+    they are then automatically assigned as the advisor.
+
+    Before the thesis can be assigned to a student, the theses board
+    must first determine whether it is suitable; this is facilitated by the
+    voting logic. If the thesis is accepted as submitted,
+    its status is then automatically changed to either 'in progress' if the advisor
+    has assigned a student, or 'accepted' otherwise.
+    The advisor is then permitted to change its status to 'archived'
+    after the student completes and presents it.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Save the status so that, when saving, we can determine whether or not it changed
@@ -44,6 +63,9 @@ class Thesis(models.Model):
     )
     kind = EnumIntegerField(enum=ThesisKind, default=ThesisKind.MASTERS)
     status = EnumIntegerField(enum=ThesisStatus, default=ThesisStatus.BEING_EVALUATED)
+    # How long the assigned student has to complete their work on this thesis
+    # Note that this is only a convenience field for the users, the system
+    # does not enforce this in any way
     reserved_until = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
     student = models.ForeignKey(
@@ -66,7 +88,7 @@ class Thesis(models.Model):
         """Ensure that the title never contains superfluous whitespace"""
         self.title = self.title.strip()
 
-    def adjust_status(self):
+    def _adjust_status(self):
         """If there is a student and the thesis has been accepted, we automatically
         move it to "in progress"; conversely, if it was in progress but the students
         have been removed, go back to accepted
@@ -79,7 +101,7 @@ class Thesis(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        self.adjust_status()
+        self._adjust_status()
         if self.status != self.__original_status:
             # If the status changed, update modified date
             self.modified = datetime.now()
