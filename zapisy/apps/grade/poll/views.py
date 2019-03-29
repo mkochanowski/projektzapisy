@@ -534,7 +534,7 @@ def polls_list(request):
     data['employees'] = Employee.objects.all(). \
         select_related().order_by('user__last_name', 'user__first_name')
     data['studies_types'] = Program.objects.all()
-    data['types'] = GROUP_TYPE_CHOICES
+    data['types'] = GROUP_TYPE_CHOICES.choices()
     data['keys_to_create'] = Poll.count_polls_without_keys()
 
     return render(request, 'grade/poll/managment/polls_list.html', data)

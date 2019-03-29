@@ -35,7 +35,7 @@ class Template(models.Model):
         blank=True,
         null=True,
         max_length=2,
-        choices=GROUP_TYPE_CHOICES,
+        choices=GROUP_TYPE_CHOICES.choices(),
         verbose_name='typ zajęć')
     sections = models.ManyToManyField(Section, verbose_name='sekcje',
                                       through='TemplateSections')

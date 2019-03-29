@@ -743,7 +743,7 @@ def prepare_data_for_create_poll(request, group_id=0):
     data['studies_types'] = Program.objects.all()
     data['semesters'] = Semester.objects.all()
     data['sections'] = Section.objects.filter(deleted=False)
-    data['types'] = GROUP_TYPE_CHOICES
+    data['types'] = GROUP_TYPE_CHOICES.choices()
 
     return data
 
@@ -763,7 +763,7 @@ def prepare_data_for_create_template(request, group_id=0):
 
     data['studies_types'] = Program.objects.all()
     data['sections'] = Section.objects.filter(deleted=False)
-    data['types'] = GROUP_TYPE_CHOICES
+    data['types'] = GROUP_TYPE_CHOICES.choices()
 
     return data
 
