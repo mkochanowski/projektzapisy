@@ -67,13 +67,32 @@ def list_courses_in_semester(semester: Semester):
 
     This list will be used in prototype.
     """
-    courses = Course.objects.filter(semester=semester).select_related('entity').values(
-        'id', 'entity__name')
+    courses = Course.objects.filter(semester=semester).select_related('entity')
+    results = []
     for course in courses:
-        course.update({
-            'url': reverse('prototype-get-course', args=(course['id'], )),
+        # print("------------------------")
+        # print(course.get_effects_list())
+        # print("------------------------")
+        efekty = []
+        for e in course.get_effects_list():
+            efekty.append( {
+                'id':e.id,
+                'name':e.group_name,
+                'desc':e.description
+            } )
+        results.append({
+            'url': reverse('prototype-get-course', args=(course.id, )),
+            'id':course.id,
+            'entity__name':course.entity.name,
+            'effects':efekty,
+            'first_year':course.suggested_for_first_year,
+            'exam':course.exam,
+            'seminars':course.seminars
         })
-    return json.dumps(list(courses))
+    print("------------------------")
+    print(results)
+    print("------------------------")
+    return json.dumps(list(results))
 
 
 def student_timetable_data(student: Student):
