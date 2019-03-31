@@ -133,13 +133,13 @@ class Poll(models.Model):
 
     def serialize_for_signing_protocol(self):
         res = {}
-        res['title'] = self.title
-        if self.group is not None:
-            res['course_name'] = self.group.course.name
+
+        if self.group is None:
+            res['type'] = 'Ankieta Ogólna'
+            res['name'] = 'Ankieta Ogólna'
+        else:
+            res['name'] = self.group.course.name
             res['type'] = self.group.get_type_display()
-            res['teacher_name'] = self.group.get_teacher_full_name()
-        if self.studies_type:
-            res['studies_type'] = self.studies_type
 
         res['id'] = self.pk
 

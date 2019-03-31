@@ -25,9 +25,8 @@ def ajax_keys_progress(request):
     return HttpResponse(str(count))
 
 
-@require_POST
 @student_required
-def ajax_get_rsa_keys(request):
+def get_poll_data(request):
     """
     For each poll student is allowed to vote in, responds with its public key
     and information, such as course name, teachers name.
@@ -47,7 +46,7 @@ def ajax_get_rsa_keys(request):
 
 @require_POST
 @student_required
-def ajax_sign_tickets(request):
+def sign_tickets(request):
     """Reads tickets sent by the user, signs them and marks them as already
     used, so user cannot sign them twice. Responds with generated signatures.
     """
