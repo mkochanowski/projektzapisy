@@ -14,8 +14,13 @@ export interface CourseShell {
     entity__name: string;
     url: string;
     groups?: Array<number>;
+    visible?: boolean;
+    tags: string[];
+    effects: string[];
+    first_year?: boolean;
+    exam: boolean;
+    seminars: boolean;
 }
-
 interface State {
     courses: { [id: number]: CourseShell };
     selection: Array<number>;
@@ -27,6 +32,9 @@ const state: State = {
 
 const getters = {
     courses(state: State): Array<CourseShell> {
+        return this.allCourses(state).filter((c:CourseShell) => c.visible);
+    },
+    allCourses(state: State): Array<CourseShell> {
         return sortBy(values(state.courses), "entity__name");
     },
     selection(state: State) {
@@ -62,6 +70,11 @@ const actions = {
         })).then(() => dispatch("commitSelection", ids));
 
     },
+
+    updateFiltering({ state, commit, dispatch }: ActionContext<State, any>, ids: number[]) {
+       state.
+    },
+
 
     // Once all courses are downloaded, it updates the selection.
     commitSelection({ state, commit }: ActionContext<State, any>,

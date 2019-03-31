@@ -80,6 +80,12 @@ def list_courses_in_semester(semester: Semester):
                 'name':e.group_name,
                 'desc':e.description
             } )
+        tagi = []
+        for t in course.get_tags_list():
+            tagi.append( {
+                'id': t.id,
+                'description': t.description
+            } )
         results.append({
             'url': reverse('prototype-get-course', args=(course.id, )),
             'id':course.id,
@@ -87,7 +93,8 @@ def list_courses_in_semester(semester: Semester):
             'effects':efekty,
             'first_year':course.suggested_for_first_year,
             'exam':course.exam,
-            'seminars':course.seminars
+            'seminars':course.seminars > 0,
+            'tags':tagi
         })
     print("------------------------")
     print(results)
