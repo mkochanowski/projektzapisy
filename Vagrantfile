@@ -1,5 +1,12 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require 'yaml'
+
+begin
+  settings = YAML.load_file 'vagrant.yml'
+rescue Errno::ENOENT
+  settings = {}
+end
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -25,7 +32,11 @@ Vagrant.configure(2) do |config|
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    if settings['mem']
+      vb.memory = settings['mem']
+    else
+      vb.memory = "1024"
+    end
     # The folder "node_modules" will live somewhere else and only be mounted
     # in /vagrant/zapisy to avoid the issue with symlinks on Windows.
     config.vm.provision "shell", inline: <<-SHELL

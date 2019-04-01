@@ -26,3 +26,4 @@ zapisy/webpack_resources/webpack-stats.json
 *.gz
 *.sql
 *.sqlite3
+vagrant.yml
