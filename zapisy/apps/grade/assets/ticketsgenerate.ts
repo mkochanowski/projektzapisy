@@ -124,7 +124,7 @@ async function getSignedTicketsFromServer(pollDataDict: PollDataDict) {
     return signedTickets;
 }
 
-async function generateTicketsMain() {
+export default async function generateTicketsMain(): Promise<string> {
     let pollDataDict = await getPollDataFromServer();
     let signedTickets = await getSignedTicketsFromServer(pollDataDict);
 
@@ -154,12 +154,5 @@ async function generateTicketsMain() {
         }
     }
 
-    renderTickets(ticketsForUser);
+    return JSON.stringify(ticketsForUser, null, 2);
 }
-
-function renderTickets(ticketsForUser: { [tickets: string]: TicketForUser[] }) {
-    // TODO change this
-    console.log(JSON.stringify(ticketsForUser, null, 2));
-}
-
-generateTicketsMain();

@@ -4,7 +4,7 @@ export default {
          "katex.ts",
       ],
       "ticketsgenerate": [
-         "ticketsgenerate.ts",
+         "ticketsgenerate_main.js"
       ],
    },
    rawfiles: [
