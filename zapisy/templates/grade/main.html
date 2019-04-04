@@ -4,8 +4,9 @@
 {% block main-subtitle %}Informacje{% endblock %}
 {% block grade_active %} class="active"{% endblock %}
 
-{% block grade-info %} class="active"{% endblock %}
-
+{% block grade-info %} active {% endblock %}
+<li class="breadcrumb-item"><a href="/">Strona główna</a></li>
+<li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
 {% block content %}
     <div id="mainPage-container">
       {% if grade %}
