@@ -6,17 +6,10 @@ import axios from "axios";
 import { get as getCookie } from "js-cookie";
 
 
-const axiosInstance = axios.create({
-    baseURL: '/grade/ticket/',
-    headers: {
-        'X-CSRFToken': getCookie('csrftoken'),
-    },
-});
-
 @Component
-export default class App extends Vue {
+export default class TicketsGenerator extends Vue {
   ticketGenerationFinished: boolean = false;
-  tickets: string = '';
+  tickets: string = "";
 
   async generateTicketsOnClick() {
     this.tickets = await generateTicketsMain();
@@ -24,20 +17,20 @@ export default class App extends Vue {
   }
 
   copyTickets() {
-    let ticketsToCopy = document.querySelector('#tickets') as HTMLInputElement;
-    ticketsToCopy.select();
-    document.execCommand('copy');
+    let ticketsTextArea = this.$refs["tickets-textarea"] as HTMLInputElement;
+    ticketsTextArea.select();
+    document.execCommand("copy");
   }
 }
 </script>
 
 <template>
-  <div style="text-align: center">
+  <div class="text-center">
     <button
       id="tickets_generate_button"
       class="btn"
       v-if="!ticketGenerationFinished"
-      v-on:click="generateTicketsOnClick"
+      @click="generateTicketsOnClick"
     >Pobierz klucze</button>
     <div v-if="ticketGenerationFinished">
       <div id="grade-tickets-save-form">
@@ -47,15 +40,24 @@ export default class App extends Vue {
           <strong>nie ma powrotu do tego ekranu</strong>.
         </h3>
         <br>
-        <div style="text-align: center">
-          <button id="copy-keys" class="btn btn-default" v-on:click="copyTickets">Skopiuj</button>
+        <div class="text-center">
+          <button id="copy-keys" class="btn btn-default" @click="copyTickets">Skopiuj</button>
         </div>
         <br>
-        <textarea id="tickets" name="tickets" v-model="tickets" style="width:1000px; height:400px"></textarea>
+        <textarea
+          ref="tickets-textarea"
+          id="tickets"
+          name="tickets"
+          v-model="tickets"
+          style="width:1000px; height:400px"
+        ></textarea>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.text-center {
+  text-align: center;
+}
 </style>
