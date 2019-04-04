@@ -17,6 +17,8 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
+const MomentLocalesPlugin = require("moment-locales-webpack-plugin");
+
 
 // Leave one cpu free for the ts type checker...
 const happyThreadPool = HappyPack.ThreadPool({
