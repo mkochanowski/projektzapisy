@@ -20,6 +20,18 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
+    'connectionchoice': {
+        'source_filenames': (
+            'css/main.css',
+            'css/fereol.css',
+            'css/grade/connections_choice.css',
+            'css/ui-progressbar.css'
+        ),
+        'output_filename': 'css/connectionchoice.min.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
     'gradebase': {
         'source_filenames': (
             'css/main.css',
