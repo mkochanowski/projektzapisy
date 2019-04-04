@@ -5,7 +5,7 @@
 {% render_bundle "grade-ticketsgenerate" %}
 {% endblock %}
 
-{% block tickets-generate %} class="active"{% endblock %}
+{% block tickets-generate %} active {% endblock %}
 
 {% block main-subtitle %}Pobieranie kluczy{% endblock %}
 
@@ -15,7 +15,7 @@
 Pobieranie kluczy
 {% endblock %}
 
-{% block content %}
+{% block all-content %}
 <div id="pregen">
 	{% if success %}
 	<div class="main-success">{{ success }}</div>
@@ -27,7 +27,6 @@ Pobieranie kluczy
 	<div class="main-error">{{ error }}</div>
 	{% endif %}
 	{% if grade %}
-	<div id="progressbar" style="margin-bottom: 10px;"></div>
 	<div id="grade-tickets-generate">
 		<div method="post" id="tickets_generate">
 			<h2>
@@ -69,15 +68,5 @@ Pobieranie kluczy
 
 	<div>{{ p }}</div>
 	{% endif %}
-</div>
-<div id="postgen" style="display: none;">
-	<div id="grade-tickets-save-form">
-		<h3> Pomyślnie wygenerowano klucze.</h3>
-		<h3>Zapisz je w bezpiecznym miejscu - <strong>nie ma powrotu do tego ekranu</strong>.</h3>
-		<br />
-		<div style="text-align: center"><button id="copy-keys" class="btn btn-default">Skopiuj</button></div>
-		<br />
-		<pre id="keys" name="keys"></pre>
-	</div>
 </div>
 {% endblock %}
