@@ -10,9 +10,12 @@ import { get as getCookie } from "js-cookie";
 export default class TicketsGenerator extends Vue {
   ticketGenerationFinished: boolean = false;
   tickets: string = "";
+  loading: boolean = false;
 
   async generateTicketsOnClick() {
+    this.loading = true;
     this.tickets = await generateTicketsMain();
+    this.loading = false;
     this.ticketGenerationFinished = true;
   }
 
@@ -28,10 +31,10 @@ export default class TicketsGenerator extends Vue {
   <div class="text-center">
     <button
       id="tickets_generate_button"
-      class="btn"
+      class="btn btn-primary"
       v-if="!ticketGenerationFinished"
       @click="generateTicketsOnClick"
-    >Pobierz klucze</button>
+    ><span v-if="loading" class="spinner-border spinner-border-sm"></span>Pobierz klucze</button>
     <div v-if="ticketGenerationFinished">
       <div id="grade-tickets-save-form">
         <h3>Pomyślnie wygenerowano klucze.</h3>
@@ -41,7 +44,9 @@ export default class TicketsGenerator extends Vue {
         </h3>
         <br>
         <div class="text-center">
-          <button id="copy-keys" class="btn btn-default" @click="copyTickets">Skopiuj</button>
+          <button id="copy-keys" class="btn btn-primary" @click="copyTickets">
+            Skopiuj
+          </button>
         </div>
         <br>
         <textarea
@@ -55,9 +60,3 @@ export default class TicketsGenerator extends Vue {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.text-center {
-  text-align: center;
-}
-</style>
