@@ -2,6 +2,7 @@ import os
 import logging
 import environ
 
+from django.contrib.messages import constants as messages
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -297,6 +298,12 @@ DEBUG_TOOLBAR_ALLOWED_USERS = env.list('DEBUG_TOOLBAR_ALLOWED_USERS', default=[]
 DEBUG_TOOLBAR_PANELS = env.list('DEBUG_TOOLBAR_PANELS', default=[])
 
 ROLLBAR = env.dict('ROLLBAR', default={})
+
+# Message classes set to be compatible with Bootstrap 4 alerts.
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.DEBUG: 'dark',
+}
 
 
 def show_toolbar(request):
