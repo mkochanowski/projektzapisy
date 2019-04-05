@@ -2,6 +2,7 @@ import os
 import logging
 import environ
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 env = environ.Env()
@@ -250,6 +251,17 @@ DATETIME_FORMAT = "j N Y, H:i"
 CAS_SERVER_URL = 'https://login.uni.wroc.pl/cas/'
 CAS_CREATE_USER = False
 CAS_LOGIN_MSG = 'Sukces! Zalogowano przez USOS (login: %s).'
+
+# References pull request #655: https://github.com/iiuni/projektzapisy/pull/655
+# Force django_cas_ng to use protocol version 3 instead of 2 (the default).
+# This setting can be enabled as soon as the University's CAS is upgraded to a
+# newer version. Temporary workaround: users.views.cas_logout()
+# CAS_VERSION = '3'
+
+# URL where user will be redirected to after logging out if there is
+# no referrer and no next page set.
+LOGOUT_REDIRECT_URL = '/'
+CAS_REDIRECT_URL = LOGOUT_REDIRECT_URL
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
