@@ -175,6 +175,8 @@ TEMPLATES = [
 # and Authentication both must come before LocalePref which
 # must precede LocaleMiddleware, and Common must go afterwards.
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -293,6 +295,29 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # doesn't have as many features, in particular it cannot serialize
 # custom objects, and we need this behavior.
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# Attach X-XSS-Protection header to all outgoing HTTP responses.
+# It tells conformant browsers to activate their built-in
+# XSS (cross-site scripting attack) detection filter.
+SECURE_BROWSER_XSS_FILTER = True
+
+# Attach X-Content-Type-Options header with a value of nosniff
+# to all outgoing HTTP responses.
+# What it does is preventing the browser from trying to guess
+# a file type by 'sniffing' (applying some heuristic algorithms to) it.
+# Such feature can be abused in surprising ways, e.g. by disguising
+# JavaScript code in a text/plain file.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# How long should our site be remembered to be HTTPS-only
+# by browsers.
+SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
+
+# Manifest the will to be included in so-called browser preload list,
+# physically distributed with browsers (Chrome for instance) to
+# basically do what HSTS would do, but even when a specific site
+# has never been seen before.
+SECURE_HSTS_PRELOAD = True
 
 DEBUG_TOOLBAR_ALLOWED_USERS = env.list('DEBUG_TOOLBAR_ALLOWED_USERS', default=[])
 DEBUG_TOOLBAR_PANELS = env.list('DEBUG_TOOLBAR_PANELS', default=[])
