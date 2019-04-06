@@ -9,17 +9,17 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 import Component from "vue-class-component";
 
-import { Group } from "../models";
-import { CourseShell } from "../store/courses";
-
-export type CourseObject = { id: number; course__entity: string; url: string };
+import { CourseShell, Filter, Group, Course } from "../models";
+import { FiltersCollection } from "../store/courses";
 
 @Component({
   props: {
-    courses: Array as () => CourseObject[],
+    courses: Array as () => CourseShell[],
+    activeFilters: Array as () => Filter[],
   },
   computed: mapGetters("courses", {
-    selectionState: "selection"
+    selectionState: "selection",
+    activeFilters:"activeFiltersArray"
   }),
 })
 export default class CourseList extends Vue {
@@ -39,9 +39,9 @@ export default class CourseList extends Vue {
     <a @click="selection = []">Odznacz wszystkie</a>
     <div class="course-list-sidebar">
       <ul class="course-list-sidebar-inner">
-        <li v-for="c of courses" :key="c.id">
+        <li v-for="c of courses.filter(c=>activeFilters.reduce( (ac,cur)=>ac && cur.test(c) ,true ))" :key="c.id">
           <input type="checkbox" :id="c.id" :value="c.id" v-model="selection">
-          <label :for="c.id">{{ c.entity__name }}</label>
+          <label :for="c.id">{{ c.name }}</label>
         </li>
       </ul>
     </div>
