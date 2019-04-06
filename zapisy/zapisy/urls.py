@@ -24,7 +24,6 @@ urlpatterns = [
 
     url(r'^news/', include('apps.news.urls')),
     url(r'^users/', include('apps.users.urls')),
-    url('accounts/', include('apps.email_change.urls')),
 
     url(r'^grade/', include('apps.grade.urls')),
     url(r'^feeds/news/$', LatestNews()),
@@ -42,9 +41,13 @@ urlpatterns = [
     url(r'^vote/', include('apps.offer.vote.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', admin.site.urls),
-    url(r'^accounts/login$', cas_views.login, name='cas_ng_login'),
-    url(r'^accounts/logout$', users_views.cas_logout, name='cas_ng_logout'),
-    url(r'^accounts/callback$', cas_views.callback, name='cas_ng_proxy_callback'),
+
+
+    path('accounts/', include('apps.email_change.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/login', cas_views.LoginView.as_view(), name='cas_ng_login'),
+    path('accounts/logout', users_views.cas_logout, name='cas_ng_logout'),
+    path('accounts/callback', cas_views.CallbackView.as_view(), name='cas_ng_proxy_callback'),
 ]
 
 urlpatterns += [

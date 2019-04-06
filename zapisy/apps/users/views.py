@@ -209,14 +209,6 @@ def consultations_change(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
-def password_change_done(request: HttpRequest) -> HttpResponse:
-    """informs if password were changed"""
-    logger.info('User (%s) changed password' % request.user.get_full_name())
-    messages.success(request, "Twoje hasło zostało zmienione.")
-    return HttpResponseRedirect(reverse('my-profile'))
-
-
-@login_required
 def my_profile(request):
     """User profile page.
 
@@ -337,7 +329,7 @@ def cas_logout(request, **kwargs) -> HttpResponse:
     using the legacy protocol (version 2), rewrite the given url to match
     the new schema. If not, simply return the original response.
     """
-    response = cas_baseviews.logout(request, **kwargs)
+    response = cas_baseviews.LogoutView.as_view()(request, **kwargs)
 
     if (isinstance(response, HttpResponseRedirect) and
             int(settings.CAS_VERSION) == 2):

@@ -1,7 +1,7 @@
 {# Base template for an entire System #}
 
 {% load fereol_common %}
-{% load staticfiles %}
+{% load static %}
 {% load should_display_debug %}
 {% load debug_info %}
 {% load i18n %}
@@ -141,6 +141,7 @@
                                         <div class="form-group">
                                             <label>Login</label>
                                             <input type="text" class="form-control"
+                                                    name="username"
                                                     placeholder="Użytkownik"
                                                     oninvalid="this.setCustomValidity('Nazwa użytkownika jest wymagana')"
                                                     required>
