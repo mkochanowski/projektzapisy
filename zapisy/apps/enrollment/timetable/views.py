@@ -67,38 +67,28 @@ def list_courses_in_semester(semester: Semester):
 
     This list will be used in prototype.
     """
-    courses = Course.objects.filter(semester=semester).select_related('entity')
+    courses = Course.objects.filter(semester=semester).select_related('entity', 'entity__type').prefetch_related('entity__tags', 'entity__effects')
     results = []
     for course in courses:
-        # print("------------------------")
-        # print(course.get_effects_list())
-        # print("------------------------")
         efekty = []
         for e in course.get_effects_list():
-            efekty.append( {
-                'id':e.id,
-                'name':e.group_name,
-                'desc':e.description
-            } )
+            efekty.append( e.group_name )
         tagi = []
         for t in course.get_tags_list():
-            tagi.append( {
-                'id': t.id,
-                'description': t.description
-            } )
+            tagi.append( t.full_name )
         results.append({
             'url': reverse('prototype-get-course', args=(course.id, )),
             'id':course.id,
-            'entity__name':course.entity.name,
+            'name':course.entity.name,
+            'shortName':course.entity.shortName,
             'effects':efekty,
-            'first_year':course.suggested_for_first_year,
+            'firstYearFriendly':course.suggested_for_first_year,
+            'type': course.entity.type.name,
             'exam':course.exam,
             'seminars':course.seminars > 0,
-            'tags':tagi
+            'tags':tagi,
+            'english':course.english
         })
-    print("------------------------")
-    print(results)
-    print("------------------------")
     return json.dumps(list(results))
 
 
