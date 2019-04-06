@@ -3,55 +3,66 @@
 import axios from "axios";
 import { values, flatten, sortBy } from "lodash";
 import { ActionContext } from "vuex";
-import { GroupJSON } from "../models";
+import { GroupJSON, CourseShell, CourseShellJSON, Filter } from "../models";
 
 // Sets header for all POST requests to enable CSRF protection.
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-export interface CourseShell {
-    id: number;
-    entity__name: string;
-    url: string;
-    groups?: Array<number>;
-    visible?: boolean;
-    tags: string[];
-    effects: string[];
-    first_year?: boolean;
-    exam: boolean;
-    seminars: boolean;
-}
 interface State {
     courses: { [id: number]: CourseShell };
-    selection: Array<number>;
+    activeFilters: Map<string,Filter>;
+    selection: number[];
+    allEffects: string[];
+    allTypes: string[];
+    allTags: string[];
 }
 const state: State = {
     courses: {},
+    activeFilters: new Map(),
     selection: [],
+    allEffects: [],
+    allTypes: [],
+    allTags: [],
 };
 
+export type FiltersCollection = Map<string,Filter>;
+
 const getters = {
-    courses(state: State): Array<CourseShell> {
-        return this.allCourses(state).filter((c:CourseShell) => c.visible);
-    },
-    allCourses(state: State): Array<CourseShell> {
+    courses(state: State): CourseShell[] {
         return sortBy(values(state.courses), "entity__name");
     },
     selection(state: State) {
         return state.selection;
-    }
+    },
+    activeFilters(state:State):FiltersCollection {
+        return state.activeFilters;
+    },
+    activeFiltersArray(state:State):Filter[]{
+        return Array.from(state.activeFilters.values())
+    },
+    filter(filterId:string) {
+        return state.activeFilters.get(filterId);
+    },
+    allEffects(state:State):string[] {
+        return state.allEffects;
+    },
+    allTypes(state:State):string[] {
+        return state.allTypes;
+    },
+    allTags(state:State):string[] {
+        return state.allTags;
+    },
 };
 
 const actions = {
     // updateSelection will fetch all the courses, for which we miss the data,
     // and then update the selection flags.
-    updateSelection({ state, commit, dispatch }: ActionContext<State, any>,
-        ids: number[]) {
-        const idsToFetch = ids.filter(id =>
-            state.courses[id].groups === undefined);
-        if (idsToFetch.length === 0) {
-            dispatch("commitSelection", ids);
-        }
+    updateSelection(context:ActionContext<State, any>, ids: number[]) {
+        const { state, commit, dispatch } = context; 
+        const idsToFetch = ids.filter(id => state.courses[id].groups === undefined);
+        if(!idsToFetch.length) dispatch("commitSelection", ids);
+        
         // This puts a lock on all the courses that will be fetched. That way we
         // avoid fetching the same course in parallel when the student is
         // clicking too fast.
@@ -71,10 +82,6 @@ const actions = {
 
     },
 
-    updateFiltering({ state, commit, dispatch }: ActionContext<State, any>, ids: number[]) {
-       state.
-    },
-
 
     // Once all courses are downloaded, it updates the selection.
     commitSelection({ state, commit }: ActionContext<State, any>,
@@ -91,6 +98,13 @@ const actions = {
             document.getElementById("courses-list")!.innerHTML
         ) as CourseShell[];
         commit("setCourses", coursesDump);
+    },    // initFromJSONTag will be called at the start to populate the courses list.
+    
+    setFilter({ commit }: ActionContext<State, any>, {filterId, filter}:{filterId:string,filter:Filter}) {
+        commit("addFilter", {filterId, filter});
+    },
+    dropFilter({ commit }: ActionContext<State, any>, filterId: string) {
+        commit("dropFilter", filterId);
     },
 };
 
@@ -99,13 +113,31 @@ const mutations = {
         state.courses[c].groups = ids;
     },
     setCourses(state: State, courses: CourseShell[]) {
+        const allEffects:string[] = [];
+        const allTags:string[] = [];
         courses.forEach(c => {
+            if(!c.effects) c.effects=[];
+            c.effects
+                .filter(e => !allEffects.includes(e))
+                .forEach(e => allEffects.push(e));
+            if(!c.tags) c.tags=[];
+            c.tags
+                .filter(e => !allTags.includes(e))
+                .forEach(e => allTags.push(e));
             state.courses[c.id] = c;
         });
+        state.allEffects = allEffects;
+        state.allTags = allTags;
     },
     setSelection(state: State, ids: number[]) {
         state.selection = ids;
-    }
+    },
+    addFilter(state: State, {filterId, filter}:{filterId:string,filter:Filter}) {
+        state.activeFilters.set(filterId, filter);
+    },
+    dropFilter(state: State, filterId: string) {
+        state.activeFilters.delete(filterId);
+    },
 };
 
 export default {
