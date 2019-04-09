@@ -687,7 +687,6 @@ def tickets_enter(request):
                 if not valid_ser.is_valid():
                     raise ValueError
                 tickets = valid_ser.validated_data
-                
             except BaseException:
                 tickets = None
 
@@ -702,7 +701,7 @@ def tickets_enter(request):
             finished = []
             for item in tickets['tickets']:
                 id = item['id']
-                ticket= item['ticket']
+                ticket = item['ticket']
                 signed_ticket = item['signature']
                 try:
                     poll = Poll.objects.get(pk=id)
