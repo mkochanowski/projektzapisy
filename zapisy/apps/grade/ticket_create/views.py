@@ -13,18 +13,6 @@ from apps.grade.ticket_create.utils import generate_keys_for_polls, \
 from apps.users.decorators import employee_required, student_required
 
 
-@employee_required
-def ajax_keys_generate(request):
-    generate_keys_for_polls()
-    return HttpResponse("OK")
-
-
-@employee_required
-def ajax_keys_progress(request):
-    count = cache.get('generated-keys', 0)
-    return HttpResponse(str(count))
-
-
 @student_required
 def get_poll_data(request):
     """
