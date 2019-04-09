@@ -1,4 +1,4 @@
-FROM projektzapisy:base
+FROM kochanowski/projektzapisy:base
 
 COPY zapisy/ /vagrant/zapisy/
 
