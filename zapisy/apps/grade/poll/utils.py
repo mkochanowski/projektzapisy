@@ -43,10 +43,6 @@ def flatten(x):
     return result
 
 
-def poll_and_ticket_cmp(pollTuple1, pollTuple2):
-    return poll_cmp(pollTuple1[0], pollTuple2[0])
-
-
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
