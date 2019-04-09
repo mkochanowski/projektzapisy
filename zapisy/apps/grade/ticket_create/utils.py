@@ -10,16 +10,6 @@ from apps.grade.poll.models import Poll
 from apps.grade.ticket_create.models import SigningKey
 
 
-def generate_keys_for_polls(semester: Semester = None):
-    if not semester:
-        semester = Semester.get_current_semester()
-    poll_list = Poll.get_polls_without_keys(semester)
-    for poll in poll_list:
-        pem_rsa_key = SigningKey.generate_rsa_key()
-        key = SigningKey(poll=poll, private_key=pem_rsa_key)
-        key.save()
-
-
 def mark_poll_used(user, poll):
     poll.signingkey.students.add(user.student)
 
