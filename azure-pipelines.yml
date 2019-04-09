@@ -6,12 +6,20 @@ pool:
 
 variables:
   dockerId: kochanowski
-  imageName: projektzapisy_base
+  imageName: projektzapisy
 
 steps:
 - script: |
     docker login -u $(dockerId) -p $password
-    docker build -t $(dockerId)/$(imageName) -f Dockerfile.base .
-    docker push $(dockerId)/$(imageName)
+    docker build -t $(dockerId)/$(imageName):base -f Dockerfile.base .
+    docker push $(dockerId)/$(imageName):base
   env:
     password: $(dockerHubPassword)
+
+- script: |
+    docker login -u $(dockerId) -p $password 
+    docker build -t $(dockerId)/$(imageName):develop -f Dockerfile .
+    docker push $(dockerId)/$(imageName):develop
+  env:
+    password: $(dockerHubPassword)
+

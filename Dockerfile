@@ -1,4 +1,4 @@
-FROM projektzapisy_base:latest
+FROM projektzapisy:base
 
 COPY zapisy/ /vagrant/zapisy/
 
