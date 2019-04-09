@@ -145,7 +145,6 @@ class Poll(models.Model):
 
         return res
 
-
     @staticmethod
     def get_polls_for_semester(semester=None):
         if not semester:
