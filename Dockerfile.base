@@ -9,9 +9,10 @@ RUN apt-get update
 RUN apt-get -y install dos2unix sudo
 
 RUN echo "vagrant:vagrant" | chpasswd && adduser vagrant sudo
-USER vagrant
+#USER vagrant
 
 RUN find /vagrant/env/ -type f -print0 | xargs -0 dos2unix
+RUN find /vagrant/env/ -type f -print0 | xargs -0 chmod +x 
 RUN /bin/bash -c /vagrant/env/apt.sh
 RUN /bin/bash -c /vagrant/env/apache_setup.sh
 RUN /bin/bash -c /vagrant/env/docker_before_postgres.sh
