@@ -4,13 +4,12 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
-from django.core.cache import cache
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
 from apps.grade.ticket_create.utils import match_signing_requests_with_polls, \
     get_signing_response, mark_poll_used
-from apps.users.decorators import employee_required, student_required
+from apps.users.decorators import student_required
 
 
 @student_required

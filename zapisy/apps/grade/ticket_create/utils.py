@@ -1,11 +1,5 @@
 from typing import Tuple, List, Dict
-from string import whitespace
-from subprocess import getstatusoutput
-
 from django.contrib.auth.models import User
-
-from apps.enrollment.courses.models.semester import Semester
-
 from apps.grade.poll.models import Poll
 from apps.grade.ticket_create.models import SigningKey
 
