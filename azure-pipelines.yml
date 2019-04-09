@@ -9,11 +9,9 @@ variables:
   imageName: projektzapisy_base
 
 steps:
-- script:
-    echo $(dockerHubTest)
 - script: |
-    echo $(localTest)
-    docker login -u $(dockerId) -p "$(password)"
+    echo $localTest
+    docker login -u $(dockerId) -p $password
     #docker build -t $(dockerId)/$(imageName) -f Dockerfile.base .
     docker push $(dockerId)/$(imageName)
   env:
