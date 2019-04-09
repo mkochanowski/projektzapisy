@@ -1,0 +1,39 @@
+version: "2"
+services:
+  projektzapisy:
+    container_name: projektzapisy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 run.py server
+    # command: python3 manage.py runserver 0.0.0.0:8000
+    # command: ls apps
+    image: projektzapisy
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./zapisy:/vagrant/zapisy
+      - zapisy_node_modules:/vagrant_node_modules
+    ports:
+      - "80:8001"
+      - "8000:8000"
+      # - "5432:15432"
+    depends_on: 
+      - postgresdb
+
+  postgresdb:
+    image: postgres:11.2
+    restart: always
+    environment:
+      - POSTGRES_USER=fereol
+      - POSTGRES_PASSWORD=fereolpass
+      - POSTGRES_DB=fereol
+    ports:
+      - "5432:15432"
+    volumes:
+      - ./zapisy:/vagrant/zapisy
+      - zapisy_pgdata:/var/lib/postgresql/data
+
+volumes:
+  zapisy_pgdata:
+  zapisy_node_modules:

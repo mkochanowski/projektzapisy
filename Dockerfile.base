@@ -1,0 +1,34 @@
+FROM ubuntu:18.04
+
+RUN mkdir -p /vagrant /vagrant_node_modules /vagrant/zapisy/node_modules
+
+COPY env/ /vagrant/env/
+
+RUN useradd -ms /bin/bash vagrant
+RUN apt-get -y install dos2unix
+RUN find /vagrant/env/ -type f -print0 | xargs -0 dos2unix
+RUN ./vagrant/env/apt.sh
+RUN ./vagrant/env/apache_setup.sh
+RUN ./vagrant/env/docker_before_postgres.sh
+RUN ./vagrant/env/postgre_setup.sh
+RUN ./vagrant/env/tools_install.sh
+RUN apt-get -y install sudo
+RUN echo "vagrant:vagrant" | chpasswd && adduser vagrant sudo
+# USER vagrant
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN npm i -g yarn
+# RUN ./vagrant/env/nodejs_setup.sh
+RUN ./vagrant/env/py3.sh
+#>WORKDIR /vagrant/zapisy
+# RUN ./vagrant/env/webpack_setup.sh
+#>RUN yarn
+# RUN dos2unix /vagrant/env/bash_setup.sh
+RUN /bin/bash -c /vagrant/env/bash_setup.sh
+RUN /bin/bash -c /vagrant/env/redis.sh
+# RUN ./vagrant/env/env3_setup.sh
+
+RUN chown root:root /vagrant_node_modules
+RUN /bin/bash -c mount --bind /vagrant_node_modules /vagrant/zapisy/node_modules
+
+WORKDIR /vagrant/zapisy
