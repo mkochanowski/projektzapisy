@@ -5,6 +5,7 @@ RUN mkdir -p /vagrant /vagrant_node_modules /vagrant/zapisy/node_modules
 COPY env/ /vagrant/env/
 
 RUN useradd -ms /bin/bash vagrant
+RUN apt-get update
 RUN apt-get -y install dos2unix
 RUN find /vagrant/env/ -type f -print0 | xargs -0 dos2unix
 RUN ./vagrant/env/apt.sh
