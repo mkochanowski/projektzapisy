@@ -37,7 +37,7 @@ RUN /bin/bash -c /vagrant/env/redis.sh
 
 # RUN ./vagrant/env/env3_setup.sh
 
-RUN chown root:root /vagrant_node_modules
-RUN /bin/bash -c mount --bind /vagrant_node_modules /vagrant/zapisy/node_modules
+# RUN chown root:root /vagrant_node_modules
+# RUN /bin/bash -c mount --bind /vagrant_node_modules /vagrant/zapisy/node_modules
 
 WORKDIR /vagrant/zapisy
