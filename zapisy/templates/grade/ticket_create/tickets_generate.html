@@ -2,7 +2,7 @@
 {% load render_bundle from webpack_loader %}
 
 {% block js %}{{ block.super }}
-{% render_bundle "grade-ticketsgenerate" %}
+{% render_bundle "ticket_create-ticketsgenerate" %}
 {% endblock %}
 
 {% block tickets-generate %} active {% endblock %}
