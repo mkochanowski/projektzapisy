@@ -12,14 +12,16 @@ services:
     volumes:
       - ./zapisy:/vagrant/zapisy
       - zapisy_pgdata:/var/lib/postgresql/data
+    # network_mode: "host"
   
   projektzapisy:
     container_name: projektzapisy
     build:
       context: .
       dockerfile: Dockerfile
-    command: pipenv run python run.py server
+    command: python3 run.py server
     image: kochanowski/projektzapisy:latest
+    working_dir: /vagrant/zapisy
     stdin_open: true
     tty: true
     environment:
@@ -32,6 +34,8 @@ services:
       - "80:8001"
       - "8000:8000"
     depends_on: 
+      - postgresdb
+    links:
       - postgresdb
     # network_mode: "host"
 
