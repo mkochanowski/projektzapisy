@@ -269,6 +269,9 @@ class Tickets:
 
     def save(self) -> None:
         """Zapisanie kopert w ustalonym formacie."""
+        out_data = {
+            'tickets': []
+        }
         for id, poll in self.data.items():
             data = {
                 'type': poll['poll_info']['type'],
@@ -277,8 +280,8 @@ class Tickets:
                 'ticket': str(poll['m']),
                 'signature': poll['s'],
             }
-            out_data = {'tickets': data}
-            self.out_file.write(json.dumps(out_data, indent=2))
+            out_data['tickets'].append(data)
+        self.out_file.write(json.dumps(out_data, indent=2))
 
     @property
     def csrftoken(self) -> Union[str, NoReturn]:
