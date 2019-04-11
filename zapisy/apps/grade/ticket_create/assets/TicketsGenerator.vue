@@ -11,10 +11,11 @@ export default class TicketsGenerator extends Vue {
   ticketGenerationFinished: boolean = false;
   tickets: string = "";
   loading: boolean = false;
+  errors: string[] = new Array();
 
   async generateTicketsOnClick() {
     this.loading = true;
-    this.tickets = await generateTicketsMain();
+    [this.tickets, this.errors] = await generateTicketsMain();
     this.loading = false;
     this.ticketGenerationFinished = true;
   }
@@ -56,7 +57,26 @@ export default class TicketsGenerator extends Vue {
           v-model="tickets"
           style="width:1000px; height:400px"
         ></textarea>
+        <div class="ticket-error" v-for="msg in errors" :key="msg.id" >
+          Błąd: {{ msg }}
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style lang="sass" scoped>
+.ticket-error
+{
+	border: 1px solid #cccccc;
+	background: #FFF5B3;
+	font-size: 14px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+  margin: 10px;
+	margin-bottom: 10px;
+	padding: 10px 10px;
+}
+</style>
