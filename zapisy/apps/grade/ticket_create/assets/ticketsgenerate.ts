@@ -77,6 +77,29 @@ function hash(m: bigInt.BigInteger): bigInt.BigInteger {
     return bigInt(sha256(m.toString()), 16);
 }
 
+/** This function is needed, since big-integer module doesn't support secure random numbers generation.
+ *  Source: https://github.com/peterolson/BigInteger.js/pull/108
+*/
+function secureRandBetween(min: bigInt.BigInteger, max: bigInt.BigInteger): bigInt.BigInteger {
+    var range = max.subtract(min);
+    while(true) {
+        var rand = random(range.bitLength().toJSNumber());
+        if(range.geq(rand)) {
+            return min.add(rand);
+        }
+    }
+    function random(bits: number): bigInt.BigInteger {
+        let bytes = Math.ceil(bits / 8);
+        let randomArray = window.crypto.getRandomValues(new Uint8Array(bytes));
+        let bigIntRandomArray: bigInt.BigInteger[] = new Array();
+        for (let num of randomArray) {
+            bigIntRandomArray.push(bigInt(num));
+        }
+        let randBigNum = bigInt.fromArray(bigIntRandomArray, 256);
+        return randBigNum;
+    }
+}
+
 function generateRandomTicket(pubKey: PublicKey): Ticket {
     const randMin: bigInt.BigInteger = bigInt(2);
     const randMax: bigInt.BigInteger = pubKey.n;
@@ -85,8 +108,8 @@ function generateRandomTicket(pubKey: PublicKey): Ticket {
     let r: bigInt.BigInteger;
     // while condition will probably never happen, but we will check it just to be safe
     do {
-        m = bigInt.randBetween(randMin, randMax);
-        r = bigInt.randBetween(randMin, randMax);
+        m = secureRandBetween(randMin, randMax);
+        r = secureRandBetween(randMin, randMax);
     } while (bigInt.gcd(r, pubKey.n) === bigInt.one);
 
     return { m: m, r: r };
