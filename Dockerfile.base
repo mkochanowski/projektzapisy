@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN mkdir -p /vagrant /vagrant_node_modules /vagrant/zapisy/node_modules
+RUN mkdir -p /vagrant /vagrant_node_modules /vagrant/zapisy /vagrant/zapisy/node_modules /vagrant/zapisy/logs /vagrant/zapisy/.venv
 
 COPY env/ /vagrant/env/
 
