@@ -124,9 +124,10 @@ async function getSignedTicketsFromServer(pollDataDict: PollDataDict) {
     return signedTickets;
 }
 
-export default async function generateTicketsMain(): Promise<string> {
+export default async function generateTicketsMain(): Promise<[string, string[]]> {
     let pollDataDict = await getPollDataFromServer();
     let signedTickets = await getSignedTicketsFromServer(pollDataDict);
+    let errors: string[] = new Array();
 
     let ticketsForUser: { [tickets: string]: TicketForUser[] } = {
         tickets: new Array(),
@@ -134,8 +135,7 @@ export default async function generateTicketsMain(): Promise<string> {
 
     for (let signedTicket of signedTickets.data) {
         if (signedTicket.status === 'ERROR') {
-            // TODO handle error
-            console.log(signedTicket.message);
+            errors.push(signedTicket.message)
         }
         else {
             let pollData = pollDataDict[signedTicket.id];
@@ -154,5 +154,5 @@ export default async function generateTicketsMain(): Promise<string> {
         }
     }
 
-    return JSON.stringify(ticketsForUser, null, 2);
+    return [JSON.stringify(ticketsForUser, null, 2), errors];
 }
