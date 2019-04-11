@@ -15,6 +15,8 @@ from math import gcd
 from random import getrandbits
 from hashlib import sha256
 import requests
+import os
+import json
 
 Poll = Dict[str, Union[int, Mapping[str, Union[str, int]]]]
 
@@ -72,7 +74,7 @@ def try_again() -> bool:
 class Tickets:
     """Główna logika generowania kluczy do oceny zajęć."""
 
-    url: str = 'https://zapisy.ii.uni.wroc.pl/'
+    url: str = os.getenv('URL', 'https://zapisy.ii.uni.wroc.pl/')
     # Szablon do wypisania kluczy.
     template: str = ("[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n" +
                      ('-' * 34) + " \n")
@@ -161,7 +163,7 @@ class Tickets:
         }
 
         response = self.client.post(
-            self.url + 'grade/ticket/ajax_get_keys', data=data)
+            self.url + 'grade/ticket/get-poll-data', data=data)
 
         if response.ok:
             # Zwrócone dane to lista obiektów
@@ -169,7 +171,7 @@ class Tickets:
             # X jest obiektem z conajmniej polem 'title' oraz 'id'
             # może mieć również pola 'type', 'course_name', 'teacher_name'
             # jeśli ich nie ma jest to ankieta ogólna.
-            self.poll_data = response.json()
+            self.poll_data = response.json()['poll_data']
             return True
         return False
 
@@ -216,17 +218,20 @@ class Tickets:
     def get_signed_tickets(self) -> bool:
         """Wyślij karty w kopertach do podpisania."""
 
-        data = [{
-            'id': id,
+        signing_requests = [{
+            'id': str(id),
             'ticket': str(poll['t']),
         } for id, poll in self.data.items()]
+
+        data = {
+            'signing_requests': signing_requests
+        }
 
         headers = {
             'X-Csrftoken': self.csrftoken,
         }
-
         response = self.client.post(
-            self.url + 'grade/ticket/ajax_sign_tickets', json=data, headers=headers)
+            self.url + 'grade/ticket/sign-tickets', json=data, headers=headers)
 
         if response.ok:
             # Zwrócone dane to lista obiektów
@@ -249,7 +254,6 @@ class Tickets:
 
     def unblind_tickets(self) -> None:
         """Wyjęcie podpisanych kart z kopert."""
-
         for data in self.signed_blind_tickets:
             id = data['id']
             if data['status'] == 'OK':
@@ -265,18 +269,16 @@ class Tickets:
 
     def save(self) -> None:
         """Zapisanie kopert w ustalonym formacie."""
-
         for id, poll in self.data.items():
             data = {
-                'title': poll['poll_info']['title'],
-                'name': 'Ankieta ogólna ' if not poll['poll_info'].get('course_name', False) else
-                        '{course_name} \n{type}: {teacher_name}'.format(
-                            **poll['poll_info']),
+                'type': poll['poll_info']['type'],
+                'name': poll['poll_info']['name'],
                 'id': id,
                 'ticket': str(poll['m']),
-                'signed_ticket': poll['s'],
+                'signature': poll['s'],
             }
-            self.out_file.write(self.template.format(**data))
+            out_data = {'tickets': data}
+            self.out_file.write(json.dumps(out_data, indent=2))
 
     @property
     def csrftoken(self) -> Union[str, NoReturn]:
