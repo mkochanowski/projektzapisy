@@ -204,116 +204,116 @@ console.log(allAssetDefs);
 const copyCommands = buildCopyCommandsForRawfiles(allAssetDefs.rawfiles);
 
 const webpackConfig: webpack.Configuration = {
-	entry: Object.assign({
-		polyfill: "babel-polyfill",
-	}, allAssetDefs.bundles),
-	output: {
-		path: path.resolve(BUNDLE_OUTPUT_DIR),
-		filename: DEV ? "[name]_[hash].js" : "[name]_[hash].min.js",
-	},
-	watchOptions: {
-		poll: 2000
-	},
-	// Webpack types don't seem to be aware of this devtool
-	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
-	mode: DEV ? "development" : "production",
-	optimization: {
-		// This is only applied if optimization.minimize is true (mode === "production")
-		minimizer: [
-			new TerserWebpackPlugin({
-				sourceMap: false,
-				parallel: true,
-				terserOptions: {
-					parse: { ecma: 8 },
-					mangle: {
-						toplevel: true,
-						eval: true,
-					},
-					output: {
-						comments: false,
-					}
-				},
-			}),
-		],
-		splitChunks: {
-			cacheGroups: {
-				vendors: {
-					test: /node_modules/,
-					chunks: "initial",
-					name: "vendors",
-					priority: 10,
-					enforce: false
-				}
-			},
-			minChunks: 2,
-		},
-	},
-	module: {
-		rules: [
-			// TypeScript source:
-			// 1) tsc: TS -> ES6
-			// 2) babel: ES6 -> ES5 (and polyfilling)
-			{
-				// This doesn't use happypack because for whatever reason appendTsSuffixTo
-				// (needed by vuejs) breaks it
-				test: /\.tsx?$/,
-				use: [
-					{
-						loader: "cache-loader",
-						query: {
-							cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
-						}
-					},
-					{ loader: "babel-loader" },
-					{
-						loader: "ts-loader",
-						query: {
-							appendTsSuffixTo: [/\.vue$/],
-							transpileOnly: true,
-						}
-					}
-				],
-				exclude: /node_modules/,
-			},
-			// ES6 source: babel converts to ES5 (and polyfills)
-			{
-				test: /\.jsx?$/,
-				loader: "happypack/loader?id=babel",
-				exclude: /node_modules/
-			},
-			{
-				test: /\.vue$/,
-				loader: "vue-loader",
-				options: {
-					loaders: getVueCssLoaders(
-						DEV ? {
-							sourceMap: true,
-							extract: false,
-						} : {
-							sourceMap: false,
-							extract: true,
-							minifyCss: true,
-						}
-					),
-					esModule: true,
-					postcss: [
-						require("autoprefixer")({ browsers: ["last 2 versions"] })
-					],
-				},
-			},
-			{
-				test: /\.less$/,
-				use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: [{
-						loader: "css-loader",
-						options: { minimize: !DEV }
-					}, {
-						loader: "less-loader"
-					}]
-				})
-			},
-			{
+    entry: Object.assign({
+        polyfill: "babel-polyfill",
+    }, allAssetDefs.bundles),
+    output: {
+        path: path.resolve(BUNDLE_OUTPUT_DIR),
+        filename: DEV ? "[name]_[hash].js" : "[name]_[hash].min.js",
+    },
+    watchOptions: {
+        poll: 2000
+    },
+    // Webpack types don't seem to be aware of this devtool
+    devtool: DEV ? "inline-cheap-module-source-map" as any : false,
+    mode: DEV ? "development" : "production",
+    optimization: {
+        // This is only applied if optimization.minimize is true (mode === "production")
+        minimizer: [
+            new TerserWebpackPlugin({
+                sourceMap: false,
+                parallel: true,
+                terserOptions: {
+                    parse: { ecma: 8 },
+                    mangle: {
+                        toplevel: true,
+                        eval: true,
+                    },
+                    output: {
+                        comments: false,
+                    }
+                },
+            }),
+        ],
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /node_modules/,
+                    chunks: "initial",
+                    name: "vendors",
+                    priority: 10,
+                    enforce: false
+                }
+            },
+            minChunks: 2,
+        },
+    },
+    module: {
+        rules: [
+            // TypeScript source:
+            // 1) tsc: TS -> ES6
+            // 2) babel: ES6 -> ES5 (and polyfilling)
+            {
+                // This doesn't use happypack because for whatever reason appendTsSuffixTo
+                // (needed by vuejs) breaks it
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: "cache-loader",
+                        query: {
+                            cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
+                        }
+                    },
+                    { loader: "babel-loader" },
+                    {
+                        loader: "ts-loader",
+                        query: {
+                            appendTsSuffixTo: [/\.vue$/],
+                            transpileOnly: true,
+                        }
+                    }
+                ],
+                exclude: /node_modules/,
+            },
+            // ES6 source: babel converts to ES5 (and polyfills)
+            {
+                test: /\.jsx?$/,
+                loader: "happypack/loader?id=babel",
+                exclude: /node_modules/
+            },
+            {
+                test: /\.vue$/,
+                loader: "vue-loader",
+                options: {
+                    loaders: getVueCssLoaders(
+                        DEV ? {
+                            sourceMap: true,
+                            extract: false,
+                        } : {
+                            sourceMap: false,
+                            extract: true,
+                            minifyCss: true,
+                        }
+                    ),
+                    esModule: true,
+                    postcss: [
+                        require("autoprefixer")({ browsers: ["last 2 versions"] })
+                    ],
+                },
+            },
+            {
+                test: /\.less$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: [{
+                        loader: "css-loader",
+                        options: { minimize: !DEV }
+                    }, {
+                        loader: "less-loader"
+                    }]
+                })
+            },
+            {
                 test: /\.s[c|a]ss$/,
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
@@ -336,90 +336,90 @@ const webpackConfig: webpack.Configuration = {
                     }]
                 })
             },
-			{
-				test: /\.css$/,
-				use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: [{
-						loader: "css-loader",
-						options: { minimize: !DEV }
-					}]
-				})
-			},
-			{
-				test: /\.(png|jpg|gif|ttf|woff|woff2)$/,
-				use: [{
-					loader: "url-loader",
-					options: {
-						limit: 8192,
-						// ACHTUNG this should match the value of STATIC_URL in settings.py
-						publicPath: "/static",
-					}
-				}]
-			}
-		]
-	},
-	resolve: {
-		modules: [
-			path.resolve(ASSET_DIR),
-			path.resolve("./node_modules"),
-		],
-		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
-		alias: {
-			vue$: "vue/dist/vue.runtime.esm.js",
-			vuex$: "vuex/dist/vuex.esm.js",
-		},
-	},
-	resolveLoader: {
-		modules: [
-			path.resolve("./node_modules"),
-		],
-	},
-	plugins: [
-		new CleanWebpackPlugin([path.resolve(BUNDLE_OUTPUT_DIR)], {
-			verbose:  true,
-			dry:      false,
-			root:	  process.cwd(),
-		}),
-		new ExtractTextPlugin("[name]-[hash].min.css", {
-			allChunks: true
-		}),
-		new BundleTracker({ filename: "webpack_resources/webpack-stats.json" }),
-		// This will copy "raw" assets - ones where we don't want any transformations
-		// (e.g. bootstrap styles)
-		// We're not using copy-webpack-plugin because that tries to determine
-		// which files changed in watch mode and it takes forever (around 30 seconds)
-		// due to the slow shared filesystem we're using
-		new WebpackShellPlugin({
-			onBuildEnd: [
-				"echo Copying static assets...",
-				...copyCommands,
-			],
-			// If this is set, the command won't be run on incremental builds in watch mode
-			// (matters for performance)
-			dev: DEV,
-		}),
-		new HappyPack({
-			id: "babel",
-			threadPool: happyThreadPool,
-			loaders: [
-				{
-					loader: "cache-loader",
-					query: {
-						cacheDirectory: path.resolve("node_modules/.cache-loader-babel")
-					}
-				},
-				{ loader: "babel-loader" },
-			],
-		}),
-		new VueLoaderPlugin(),
-		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: [{
+                        loader: "css-loader",
+                        options: { minimize: !DEV }
+                    }]
+                })
+            },
+            {
+                test: /\.(png|jpg|gif|ttf|woff|woff2)$/,
+                use: [{
+                    loader: "url-loader",
+                    options: {
+                        limit: 8192,
+                        // ACHTUNG this should match the value of STATIC_URL in settings.py
+                        publicPath: "/static",
+                    }
+                }]
+            }
+        ]
+    },
+    resolve: {
+        modules: [
+            path.resolve(ASSET_DIR),
+            path.resolve("./node_modules"),
+        ],
+        extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
+        alias: {
+            vue$: "vue/dist/vue.runtime.esm.js",
+            vuex$: "vuex/dist/vuex.esm.js",
+        },
+    },
+    resolveLoader: {
+        modules: [
+            path.resolve("./node_modules"),
+        ],
+    },
+    plugins: [
+        new CleanWebpackPlugin([path.resolve(BUNDLE_OUTPUT_DIR)], {
+            verbose:  true,
+            dry:      false,
+            root:	  process.cwd(),
+        }),
+        new ExtractTextPlugin("[name]-[hash].min.css", {
+            allChunks: true
+        }),
+        new BundleTracker({ filename: "webpack_resources/webpack-stats.json" }),
+        // This will copy "raw" assets - ones where we don't want any transformations
+        // (e.g. bootstrap styles)
+        // We're not using copy-webpack-plugin because that tries to determine
+        // which files changed in watch mode and it takes forever (around 30 seconds)
+        // due to the slow shared filesystem we're using
+        new WebpackShellPlugin({
+            onBuildEnd: [
+                "echo Copying static assets...",
+                ...copyCommands,
+            ],
+            // If this is set, the command won't be run on incremental builds in watch mode
+            // (matters for performance)
+            dev: DEV,
+        }),
+        new HappyPack({
+            id: "babel",
+            threadPool: happyThreadPool,
+            loaders: [
+                {
+                    loader: "cache-loader",
+                    query: {
+                        cacheDirectory: path.resolve("node_modules/.cache-loader-babel")
+                    }
+                },
+                { loader: "babel-loader" },
+            ],
+        }),
+        new VueLoaderPlugin(),
+        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 
-		new MomentLocalesPlugin({
+        new MomentLocalesPlugin({
             localesToKeep: ["pl"],
         }),
 
-	],
+    ],
 };
 
 if (parseBool(process.env.ANALYZE)) {
