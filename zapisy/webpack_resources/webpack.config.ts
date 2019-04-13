@@ -218,29 +218,27 @@ const webpackConfig: webpack.Configuration = {
 	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
 	mode: DEV ? "development" : "production",
 	optimization: {
-		// This is only applied if optimization.minimize is true (mode === "development")
+		// This is only applied if optimization.minimize is true (mode === "production")
 		minimizer: [
-			new UglifyJSPlugin({
+			new TerserWebpackPlugin({
 				sourceMap: false,
 				parallel: true,
-				uglifyOptions: {
-					compress: true,
-					output: { comments: false },
-					comments: false,
-					ecma: 5,
+				terserOptions: {
+					parse: { ecma: 8 },
 					mangle: {
 						toplevel: true,
 						eval: true,
 					},
-					hoist_funs: true,
+					output: {
+						comments: false,
+					}
 				},
 			}),
 		],
 		splitChunks: {
 			cacheGroups: {
-			  	commons: {
-					name: "commons",
-					filename: "common_chunks.js",
+				vendors: {
+					test: /node_modules/,
 					chunks: "initial",
 					name: "vendors",
 					priority: 10,
@@ -299,9 +297,7 @@ const webpackConfig: webpack.Configuration = {
 					),
 					esModule: true,
 					postcss: [
-					  require("autoprefixer")({
-						browsers: ["last 2 versions"]
-					  })
+						require("autoprefixer")({ browsers: ["last 2 versions"] })
 					],
 				},
 			},
@@ -370,7 +366,8 @@ const webpackConfig: webpack.Configuration = {
 		],
 		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
 		alias: {
-			"vue$": "vue/dist/vue.runtime.esm.js",
+			vue$: "vue/dist/vue.runtime.esm.js",
+			vuex$: "vuex/dist/vuex.esm.js",
 		},
 	},
 	resolveLoader: {
@@ -415,6 +412,7 @@ const webpackConfig: webpack.Configuration = {
 				{ loader: "babel-loader" },
 			],
 		}),
+		new VueLoaderPlugin(),
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 
 		new MomentLocalesPlugin({
