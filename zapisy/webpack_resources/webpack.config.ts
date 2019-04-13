@@ -242,9 +242,12 @@ const webpackConfig: webpack.Configuration = {
 					name: "commons",
 					filename: "common_chunks.js",
 					chunks: "initial",
-					minChunks: 2
-			  	}
+					name: "vendors",
+					priority: 10,
+					enforce: false
+				}
 			},
+			minChunks: 2,
 		},
 	},
 	module: {
@@ -315,17 +318,28 @@ const webpackConfig: webpack.Configuration = {
 				})
 			},
 			{
-				test: /\.s[c|a]ss$/,
-				use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: [{
-						loader: "css-loader",
-						options: { minimize: !DEV }
-					}, {
-						loader: "sass-loader"
-					}]
-				})
-			},
+                test: /\.s[c|a]ss$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: [{
+                        loader: "css-loader",
+                        options: { minimize: !DEV }
+                    }, {
+                        loader: "postcss-loader",
+                        options: {
+                            plugins: function () { // post css plugins, can be exported to postcss.config.js
+                                return [
+                                    require("precss"),
+                                    require("autoprefixer")
+                                ];
+                            }
+                        }
+
+                    }, {
+                        loader: "sass-loader"
+                    }]
+                })
+            },
 			{
 				test: /\.css$/,
 				use: ExtractTextPlugin.extract({
@@ -402,6 +416,11 @@ const webpackConfig: webpack.Configuration = {
 			],
 		}),
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
+
+		new MomentLocalesPlugin({
+            localesToKeep: ["pl"],
+        }),
+
 	],
 };
 
