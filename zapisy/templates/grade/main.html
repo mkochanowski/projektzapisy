@@ -1,4 +1,6 @@
 {% extends "grade/base.html" %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block main-subtitle %}Informacje{% endblock %}
@@ -15,8 +17,6 @@
 {% block all-content %}
     <div id="mainPage-container">
       {% if grade %}
-        {% load static %}
-        {% load render_bundle from webpack_loader %}
         {% render_bundle "ticket_create-katex" %}
    			<h2>Ocena Zajęć</h2>
    			<div id="od-vote-main-rules">
