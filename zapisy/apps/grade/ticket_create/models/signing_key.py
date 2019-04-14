@@ -11,7 +11,6 @@ from apps.grade.ticket_create.serializers import TicketsListSerializer
 from apps.grade.poll.models import Poll
 
 
-
 PollWithTicketId = namedtuple('PollWithTicketId', ['ticket_id', 'poll'])
 
 
