@@ -67,7 +67,7 @@ def tickets_generate(request):
     if grade:
         polls_lists, general_polls = Poll.get_polls_list(request.user.student)
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
-        return render(request, 'grade/ticket_create/tickets_generate.html', data)
+        return render(request, 'ticket_create/tickets_generate.html', data)
     else:
         messages.error(request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów")
-        return render(request, 'grade/ticket_create/tickets_generate.html', {'grade': grade})
+        return render(request, 'ticket_create/tickets_generate.html', {'grade': grade})
