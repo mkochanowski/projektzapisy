@@ -11,11 +11,18 @@ export default class TicketsGenerator extends Vue {
   ticketGenerationFinished: boolean = false;
   tickets: string = "";
   loading: boolean = false;
+  exception: boolean = false;
   errors: string[] = new Array();
 
   async generateTicketsOnClick() {
     this.loading = true;
-    [this.tickets, this.errors] = await generateTicketsMain();
+    try {
+      [this.tickets, this.errors] = await generateTicketsMain();
+    }
+    catch(e) {
+      this.errors = [e.response.data];
+      this.exception = true;
+    }
     this.loading = false;
     this.ticketGenerationFinished = true;
   }
@@ -38,25 +45,27 @@ export default class TicketsGenerator extends Vue {
     ><span v-if="loading" class="spinner-border spinner-border-sm"></span>Pobierz klucze</button>
     <div v-if="ticketGenerationFinished">
       <div id="grade-tickets-save-form">
-        <h3>Pomyślnie wygenerowano klucze.</h3>
-        <h3>
-          Zapisz je w bezpiecznym miejscu -
-          <strong>nie ma powrotu do tego ekranu</strong>.
-        </h3>
-        <br>
-        <div class="text-center">
-          <button id="copy-keys" class="btn btn-primary" @click="copyTickets">
-            Skopiuj
-          </button>
+        <div v-if="!exception">
+          <h3>Pomyślnie wygenerowano klucze.</h3>
+          <h3>
+            Zapisz je w bezpiecznym miejscu -
+            <strong>nie ma powrotu do tego ekranu</strong>.
+          </h3>
+          <br>
+          <div class="text-center">
+            <button id="copy-keys" class="btn btn-primary" @click="copyTickets">
+              Skopiuj
+            </button>
+          </div>
+          <br>
+          <textarea
+            ref="tickets-textarea"
+            id="tickets"
+            name="tickets"
+            v-model="tickets"
+            style="width:1000px; height:400px"
+          ></textarea>
         </div>
-        <br>
-        <textarea
-          ref="tickets-textarea"
-          id="tickets"
-          name="tickets"
-          v-model="tickets"
-          style="width:1000px; height:400px"
-        ></textarea>
         <div class="ticket-error" v-for="msg in errors" :key="msg.id" >
           Błąd: {{ msg }}
         </div>

@@ -1,7 +1,7 @@
 import json
 
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from apps.enrollment.courses.models.semester import Semester
@@ -40,22 +40,16 @@ def sign_tickets(request):
     try:
         signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
-        return JsonResponse({
-            'error': "Couldn't parse json"
-        })
+        return HttpResponseBadRequest("Couldn't parse json")
 
     valid_ser = SigningRequestsListSerializer(data=signing_requests)
     if not valid_ser.is_valid():
-        return JsonResponse({
-            'error': 'Invalid request'
-        })
+        return HttpResponseBadRequest("Invalid request")
     try:
         matched_requests = match_signing_requests_with_polls(
             valid_ser.validated_data['signing_requests'], request.user)
     except KeyError:
-        return JsonResponse({
-            'error': "Couldn't match provided id with poll"
-        })
+        return HttpResponseBadRequest("Couldn't match provided id with poll")
 
     response = []
     for signing_request, poll in matched_requests:
