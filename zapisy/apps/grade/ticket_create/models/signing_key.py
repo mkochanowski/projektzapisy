@@ -1,21 +1,15 @@
 import json
-
+from collections import namedtuple
+from typing import Dict, List, Tuple
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from Crypto.Signature import pkcs1_15
-
-from subprocess import getstatusoutput
-from collections import namedtuple
-
-from apps.enrollment.courses.models.semester import Semester
+from django.db import models
+from django.apps import apps
 from apps.users.models import Student
 from apps.grade.ticket_create.serializers import TicketsListSerializer
 from apps.grade.poll.models import Poll
 
-from django.db import models
-from django.apps import apps
-
-from typing import Dict, List, Tuple
 
 
 PollWithTicketId = namedtuple('PollWithTicketId', ['ticket_id', 'poll'])
