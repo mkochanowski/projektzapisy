@@ -42,6 +42,7 @@ export default class TicketsGenerator extends Vue {
       class="btn btn-primary"
       v-if="!ticketGenerationFinished"
       @click="generateTicketsOnClick"
+      :disabled="loading"
     ><span v-if="loading" class="spinner-border spinner-border-sm"></span>Pobierz klucze</button>
     <div v-if="ticketGenerationFinished">
       <div id="grade-tickets-save-form">
