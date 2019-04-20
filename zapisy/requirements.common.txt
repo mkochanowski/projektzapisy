@@ -23,7 +23,6 @@ pycryptodome==3.8.1
 rollbar==0.13.17
 newrelic==2.68.0.50
 gunicorn==19.7.1
-lxml==4.2.1
 python-dateutil==2.7.3
 vobject==0.9.5
 python-memcached==1.58
