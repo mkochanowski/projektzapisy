@@ -22,7 +22,8 @@ steps:
     echo "Building base image version $(imageBaseVersion)"
     docker login -u $(dockerId) -p $password
     docker build -t $(dockerId)/$(imageName):base -t $(dockerId)/$(imageName):base-$(imageBaseVersion) -f Dockerfile.base .
-    docker tag $(dockerId)/$(imageName):base $(dockerId)/$(imageName):base-$(imageBaseVersion)
+    # docker tag $(dockerId)/$(imageName):base $(dockerId)/$(imageName):base-$(imageBaseVersion)
+    docker push $(dockerId)/$(imageName):base
     docker push $(dockerId)/$(imageName):base-$(imageBaseVersion) && curl -s https://unversion.me/listener/$(zapisyBaseListener)/$(imageBaseVersion)/
   env:
     password: $(dockerHubPassword)
@@ -32,7 +33,8 @@ steps:
     echo "Building develop image version $(imageBaseVersion)"
     docker login -u $(dockerId) -p $password 
     docker build -t $(dockerId)/$(imageName):develop -t $(dockerId)/$(imageName):develop-$(imageDevelopVersion) -f Dockerfile .
-    docker tag $(dockerId)/$(imageName):develop $(dockerId)/$(imageName):develop-$(imageDevelopVersion)
+    # docker tag $(dockerId)/$(imageName):develop $(dockerId)/$(imageName):develop-$(imageDevelopVersion)
+    docker push $(dockerId)/$(imageName):develop
     docker push $(dockerId)/$(imageName):develop-$(imageDevelopVersion) && curl -s https://unversion.me/listener/$(zapisyDevelopListener)/$(imageDevelopVersion)/
   env:
     password: $(dockerHubPassword)
