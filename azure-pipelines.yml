@@ -11,26 +11,25 @@ variables:
 steps:
 - bash: |
     export UNVME_BASE=$(curl -s https://unversion.me/@kochanowski/projekt-zapisy/dockerhub/base/patch/)
-    echo '##vso[task.setvariable variable=imageBaseVersion;isOutput=true]$UNVME_BASE'
+    echo "##vso[task.setvariable variable=imageBaseVersion;isOutput=true]$UNVME_BASE"
     export UNVME_DEVELOP=$(curl -s https://unversion.me/@kochanowski/projekt-zapisy/dockerhub/develop/patch/)
-    echo '##vso[task.setvariable variable=imageDevelopVersion;isOutput=true]$UNVME_DEVELOP'
+    echo "##vso[task.setvariable variable=imageDevelopVersion;isOutput=true]$UNVME_DEVELOP"
     echo "Base version $UNVME_BASE"
-    echo "Develop version $UNVEM_DEVELOP"
-  name: setVersions
+    echo "Develop version $UNVME_DEVELOP"
   displayName: Get version numbers
 
 - script: |
     docker login -u $(dockerId) -p $password
-    docker build -t $(dockerId)/$(imageName):base -t $(dockerId)/$(imageName):base-$(setVersions.imageBaseVersion) -f Dockerfile.base .
-    docker push $(dockerId)/$(imageName):base-$(setVersions.imageBaseVersion) && curl -s https://unversion.me/listener/$(zapisyBaseListener)/$(setVersions.imageBaseVersion)/
+    docker build -t $(dockerId)/$(imageName):base -t $(dockerId)/$(imageName):base-$(imageBaseVersion) -f Dockerfile.base .
+    docker push $(dockerId)/$(imageName):base-$(imageBaseVersion) && curl -s https://unversion.me/listener/$(zapisyBaseListener)/$(imageBaseVersion)/
   env:
     password: $(dockerHubPassword)
   displayName: Push base image
 
 - script: |
     docker login -u $(dockerId) -p $password 
-    docker build -t $(dockerId)/$(imageName):develop -t $(dockerId)/$(imageName):develop-$(setVersions.imageDevelopVersion) -f Dockerfile .
-    docker push $(dockerId)/$(imageName):develop-$(setVersions.imageDevelopVersion) && curl -s https://unversion.me/listener/$(zapisyDevelopListener)/$(setVersions.imageDevelopVersion)/
+    docker build -t $(dockerId)/$(imageName):develop -t $(dockerId)/$(imageName):develop-$(imageDevelopVersion) -f Dockerfile .
+    docker push $(dockerId)/$(imageName):develop-$(imageDevelopVersion) && curl -s https://unversion.me/listener/$(zapisyDevelopListener)/$(imageDevelopVersion)/
   env:
     password: $(dockerHubPassword)
   displayName: Push develop image
