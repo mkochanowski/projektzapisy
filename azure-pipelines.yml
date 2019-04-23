@@ -19,7 +19,7 @@ steps:
 - script: |
     docker login -u $(dockerId) -p $password
     docker build -t $(dockerId)/$(imageName):base -t $(dockerId)/$(imageName):base-$(imageBaseVersion) -f Dockerfile.base .
-    docker push $(dockerId)/$(imageName):base && curl -s https://unversion.me/listener/$(zapisyBaseListener)/$(imageBaseVersion)/
+    docker push $(dockerId)/$(imageName):base-$(imageBaseVersion) && curl -s https://unversion.me/listener/$(zapisyBaseListener)/$(imageBaseVersion)/
   env:
     password: $(dockerHubPassword)
   displayName: Push base image
@@ -27,7 +27,7 @@ steps:
 - script: |
     docker login -u $(dockerId) -p $password 
     docker build -t $(dockerId)/$(imageName):develop -t $(dockerId)/$(imageName):develop-$(imageDevelopVersion) -f Dockerfile .
-    docker push $(dockerId)/$(imageName):develop && curl -s https://unversion.me/listener/$(zapisyDevelopListener)/$(imageDevelopVersion)/
+    docker push $(dockerId)/$(imageName):develop-$(imageDevelopVersion) && curl -s https://unversion.me/listener/$(zapisyDevelopListener)/$(imageDevelopVersion)/
   env:
     password: $(dockerHubPassword)
   displayName: Push develop image
