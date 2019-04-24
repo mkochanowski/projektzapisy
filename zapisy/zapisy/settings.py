@@ -185,7 +185,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
-    'pipeline.middleware.MinifyHTMLMiddleware',
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
