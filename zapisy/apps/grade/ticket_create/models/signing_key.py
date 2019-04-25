@@ -3,7 +3,6 @@ from collections import namedtuple
 from typing import Dict, List, Tuple
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-from Crypto.Signature import pkcs1_15
 from django.db import models
 from django.apps import apps
 from apps.users.models import Student
