@@ -1,3 +1,4 @@
+'''This code exists only to enable signals.'''
 from django.apps import AppConfig
 
 
