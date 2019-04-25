@@ -33,7 +33,7 @@ class SigningKey(models.Model):
     def sign_ticket(self, ticket: int) -> int:
         key = RSA.importKey(self.private_key)
         if ticket >= key.n or ticket <= 0:
-            raise ValueError
+            raise ValueError("Ticket value not in valid range")
         signed = pow(ticket, key.d, key.n)
         return signed
 
@@ -90,19 +90,19 @@ class SigningKey(models.Model):
         tickets = json.loads(raw_tickets)
         valid_ser = TicketsListSerializer(data=tickets)
         if not valid_ser.is_valid():
-            raise ValueError
+            raise ValueError("Invalid format")
         tickets_list = valid_ser.validated_data['tickets']
 
         tickets_ids = [ticket['id'] for ticket in tickets_list]
 
         # Make sure there are no duplicate ids
         if len(tickets_ids) != len(set(tickets_ids)):
-            raise ValueError
+            raise ValueError("Duplicate ids detected")
 
         polls = Poll.objects.filter(pk__in=tickets_ids).select_related('signingkey').order_by('pk')
         # Make sure all provided ids exist in database
         if len(polls) != len(tickets_list):
-            raise ValueError
+            raise ValueError("Provided id doesn't exist in database")
         tickets_list.sort(key=lambda ticket: ticket['id'])
 
         valid_polls = []
