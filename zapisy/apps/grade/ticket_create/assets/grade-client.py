@@ -17,7 +17,7 @@ URL = os.getenv('URL', 'https://zapisy.ii.uni.wroc.pl/')
 
 def hash_(m: int) -> int:
     '''We are using hash function to disable multiplicative properties
-    of RSA encryption/decryption. In other words, if E(m) is standard rsa 
+    of RSA encryption/decryption. In other words, if E(m) is standard rsa
     encryption/decryption, then E(m*k) = E(m) * E(k), but if we set
     E'(m) = E(H(m)), where H is hash function, then E'(m*k) != E'(m) * E'(k).
     If we didn't use that, you would be able to generate many tickets, just
@@ -101,7 +101,6 @@ class TicketCreate:
         if login_success_check.status_code != 200:
             raise RuntimeError("Login failed")
 
-
     def get_polls(self) -> Dict[int, PollData]:
         '''First step of the protocol, query the server for polls metadata(name, type, id)
         and public keys.
@@ -125,12 +124,11 @@ class TicketCreate:
             'signing_requests': []
         }
 
-        for id_, poll_data in polls.items():
+        for poll_data in polls.values():
             ticket = Ticket(poll_data.pub_key)
             poll_data.ticket = ticket
             signing_request = poll_data.get_signing_request()
             data['signing_requests'].append(signing_request)
-        
         return data
 
     def get_tickets(self):
@@ -175,7 +173,6 @@ def main():
 
     with open(args.f, 'w') as f:
         f.write(json.dumps(tickets, indent=2, ensure_ascii=False))
-
 
 
 if __name__ == '__main__':
