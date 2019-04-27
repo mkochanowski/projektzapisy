@@ -6,6 +6,9 @@ from apps.grade.ticket_create.models import SigningKey
 
 @receiver(post_save, sender=Poll)
 def generate_key(sender: Poll, instance: Poll, **kwargs) -> None:
+    if not kwargs['created']:
+        # Skip if Poll is being modified rather than created.
+        return
     pem_rsa_key = SigningKey.generate_rsa_key()
     key = SigningKey(poll=instance, private_key=pem_rsa_key)
     key.save()
