@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import json
-import os
 import sys
 from getpass import getpass
 from math import gcd
