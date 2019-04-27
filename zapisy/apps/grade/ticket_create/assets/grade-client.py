@@ -137,6 +137,14 @@ class TicketCreate:
         tickets_for_user = {
             'tickets': []
         }
+        # res is an array of dictionaries with following format:
+        # {
+        #   status: string = OK | ERROR
+        #   message: string
+        #   id: int
+        #   ticket: string
+        #   signature: string
+        # }
         for signed_ticket in res:
             if signed_ticket['status'] == 'ERROR':
                 print('ERROR: {}'.format(signed_ticket['message']))
