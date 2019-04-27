@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import sys
 from getpass import getpass
 from math import gcd
 from secrets import randbelow
@@ -163,14 +164,14 @@ class TicketCreate:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('f', type=str, help='Path to the output file.')
+    parser.add_argument('-f', '--filename', type=str, help='Path to the output file.', default=None)
     args = parser.parse_args()
 
     tickets_creator = TicketCreate(URL)
     tickets = tickets_creator.get_tickets()
 
-    with open(args.f, 'w') as f:
-        f.write(json.dumps(tickets, indent=2, ensure_ascii=False))
+    f = sys.stdout if args.filename is None else open(args.filename, 'w')
+    f.write(json.dumps(tickets, indent=2, ensure_ascii=False))
 
 
 if __name__ == '__main__':
