@@ -34,14 +34,13 @@ def get_signing_response(user: User, poll: Poll, signing_request: Dict) -> Dict:
             'message': error_msg,
             'id': signing_request['id'],
         }
-    else:
-        key = SigningKey.objects.get(poll=poll)
-        signed_ticket = key.sign_ticket(signing_request['ticket'])
-        return {
-            'status': 'OK',
-            'id': signing_request['id'],
-            'signature': str(signed_ticket),
-        }
+    key = SigningKey.objects.get(poll=poll)
+    signed_ticket = key.sign_ticket(signing_request['ticket'])
+    return {
+        'status': 'OK',
+        'id': signing_request['id'],
+        'signature': str(signed_ticket),
+    }
 
 
 def match_signing_requests_with_polls(signing_requests, user):
