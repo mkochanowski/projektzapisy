@@ -63,11 +63,10 @@ def sign_tickets(request):
 
 @student_required
 def tickets_generate(request):
-    grade = Semester.objects.filter(is_grade_active=True).count() > 0
-    if grade:
-        polls_lists, general_polls = Poll.get_polls_list(request.user.student)
-        data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
-        return render(request, 'ticket_create/tickets_generate.html', data)
-    else:
+    grade = Semester.objects.filter(is_grade_active=True).exists()
+    if not grade:
         messages.error(request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów")
         return render(request, 'ticket_create/tickets_generate.html', {'grade': grade})
+    polls_for_courses, other_polls = Poll.get_polls_list(request.user.student)
+    data = {'polls': polls_for_courses, 'grade': grade, 'general_polls': other_polls}
+    return render(request, 'ticket_create/tickets_generate.html', data)
