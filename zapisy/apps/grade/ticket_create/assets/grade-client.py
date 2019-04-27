@@ -92,11 +92,10 @@ class TicketCreate:
             'password': password,
         }
 
-        response = self._post('/users/login/', data=data)
-        assert response.ok
+        self._post('/users/login/', data=data)
         login_success_check = self._post('/grade/ticket/tickets-generate', allow_redirects=False)
         if login_success_check.status_code != 200:
-            raise RuntimeError("Login failed")
+            raise RuntimeError("Login failed - probably wrong username or password")
 
     def get_polls(self) -> Dict[int, PollData]:
         """First step of the protocol, query the server for polls metadata(name, type, id)
