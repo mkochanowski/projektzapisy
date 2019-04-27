@@ -1,15 +1,17 @@
 import json
 
-from django.contrib import messages
-from django.http import JsonResponse, HttpResponseBadRequest
-from django.shortcuts import render
-from django.views.decorators.http import require_POST
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
-from apps.grade.ticket_create.utils import match_signing_requests_with_polls, \
-    get_signing_response, mark_poll_used
+from apps.grade.ticket_create.utils import (get_signing_response,
+                                            mark_poll_used,
+                                            match_signing_requests_with_polls)
 from apps.users.decorators import student_required
+from django.contrib import messages
+from django.db import transaction
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_POST
 
 
 @student_required
@@ -33,6 +35,7 @@ def get_poll_data(request):
 
 @require_POST
 @student_required
+@transaction.atomic
 def sign_tickets(request):
     """Reads tickets sent by the user, signs them and marks them as already
     used, so user cannot sign them twice. Responds with generated signatures.
