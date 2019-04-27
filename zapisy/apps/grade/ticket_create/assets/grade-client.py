@@ -1,16 +1,17 @@
 #!/usr/bin/env python
-import os
 import argparse
 import json
+import os
+from getpass import getpass
 from math import gcd
 from secrets import randbelow
 from typing import Dict
-from getpass import getpass
 from urllib.parse import urljoin
-from Crypto.PublicKey import RSA
-from Crypto.Hash import SHA256
-from Crypto.Util.number import inverse
+
 import requests
+from Crypto.Hash import SHA256
+from Crypto.PublicKey import RSA
+from Crypto.Util.number import inverse
 
 URL = os.getenv('URL', 'https://zapisy.ii.uni.wroc.pl/')
 
