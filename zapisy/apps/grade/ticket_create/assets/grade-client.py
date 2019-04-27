@@ -16,13 +16,13 @@ URL = os.getenv('URL', 'https://zapisy.ii.uni.wroc.pl/')
 
 
 def hash_(m: int) -> int:
-    '''We are using hash function to disable multiplicative properties
+    """We are using hash function to disable multiplicative properties
     of RSA encryption/decryption. In other words, if E(m) is standard rsa
     encryption/decryption, then E(m*k) = E(m) * E(k), but if we set
     E'(m) = E(H(m)), where H is hash function, then E'(m*k) != E'(m) * E'(k).
     If we didn't use that, you would be able to generate many tickets, just
     by knowing factors of m.
-    '''
+    """
     h = SHA256.new()
     h.update(str(m).encode())
     return int(h.hexdigest(), 16)
@@ -37,7 +37,7 @@ def unblind(pub_key, m, r):
 
 
 class Ticket:
-    '''Class which is responsible for generating and holding ticket data.'''
+    """Class which is responsible for generating and holding ticket data."""
     def __init__(self, pub_key):
         # This while loop could be omitted, since condition GCD(r, pub_key.n) != 1 will probably
         # never happen in our universe lifetime, but lets do that for the sake of correctness.
@@ -51,8 +51,7 @@ class Ticket:
 
 
 class PollData:
-    '''This class serves the purpose of holding data related to poll in little bit
-    of a higher level than just a raw dictionary'''
+    """This class serves the purpose of holding data related to poll"""
     def __init__(self, poll: Dict, ticket=None):
         self.pub_key = RSA.construct((int(poll['key']['n']), int(poll['key']['e'])))
         self.name = poll['poll_info']['name']
@@ -70,13 +69,13 @@ class PollData:
 
 
 class TicketCreate:
-    '''Main logic.'''
+    """Main logic."""
     def __init__(self, url):
         self.url = url
         self.client = requests.Session()
 
     def _post(self, path: str, *args, **kwargs) -> requests.Response:
-        '''Wrapper for self.client.post.'''
+        """Wrapper for self.client.post."""
         if 'headers' not in kwargs:
             kwargs['headers'] = {}
         kwargs['headers']['X-CSRFToken'] = self.csrf_token
@@ -100,13 +99,13 @@ class TicketCreate:
             raise RuntimeError("Login failed")
 
     def get_polls(self) -> Dict[int, PollData]:
-        '''First step of the protocol, query the server for polls metadata(name, type, id)
+        """First step of the protocol, query the server for polls metadata(name, type, id)
         and public keys.
 
         Returns:
             Dict with id as a key, and as a value, data received from the server,
             wrapped in PollData class.
-        '''
+        """
         res = self._post('/grade/ticket/get-poll-data')
         polls = res.json()
         return {
@@ -115,9 +114,9 @@ class TicketCreate:
         }
 
     def get_signed_tickets(self, polls: Dict[int, PollData]):
-        '''Second step of the protocol, after generating tickets, sends them,
+        """Second step of the protocol, after generating tickets, sends them,
         blinded, to the server for signing.
-        '''
+        """
         data = {
             'signing_requests': []
         }
@@ -130,7 +129,7 @@ class TicketCreate:
         return data
 
     def get_tickets(self):
-        '''Main function.'''
+        """Main function."""
         self.login()
         polls = self.get_polls()
         signing_request = self.get_signed_tickets(polls)
