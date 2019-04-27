@@ -60,7 +60,7 @@ class PollData:
         self.id = poll['poll_info']['id']
         self.ticket = ticket
 
-    def get_signing_request(self) -> Dict:
+    def serialize_blinded_ticket(self) -> Dict:
         assert self.ticket is not None
         ticket_to_sign = blind(self.pub_key, hash_(self.ticket.m), self.ticket.r)
         return {
@@ -125,7 +125,7 @@ class TicketCreate:
         for poll_data in polls.values():
             ticket = Ticket(poll_data.pub_key)
             poll_data.ticket = ticket
-            signing_request = poll_data.get_signing_request()
+            signing_request = poll_data.serialize_blinded_ticket()
             data['signing_requests'].append(signing_request)
         return data
 
