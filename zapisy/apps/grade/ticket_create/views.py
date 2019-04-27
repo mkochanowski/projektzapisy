@@ -3,9 +3,7 @@ import json
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
-from apps.grade.ticket_create.utils import (get_signing_response,
-                                            mark_poll_used,
-                                            match_signing_requests_with_polls)
+from apps.grade.ticket_create.models import SigningKey
 from apps.users.decorators import student_required
 from django.contrib import messages
 from django.db import transaction
@@ -49,16 +47,17 @@ def sign_tickets(request):
     if not valid_ser.is_valid():
         return HttpResponseBadRequest("Invalid request")
     try:
-        matched_requests = match_signing_requests_with_polls(
+        matched_requests = SigningKey.match_signing_requests_with_polls(
             valid_ser.validated_data['signing_requests'], request.user)
     except KeyError:
         return HttpResponseBadRequest("Couldn't match provided id with poll")
 
     response = []
     for signing_request, poll in matched_requests:
-        signing_response = get_signing_response(request.user, poll, signing_request)
+        signing_response = SigningKey.get_signing_response(request.user, poll, signing_request)
         if signing_response['status'] != 'ERROR':
-            mark_poll_used(request.user, poll)
+            # mark poll used
+            poll.signingkey.students.add(request.user.student)
         response.append(signing_response)
 
     return JsonResponse(response, safe=False)
