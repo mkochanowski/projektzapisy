@@ -21,7 +21,8 @@ def hash_(m: int) -> int:
     encryption/decryption, then E(m*k) = E(m) * E(k), but if we set
     E'(m) = E(H(m)), where H is hash function, then E'(m*k) != E'(m) * E'(k).
     If we didn't use that, you would be able to generate many tickets, just
-    by knowing factors of m.
+    by knowing factors of m. Server will also compute SHA256 of a ticket, so
+    if we didn't do this, out ticket would be invalid
     """
     h = SHA256.new()
     h.update(str(m).encode())
