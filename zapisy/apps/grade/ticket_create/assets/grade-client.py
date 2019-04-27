@@ -14,8 +14,6 @@ from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Util.number import inverse
 
-URL = os.getenv('URL', 'https://zapisy.ii.uni.wroc.pl/')
-
 
 def hash_(m: int) -> int:
     """We are using hash function to disable multiplicative properties
@@ -164,10 +162,11 @@ class TicketCreate:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f', '--filename', type=str, help='Path to the output file.', default=None)
+    parser.add_argument('-f', '--filename', type=str, help='Path to the output file.')
+    parser.add_argument('-u', '--url', type=str, default='https://zapisy.ii.uni.wroc.pl/')
     args = parser.parse_args()
 
-    tickets_creator = TicketCreate(URL)
+    tickets_creator = TicketCreate(args.url)
     tickets = tickets_creator.get_tickets()
 
     f = sys.stdout if args.filename is None else open(args.filename, 'w')
