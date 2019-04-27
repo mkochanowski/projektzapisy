@@ -115,8 +115,8 @@ class TicketCreate:
         }
 
     def get_signed_tickets(self, polls: Dict[int, PollData]):
-        '''Second step of the protocol, after generating tickets, sends them
-        in blinded form to the server, so it can sign them.
+        '''Second step of the protocol, after generating tickets, sends them,
+        blinded, to the server for signing.
         '''
         data = {
             'signing_requests': []
