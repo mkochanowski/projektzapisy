@@ -81,7 +81,7 @@ class TicketCreate:
             kwargs['headers'] = {}
         kwargs['headers']['X-CSRFToken'] = self.csrf_token
         response = self.client.post(urljoin(self.url, path), *args, **kwargs)
-        assert response.ok
+        response.raise_for_status()
         return response
 
     def login(self) -> None:
