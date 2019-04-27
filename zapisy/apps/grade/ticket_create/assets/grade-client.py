@@ -74,8 +74,6 @@ class TicketCreate:
     def __init__(self, url):
         self.url = url
         self.client = requests.Session()
-        res = self.client.get(self.url)
-        res.raise_for_status()
 
     def _post(self, path: str, *args, **kwargs) -> requests.Response:
         '''Wrapper for self.client.post.'''
