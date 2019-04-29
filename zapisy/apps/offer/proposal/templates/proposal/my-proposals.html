@@ -1,0 +1,56 @@
+{% extends "offer/base.html" %}
+
+{% load proposal_status %}
+{% load render_bundle from webpack_loader %}
+
+{% block offer_menu_my_proposals %} class="active"{% endblock %}
+
+{% block main-subtitle %}
+    Moje propozycje przedmiotów
+{% endblock %}
+
+
+{% block top-content %}
+{% endblock %}
+
+{% block bread %}
+    <li class="breadcrumb-item"><a href="/">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'offer-main' %}">Oferta dydaktyczna</a></li>
+    {% if proposal %}
+        <li class="breadcrumb-item"><a href="{% url 'my-proposals' %}">Moje propozycje</a></li>
+        <li class="breadcrumb-item active">{{ proposal.name }}</li>
+    {% else %}
+        <li class="breadcrumb-item active">Moje propozycje</li>
+    {% endif %}
+{% endblock %}
+
+
+{% block all-content %}
+    {% regroup proposals_list|dictsort:"status" by get_status_display as statuses %}
+    {% with active_status=proposal.status|default:1 %}
+    <div class="jumbotron">
+        <dl>
+            {% for status, proposals in statuses %}
+                <dt class="nav-item">{{ status|capfirst }}<dt>
+                <dd>
+                    <ul>
+                        {% for prp in proposals %}
+                        <li>
+                            <a href="{% url 'my-proposal-show' prp.slug %}"
+                                    {% if prp == proposal %}class="font-weight-bolder"{% endif %}>
+                                {{ prp.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </dd>
+            {% empty %}
+                <p class="lead">Brak propozycji przedmiotów.</p>
+            {% endfor %}
+        </dl>
+    </div>
+    {% endwith %}
+    {% if proposal %}
+        {% include 'proposal/proposal.html' with course=proposal %}
+    {% endif %}
+{% endblock %}
