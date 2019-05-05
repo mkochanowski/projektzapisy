@@ -1,7 +1,7 @@
 import json
 
 from apps.enrollment.courses.models.semester import Semester
-from apps.grade.poll.models.poll import Poll
+from apps.grade.poll.models import Poll
 from apps.grade.ticket_create.serializers import SigningRequestsListSerializer
 from apps.grade.ticket_create.models import SigningKey
 from apps.users.decorators import student_required
