@@ -4,7 +4,6 @@ import csv
 import unidecode
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-from Crypto.Signature import pkcs1_15
 from apps.grade.poll.models import Poll, Section, SectionOrdering, \
     OpenQuestion, SingleChoiceQuestion, \
     OpenQuestionOrdering, \
@@ -16,9 +15,6 @@ from apps.grade.poll.models import Poll, Section, SectionOrdering, \
     MultipleChoiceQuestionAnswer, \
     OpenQuestionAnswer, Option, Template, \
     TemplateSections, Origin
-from apps.grade.ticket_create.utils import (
-    poll_cmp, flatten,
-)
 from apps.grade.poll.exceptions import NoTitleException, NoPollException, \
     NoSectionException
 
@@ -30,58 +26,44 @@ from apps.users.models import Program
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
 from functools import reduce, cmp_to_key
+from collections import defaultdict
 
 
-def poll_and_ticket_cmp(pollTuple1, pollTuple2):
-    return poll_cmp(pollTuple1[0], pollTuple2[0])
+def flatten(x):
+    result = []
+    for el in x:
+        if isinstance(el, list):
+            if hasattr(el, "__iter__") and not isinstance(el, str):
+                result.extend(flatten(el))
+            else:
+                result.append(el)
+        else:
+            result.append(el)
+
+    return result
 
 
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
 
-def check_signature(ticket: str, ticket_signature: int, public_key):
-    pk = RSA.importKey(public_key.public_key)
-    ticket_hash = SHA256.new(ticket.encode("utf-8"))
-    signature_as_bytes = int_to_bytes(ticket_signature)
-    try:
-        pkcs1_15.new(pk).verify(ticket_hash, signature_as_bytes)
-        return True
-    except (TypeError, ValueError):
-        return False
+def bytes_to_int(x: bytes) -> int:
+    return int.from_bytes(x, byteorder='big')
 
 
 def group_polls_and_tickets_by_course(poll_and_ticket_list):
     if not poll_and_ticket_list:
         return []
 
-    poll_and_ticket_list.sort(key=cmp_to_key(poll_and_ticket_cmp))
-
-    res = []
-    act_polls = []
-    act_group = poll_and_ticket_list[0][0].group
+    res = defaultdict(list)
 
     for (poll, ticket, signed_ticket) in poll_and_ticket_list:
-        if not act_group:
-            if poll.group == act_group:
-                act_polls.append((poll.pk, ticket, signed_ticket))
-            else:
-                res.append(('Ankiety ogólne', act_polls))
-                act_group = poll.group
-                act_polls = [(poll.pk, ticket, signed_ticket)]
+        if not poll.group:
+            res['Ankiety ogólne'].append((poll.pk, ticket, signed_ticket))
         else:
-            if poll.group.course == act_group.course:
-                act_polls.append((poll.pk, ticket, signed_ticket))
-            else:
-                res.append((str(act_group.course.name), act_polls))
-                act_group = poll.group
-                act_polls = [(poll.pk, ticket, signed_ticket)]
+            res[str(poll.group.course.name)].append((poll.pk, ticket, signed_ticket))
 
-    if act_group:
-        res.append((str(act_group.course.name), act_polls))
-    else:
-        res.append(('Ankiety ogólne', act_polls))
-
+    res = [(key, res[key]) for key in res]
     return res
 
 

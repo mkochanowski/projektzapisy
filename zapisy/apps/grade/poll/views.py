@@ -15,13 +15,12 @@ from apps.grade.poll.models.last_visit import LastVisit
 from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.enrollment.courses.models.semester import Semester
-from apps.grade.ticket_create.utils import from_plaintext
-from apps.grade.ticket_create.models import PublicKey
+from apps.grade.ticket_create.serializers import TicketsListSerializer
 from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQuestion, \
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
 from apps.grade.poll.forms import TicketsForm, PollForm
-from apps.grade.poll.utils import check_signature, prepare_data, group_polls_and_tickets_by_course, \
+from apps.grade.poll.utils import prepare_data, group_polls_and_tickets_by_course, \
     create_slug, get_next, get_prev, get_ticket_and_signed_ticket_from_session, \
     group_polls_by_course, group_polls_by_teacher, getGroups, declination_poll, \
     declination_section, declination_template, csv_prepare, generate_csv_title, get_objects, \
@@ -683,11 +682,15 @@ def tickets_enter(request):
             else:
                 tickets_plaintext = form.cleaned_data['ticketsfield']
             try:
-                ids_and_tickets = from_plaintext(tickets_plaintext)
+                raw_tickets = json.loads(tickets_plaintext)
+                valid_ser = TicketsListSerializer(data=raw_tickets)
+                if not valid_ser.is_valid():
+                    raise ValueError
+                tickets = valid_ser.validated_data
             except BaseException:
-                ids_and_tickets = []
+                tickets = None
 
-            if not ids_and_tickets:
+            if not tickets:
                 messages.error(request, "Podano niepoprawne bilety.")
                 data['form'] = form
                 data['grade'] = grade
@@ -696,20 +699,23 @@ def tickets_enter(request):
             errors = []
             polls = []
             finished = []
-            for (id, (ticket, signed_ticket)) in ids_and_tickets:
+            for item in tickets['tickets']:
+                id = item['id']
+                ticket = item['ticket']
+                signed_ticket = item['signature']
                 try:
                     poll = Poll.objects.get(pk=id)
-                    public_key = PublicKey.objects.get(poll=poll)
-                    if check_signature(ticket, signed_ticket, public_key):
+                    key = poll.signingkey
+                    if key.verify_signature(ticket, signed_ticket):
                         try:
                             st = SavedTicket.objects.get(poll=poll,
-                                                         ticket=ticket)
+                                                         ticket=str(ticket))
                             if st.finished:
                                 finished.append((poll, ticket, signed_ticket))
                             else:
                                 polls.append((poll, ticket, signed_ticket))
                         except BaseException:
-                            st = SavedTicket(poll=poll, ticket=ticket)
+                            st = SavedTicket(poll=poll, ticket=str(ticket))
                             st.save()
                             polls.append((poll, ticket, signed_ticket))
                     else:
@@ -785,7 +791,7 @@ def poll_answer(request, slug, pid):
         return render(request, 'grade/poll/user_is_authenticated.html', {})
 
     poll = Poll.objects.get(pk=pid)
-    public_key = PublicKey.objects.get(poll=poll)
+    key = poll.signingkey
 
     (ticket, signed_ticket) = get_ticket_and_signed_ticket_from_session(request.session, slug, pid)
 
@@ -825,7 +831,7 @@ def poll_answer(request, slug, pid):
     data['next'] = get_next(poll_cands, finished_cands, int(pid))
     data['prev'] = get_prev(poll_cands, finished_cands, int(pid))
 
-    if ticket and signed_ticket and check_signature(ticket, signed_ticket, public_key):
+    if ticket and signed_ticket and key.verify_signature(ticket, signed_ticket):
         st = SavedTicket.objects.get(ticket=str(ticket), poll=poll)
 
         if request.method == "POST" and not st.finished:

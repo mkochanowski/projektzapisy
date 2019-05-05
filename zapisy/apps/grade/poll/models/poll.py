@@ -13,6 +13,7 @@ from apps.enrollment.records import models as records_models
 from .section import SectionOrdering
 from .saved_ticket import SavedTicket
 from .origin import Origin
+from typing import Dict, List
 
 
 class Poll(models.Model):
@@ -130,28 +131,19 @@ class Poll(models.Model):
             result.append(section.all_answers(self))
         return result
 
-    def as_row(self):
-        from apps.grade.ticket_create.models.public_key import PublicKey
+    def serialize_for_signing_protocol(self):
+        res = {}
 
-        res = "<tr><td>"
-        res += str(self.pk) + '</td><td>'
-        res += str(self.title) + '</td><td>'
-
-        if self.group:
-            res += str(self.group.course.name) + '</td><td>'
-            res += str(self.group.get_type_display()) + '</td><td>'
-            res += str(self.group.get_teacher_full_name()) + '</td><td>'
+        if self.group is None:
+            res['type'] = 'Ankieta Ogólna'
+            res['name'] = 'Ankieta Ogólna'
         else:
-            res += '-</td><td>-</td><td>-</td><td>'
+            res['name'] = self.group.course.name
+            res['type'] = self.group.get_type_display()
 
-        if self.studies_type:
-            res += str(self.studies_type) + '</td><td>'
-        else:
-            res += '-</td><td>'
+        res['id'] = self.pk
 
-        res += str(" &#10;".join(PublicKey.objects.get(poll=self.pk).public_key.split('\n')))
-        res += '</td></tr>'
-        return SafeText(res)
+        return res
 
     @staticmethod
     def get_polls_for_semester(semester=None):
@@ -177,33 +169,23 @@ class Poll(models.Model):
         return [g for g in groups if g.pk not in polls]
 
     @staticmethod
-    def get_current_polls(student: Student):
-        semester = Semester.objects.get(is_grade_active=True)
-        where = [
-            '((SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) > 0)']
-        if student:
-            count = '((SELECT COUNT(*) FROM ticket_create_usedticketstamp WHERE poll_id = poll_poll.id AND student_id = %d) = 0)' % student.id
-            where.append(count)
-
-        return Poll.objects.filter(deleted=False, semester=semester)\
-            .select_related('semester', 'studies_type')\
-            .extra(where=where)
+    def get_current_polls():
+        semester = Semester.get_current_semester()
+        return Poll.objects.filter(semester=semester, deleted=False)
 
     @staticmethod
     def get_semester_polls_without_keys(semester=None):
-        from apps.grade.ticket_create.models.public_key import PublicKey
         if not semester:
             semester = Semester.get_current_semester()
 
-        polls_with_keys = PublicKey.objects.all().values_list('poll')
-        return Poll.objects.filter(semester=semester, deleted=False).exclude(pk__in=polls_with_keys)
+        return Poll.get_polls_without_keys(semester)
 
     @staticmethod
     def get_polls_without_keys(semester=None):
-        from apps.grade.ticket_create.models.public_key import PublicKey
+        from apps.grade.ticket_create.models.signing_key import SigningKey
 
-        polls_with_keys = PublicKey.objects.filter(poll__semester=semester)
-        return Poll.objects.filter(semester=semester, deleted=False).exclude(pk__in=polls_with_keys)
+        polls_with_keys = SigningKey.objects.filter(poll__semester=semester)
+        return Poll.objects.filter(semester=semester, deleted=False).exclude(signingkey__in=polls_with_keys)
 
     @staticmethod
     def get_current_semester_polls_without_keys():
@@ -211,21 +193,11 @@ class Poll(models.Model):
 
     @staticmethod
     def count_polls_without_keys():
-        from apps.grade.ticket_create.models.public_key import PublicKey
-
-        polls_with_keys = PublicKey.objects.all()
-        return Poll.objects.filter(deleted=False).exclude(pk__in=polls_with_keys).count()
+        return Poll.get_polls_without_keys().count()
 
     @staticmethod
     def count_current_semester_polls_without_keys():
-        from apps.grade.ticket_create.models.public_key import PublicKey
-
-        semester = Semester.get_current_semester()
-        polls_with_keys = PublicKey.objects.all().values('poll')
-        return Poll.objects.filter(
-            semester=semester,
-            deleted=False).exclude(
-            pk__in=polls_with_keys).count()
+        return Poll.get_current_semester_polls_without_keys().count()
 
     @staticmethod
     def get_polls_list(student):
@@ -245,13 +217,24 @@ class Poll(models.Model):
         return courses, general
 
     @staticmethod
-    def get_all_polls_for_student(student):
+    def get_all_polls_for_student(student: Student) -> List:
         groups = records_models.Record.objects.filter(
             student=student, status=records_models.RecordStatus.ENROLLED).select_related('group').values_list(
                 'group__id', flat=True)
 
-        return [x for x in Poll.get_current_polls(
-            student=student) if not x.group or x.group.id in groups]
+        return [x for x in Poll.get_current_polls() if not x.group or x.group.id in groups]
+
+    @staticmethod
+    def get_all_polls_for_student_as_dict(student: Student) -> Dict:
+        groups = records_models.Record.objects.filter(
+            student=student, status=records_models.RecordStatus.ENROLLED).select_related('group').values_list(
+                'group__id', flat=True)
+
+        return {
+            poll.pk: poll
+            for poll in Poll.get_current_polls()
+            if not poll.group or poll.group.id in groups
+        }
 
     @staticmethod
     def get_all_polls_for_group(group, semester=None):
