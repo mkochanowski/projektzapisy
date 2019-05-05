@@ -1,14 +1,19 @@
 {% extends "grade/base.html" %}
 
 {% block main-subtitle %}Wyniki oceny{% endblock %}
-{% block nav-grade-results %}active{% endblock %}
+{% block nav-grade-poll-v2-submissions %}active{% endblock %}
 
 {% block bread %}
     <li class="breadcrumb-item"><a href="/">Strona główna</a></li>
     <li class="breadcrumb-item"><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Wyniki oceny</li>
+    <li class="breadcrumb-item active" aria-current="page">Ankiety</li>
 {% endblock %}
 
 {% block all-content %}
-	Wyniki oceny
+<form action="" method="post">
+	{% csrf_token %}
+	{{ form.media }}
+	{{ form }}
+	<input type="submit" value="Submit" />
+</form>
 {% endblock %}

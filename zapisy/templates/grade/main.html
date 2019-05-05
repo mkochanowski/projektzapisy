@@ -3,21 +3,35 @@
 {% load render_bundle from webpack_loader %}
 
 
-{% block main-subtitle %}Informacje{% endblock %}
+{% block main-subtitle %}Zasady{% endblock %}
 {% block grade_active %} class="active"{% endblock %}
-
-{% block grade-info %}active{% endblock %}
+{% block nav-grade-main %}active{% endblock %}
 
 {% block bread %}
-<li class="breadcrumb-item"><a href="/">Strona główna</a></li>
-<li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
+    <li class="breadcrumb-item"><a href="/">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
 {% endblock %}
 
 
 {% block all-content %}
 <div id="mainPage-container">
-  {% if grade %}
   {% render_bundle "ticket_create-katex" %}
+  {% if user.employee or user.is_superuser %}
+    <div class="alert alert-info" role="alert">
+      Wypróbuj nową funkcjonalność – <a href="{% url 'grade-poll-v2-schemas' %}">edytowanie szablonów</a>. Umożliwia ona rozszerzanie ankiet o dodatkowe, spersonalizowane pytania dla wybranych przedmiotów.  
+    </div>
+  {% else %}
+    {% if is_grade_active %}
+    <div class="alert alert-info" role="alert">
+      Ocena jest aktywna. Jeżeli chcesz wypełnić ankietę, przejdź do <a href="{% url 'grade-poll-v2-tickets-enter' %}">wprowadzania kluczy</a>.   
+    </div>
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      Ocena nie jest w tej chwili aktywna.
+    </div>
+    {% endif %}
+  {% endif %}
   <h2>Ocena Zajęć</h2>
   <div id="od-vote-main-rules">
     <p>
@@ -124,11 +138,6 @@
       </li>
     </ol>
   </div>
-
-  {% else %}
-  <p class="disabled-link">Ocena nie jest w tej chwili aktywna.</p>
-  {% endif %}
-
 </div>
 
 {% endblock %}
