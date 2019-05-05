@@ -35,7 +35,6 @@ class Poll(models.Model):
     class Meta:
         verbose_name = "ankieta"
         verbose_name_plural = "ankiety"
-        app_label = "poll_v2"
 
     def get_schema(self):
         pass
