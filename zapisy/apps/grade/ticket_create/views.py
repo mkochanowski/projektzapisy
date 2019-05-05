@@ -68,7 +68,7 @@ def tickets_generate(request):
     grade = Semester.objects.filter(is_grade_active=True).exists()
     if not grade:
         messages.error(request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów")
-        return render(request, 'ticket_create/tickets_generate.html', {'grade': grade})
-    polls_for_courses, other_polls = Poll.get_polls_list(request.user.student)
-    data = {'polls': polls_for_courses, 'grade': grade, 'general_polls': other_polls}
+        return render(request, 'ticket_create/tickets_generate.html', {'grade': grade, 'is_grade_active': grade})
+    polls_for_courses, other_polls = Poll.get_polls_courses_and_general(request.user.student)
+    data = {'polls': polls_for_courses, 'grade': grade, 'general_polls': other_polls, 'is_grade_active': grade}
     return render(request, 'ticket_create/tickets_generate.html', data)

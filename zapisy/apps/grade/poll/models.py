@@ -53,7 +53,7 @@ class Poll(models.Model):
         return "Ankieta"
 
     @staticmethod
-    def get_polls_nested_data(student: Student) -> (dict, list):
+    def get_polls_courses_and_general(student: Student) -> (dict, list):
         polls = Poll.get_all_polls_for_student(student)
 
         courses = {}
@@ -70,6 +70,28 @@ class Poll(models.Model):
                 general.append(poll)
 
         return courses, general
+
+    def serialize_for_signing_protocol(self):
+        result = {}
+
+        if self.group is None:
+            result["type"] = "Ankieta Ogólna"
+            result["name"] = "Ankieta Ogólna"
+        else:
+            result["type"] = self.group.get_type_display()
+            result["name"] = self.group.course.name
+
+        result["id"] = self.pk
+
+        return result
+
+    def is_student_entitled_to_poll(self, student: Student):
+        """Checks if the student should be able to participate in the poll."""
+        if self.group:
+            if not records_models.Record.is_enrolled(student.id, self.group_id):
+                return False
+        # TODO: if self.course
+        return True
 
     @staticmethod
     def get_all_polls_for_student(student: Student) -> list:
@@ -101,19 +123,9 @@ class Poll(models.Model):
 
     @staticmethod
     def get_all_polls_for_student_as_dict(student: Student) -> dict:
-        groups = (
-            records_models.Record.objects.filter(
-                student=student, status=records_models.RecordStatus.ENROLLED
-            )
-            .select_related("group")
-            .values_list("group__id", flat=True)
-        )
+        polls = Poll.get_all_polls_for_student(student)
 
-        return {
-            poll.pk: poll
-            for poll in Poll.get_current_polls()
-            if not poll.group or poll.group.id in groups
-        }
+        return {poll.pk: poll for poll in polls}
 
 
 class Schema(models.Model):

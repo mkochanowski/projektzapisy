@@ -13,7 +13,7 @@ def check_grade_status() -> bool:
 
 
 class TicketsEntry(TemplateView):
-    template_name = "grade/poll_v2/tickets_enter.html"
+    template_name = "grade/poll/tickets_enter.html"
 
     def get(self, request):
         form = TicketsEntryForm()
@@ -30,7 +30,7 @@ class TicketsEntry(TemplateView):
 
 
 class SubmissionEntry(UpdateView):
-    template_name = "grade/poll_v2/poll_submission.html"
+    template_name = "grade/poll/poll_submission.html"
     model = Submission
     slug_field = "submission_slug"
     form_class = SubmissionEntryForm
@@ -59,7 +59,7 @@ class SubmissionEntry(UpdateView):
 
 
 class PollResults(TemplateView):
-    template_name = "grade/poll_v2/poll_results.html"
+    template_name = "grade/poll/poll_results.html"
 
     def get(self, request):
         is_grade_active = check_grade_status()
@@ -68,7 +68,7 @@ class PollResults(TemplateView):
 
 
 class SchemasManagement(TemplateView):
-    template_name = "grade/poll_v2/poll_schemas.html"
+    template_name = "grade/poll/poll_schemas.html"
 
     def get(self, request):
         is_grade_active = check_grade_status()
@@ -86,7 +86,7 @@ class GradeDetails(TemplateView):
 
 
 # class SubmissionEntry(TemplateView):
-#     template_name = "grade/poll_v2/poll_submission.html"
+#     template_name = "grade/poll/poll_submission.html"
 
 #     def get(self, request):
 #         form = SubmissionEntryForm()
