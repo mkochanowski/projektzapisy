@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+# from django.shortcuts import reverse
 
 from choicesenum import ChoicesEnum
 
@@ -36,8 +37,13 @@ class Poll(models.Model):
         verbose_name = "ankieta"
         verbose_name_plural = "ankiety"
 
-    def get_schema(self):
-        pass
+    @property
+    def type(self):
+        if self.group == None and self.course == None:
+            return PollType.GENERAL
+        if self.semester == None and self.group == None:
+            return PollType.EXAM
+        return self.group.type
 
     def __str__(self):
         if self.group:
@@ -46,7 +52,7 @@ class Poll(models.Model):
                 + self.group.get_teacher_full_name()
             )
         elif self.course:
-            return f"Ankieta dla kursu: {self.course}"
+            return f"Ankieta dla przedmiotu: {self.course}"
         elif self.semester:
             return f"Ankieta ogólna: semestr {self.semester}"
 
@@ -133,9 +139,74 @@ class Schema(models.Model):
     # poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING)
     poll_type = models.CharField(choices=PollType.choices(), max_length=80)
 
+    class Meta:
+        verbose_name = "szablon"
+        verbose_name_plural = "szablony"
+
     @classmethod
     def edit(cls, new_schema):
         pass
+
+    @classmethod
+    def get_schema_from_file(cls, poll_type):
+        return {
+            "version": 1,
+            "schema": [
+                {"question": "To jest testowe pytanie.", "type": "short_open_answer"},
+                {
+                    "question": "To jest długie otwarte pytanie.",
+                    "type": "long_open_answer",
+                },
+                {
+                    "question": "Uważasz, że w stosunku do otrzymanej oceny, Twoje umiejętności są",
+                    "type": "predefined_choices_personal_evaluation",
+                },
+                {
+                    "question": "Ile czasu tygodniowo, poza zajęciami, regularnie przeznaczasz na studiowanie? ",
+                    "type": "predefined_choices_time_stretched",
+                },
+                {
+                    "question": "Ile średnio czasu tygodniowo poświęcałeś na przygotowanie się do zajęć? ",
+                    "type": "predefined_choices_time_short",
+                },
+                {
+                    "question": "Czy egzamin był trudny?",
+                    "type": "predefined_choices_grade",
+                },
+            ],
+        }
+
+    @classmethod
+    def get_latest(cls, poll_type):
+        schema = cls.objects.filter(poll_type=poll_type).first()
+        if not schema:
+            schema = cls(
+                questions=cls.get_schema_from_file(poll_type=poll_type),
+                poll_type=poll_type,
+            )
+            schema.save()
+
+        return schema
+
+    @staticmethod
+    def get_default_value_for_question_type(question_type):
+        return ""
+
+    def get_schema_with_default_answers(self):
+        if self.questions and "version" in self.questions and "schema" in self.questions:
+            schema_with_answers = {
+                "version": self.questions["version"],
+                "schema": list(map(
+                    lambda x: {
+                        "question": x["question"],
+                        "type": x["type"],
+                        "answer": self.get_default_value_for_question_type(x["type"]),
+                    },
+                    self.questions["schema"])
+                ),
+            }
+
+            return schema_with_answers
 
 
 class Submission(models.Model):
@@ -145,6 +216,19 @@ class Submission(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "złoszenie"
+        verbose_name_plural = "zgłoszenia"
+
     @classmethod
-    def get_or_create(cls, ticket):
-        pass
+    def get_or_create(cls, ticket: int, poll: Poll):
+        submission = cls.objects.filter(ticket=ticket).first()
+        if not submission:
+            print("Creating new submission")
+            schema = Schema.get_latest(poll_type=poll.type)
+            answers = schema.get_schema_with_default_answers()
+            print(f"schema={schema}, answers={answers}")
+            submission = cls(schema=schema, answers=answers, ticket=ticket)
+            submission.save()
+
+        return submission

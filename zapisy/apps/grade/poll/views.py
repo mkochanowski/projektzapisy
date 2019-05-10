@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.views.generic import TemplateView, UpdateView
 
 from apps.enrollment.courses.models.semester import Semester
+from apps.grade.ticket_create.models import SigningKey
 
 from .models import Submission
 from .forms import TicketsEntryForm, SubmissionEntryForm
@@ -26,6 +27,21 @@ class TicketsEntry(TemplateView):
         )
 
     def post(self, request):
+        form = TicketsEntryForm(request.POST)
+        if form.is_valid():
+            tickets = form.cleaned_data["tickets"]
+            correct_polls, failed_polls = SigningKey.parse_raw_tickets(tickets)
+
+            submissions = []
+            for poll_with_ticket in correct_polls:
+                ticket, poll = poll_with_ticket
+                submission = Submission.get_or_create(ticket=ticket, poll=poll)
+                print(f"Ticket: {ticket}\nPoll: {poll}\nSubmission: {submission}\n")
+                submissions.append(submission.pk)
+
+            self.request.session["grade_poll_submissions"] = submissions
+            self.request.session["grade_poll_current_submission"] = submissions[0]
+
         return redirect("grade-poll-v2-submissions")
 
 
@@ -34,28 +50,39 @@ class SubmissionEntry(UpdateView):
     model = Submission
     slug_field = "submission_slug"
     form_class = SubmissionEntryForm
-    jsonfields = [
-        {"name": "First Name", "slug": "first_name"},
-        {"name": "Last Name", "slug": "last_name"},
-    ]
+    jsonfields = []
 
     def get_form_kwargs(self):
         kw = super().get_form_kwargs()
-        kw["jsonfields"] = self.jsonfields
+        submission = Submission.objects.filter(
+            pk=self.request.session["grade_poll_current_submission"]
+        ).first()
+        if submission:
+            kw["jsonfields"] = submission.answers["schema"]
+
         return kw
 
     def get_initial(self):
         initial = super().get_initial()
-        for field in self.jsonfields:
-            initial[field["slug"]] = self.object.fields.get(field["slug"])
+        submission = Submission.objects.filter(
+            pk=self.request.session["grade_poll_current_submission"]
+        ).first()
+
+        for index, field in enumerate(submission.answers["schema"]):
+            field_name = f"field_{index}"
+            initial[field_name] = submission.answers["schema"][index]["answer"]
+
         return initial
 
     def get_object(self):
-        return get_object_or_404(
-            # Submission, pk=request.session["poll_v2_submission_id"]
-            Submission,
-            pk=1,
-        )
+        submission = Submission.objects.filter(
+            pk=self.request.session["grade_poll_current_submission"]
+        ).first()
+
+        return submission
+
+    def get_success_url(self):
+        return reverse("grade-poll-v2-submissions")
 
 
 class PollResults(TemplateView):
@@ -84,13 +111,3 @@ class GradeDetails(TemplateView):
 
         return render(request, self.template_name, {"is_grade_active": is_grade_active})
 
-
-# class SubmissionEntry(TemplateView):
-#     template_name = "grade/poll/poll_submission.html"
-
-#     def get(self, request):
-#         form = SubmissionEntryForm()
-#         return render(request, self.template_name, {"form": form})
-
-#     def post(self, request):
-#         return render(request, self.template_name)

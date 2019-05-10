@@ -18,15 +18,9 @@
 		<div id='grade-tickets-enter'>
 		  <form action="{% url 'grade-poll-v2-tickets-enter' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <h2>Wprowadzanie kluczy</h2>
-                <div class="form-group">
-                    <label for="id_ticketsfield" >Podaj wygenerowane klucze</label>
-                    <textarea name="ticketsfield" rows="20" id="id_ticketsfield" class="form-control"></textarea>
-                </div>
+                <h2>Wprowadzanie kluczy</h2><br>
+                {{ form.tickets }}<br>
                 <p class="text-center text-info">Jeżeli nie posiadasz jeszcze kluczy, zaloguj się i je wygeneruj.</p>
-
-                <!-- <div class=""></div>
-                {{ form.tickets }} -->
                 <button class="mx-auto d-block btn btn-primary" type="submit">Rozpocznij ocenę</button>
             </form>
         </div>

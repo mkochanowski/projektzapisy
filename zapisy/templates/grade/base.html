@@ -28,7 +28,7 @@
         <a class="nav-link" href="{% url 'grade-poll-v2-schemas' %}">Szablony</a>
     </li>
     {% endif %}
-    {% if is_grade_active and available_submissions %}
+    {% if request.session.grade_poll_current_submission %}
     <li class="{% block nav-grade-poll-v2-submissions %}{% endblock %}">
         <a class="nav-link" href="{% url 'grade-poll-v2-submissions' %}">Ankiety</a>
     </li>
