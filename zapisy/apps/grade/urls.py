@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 # by default, they return a fully rendered page
 
 urlpatterns = [
-    url(r'^$', poll_views.GradeDetails.as_view(), name="grade-main"),
+    url(r"^$", poll_views.GradeDetails.as_view(), name="grade-main"),
     url("poll/", include("apps.grade.poll.urls")),
     url("ticket/", include("apps.grade.ticket_create.urls")),
 ]

@@ -8,6 +8,7 @@ class SchemaAdmin(admin.ModelAdmin):
         obj.user = request.user
         super().save_model(request, obj, form, change)
 
+
 admin.site.register(Poll)
 admin.site.register(Submission)
 admin.site.register(Schema)

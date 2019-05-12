@@ -2,36 +2,19 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-# from django.shortcuts import reverse
-
-from choicesenum import ChoicesEnum
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.records import models as records_models
 from apps.users.models import Student
-
-# Temporary enum
-class PollType(ChoicesEnum):
-    LECTURE = 1, "ankieta dla wykładu"
-    EXERCISE = 2, "ankieta dla ćwiczeń"
-    LABS = 3, "ankieta dla pracowni"
-    EXERCISE_LABS = 5, "ankieta dla ćwiczenio-pracowni"
-    SEMINARY = 6, "ankieta dla seminarium"
-    LECTORATE = 7, "ankieta dla lektoratu"
-    PHYSICAL_EDUCATION = 8, "ankieta dla zajęć wf"
-    REPETITORY = 9, "ankieta dla repetytorium"
-    PROJECT = 10, "ankieta dla projektu"
-    EXAM = 1000, "ankieta dla egzaminu"
-    GENERAL = 1001, "ankieta ogólna"
+from apps.grade.poll.enums import PollType
 
 
 class Poll(models.Model):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
-    # key = models.ForeignKey(SigningKey, on_delete=models.DO_NOTHING)
 
     class Meta:
         verbose_name = "ankieta"
@@ -47,45 +30,42 @@ class Poll(models.Model):
 
     def __str__(self):
         if self.group:
-            return (
-                f"Ankieta dla grupy: {self.group.get_type_display()} "
-                + self.group.get_teacher_full_name()
-            )
+            group_type = self.group.get_type_display().capitalize()
+            teacher_name = self.group.get_teacher_full_name()
+
+            return f"{group_type}: {teacher_name}"
         elif self.course:
-            return f"Ankieta dla przedmiotu: {self.course}"
+            return f"Egzamin: {self.course.owner}"
         elif self.semester:
-            return f"Ankieta ogólna: semestr {self.semester}"
+            return f"Semestr {self.semester}"
 
-        return "Ankieta"
+        return "Ankieta ogólna"
 
-    @staticmethod
-    def get_polls_courses_and_general(student: Student) -> (dict, list):
-        polls = Poll.get_all_polls_for_student(student)
+    @property
+    def category(self) -> str:
+        if self.course:
+            return self.course.name
+        elif self.group:
+            return self.group.course.name
+        else:
+            return "Ankiety ogólne"
 
-        courses = {}
-        general = []
-        for poll in polls:
-            if poll.group:
-                if poll.group.course_id not in courses:
-                    courses[poll.group.course_id] = {
-                        "courses": poll.group.course,
-                        "polls": [],
-                    }
-                courses[poll.group.course_id]["polls"].append(poll)
-            else:
-                general.append(poll)
-
-        return courses, general
+    @property
+    def subcategory(self) -> str:
+        return self
 
     def serialize_for_signing_protocol(self):
         result = {}
 
-        if self.group is None:
-            result["type"] = "Ankieta Ogólna"
-            result["name"] = "Ankieta Ogólna"
-        else:
-            result["type"] = self.group.get_type_display()
+        if self.group:
             result["name"] = self.group.course.name
+            result["type"] = self.group.get_type_display()
+        if self.course:
+            result["name"] = self.course.name
+            result["type"] = "egzamin"
+        if self.semester:
+            result["name"] = self.semester.get_name()
+            result["type"] = "ankieta ogólna"
 
         result["id"] = self.pk
 
@@ -103,9 +83,9 @@ class Poll(models.Model):
     def get_all_polls_for_student(student: Student) -> list:
         polls = []
         current_semester = Semester.get_current_semester()
-        semester_poll = Poll.objects.filter(semester=current_semester).first()
-        if semester_poll:
-            polls.append(semester_poll)
+        poll_for_semester = Poll.objects.filter(semester=current_semester).first()
+        if poll_for_semester:
+            polls.append(poll_for_semester)
 
         records = records_models.Record.objects.filter(
             student=student, status=records_models.RecordStatus.ENROLLED
@@ -117,27 +97,21 @@ class Poll(models.Model):
             semester = course.semester
 
             if semester == current_semester:
-                course_poll = Poll.objects.filter(course=course).first()
-                if course_poll and course_poll not in polls:
-                    polls.append(course_poll)
+                if course.exam:
+                    poll_for_course = Poll.objects.filter(course=course).first()
+                    if poll_for_course and poll_for_course not in polls:
+                        polls.append(poll_for_course)
 
-                group_poll = Poll.objects.filter(group=group).first()
-                if group_poll:
-                    polls.append(group_poll)
+                poll_for_group = Poll.objects.filter(group=group).first()
+                if poll_for_group:
+                    polls.append(poll_for_group)
 
         return polls
-
-    @staticmethod
-    def get_all_polls_for_student_as_dict(student: Student) -> dict:
-        polls = Poll.get_all_polls_for_student(student)
-
-        return {poll.pk: poll for poll in polls}
 
 
 class Schema(models.Model):
     questions = JSONField(default=dict)
-    # poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING)
-    poll_type = models.CharField(choices=PollType.choices(), max_length=80)
+    type = models.CharField(choices=PollType.choices(), max_length=80)
 
     class Meta:
         verbose_name = "szablon"
@@ -178,11 +152,10 @@ class Schema(models.Model):
 
     @classmethod
     def get_latest(cls, poll_type):
-        schema = cls.objects.filter(poll_type=poll_type).first()
+        schema = cls.objects.filter(type=poll_type).first()
         if not schema:
             schema = cls(
-                questions=cls.get_schema_from_file(poll_type=poll_type),
-                poll_type=poll_type,
+                questions=cls.get_schema_from_file(poll_type=poll_type), type=poll_type
             )
             schema.save()
 
@@ -193,16 +166,24 @@ class Schema(models.Model):
         return ""
 
     def get_schema_with_default_answers(self):
-        if self.questions and "version" in self.questions and "schema" in self.questions:
+        if (
+            self.questions
+            and "version" in self.questions
+            and "schema" in self.questions
+        ):
             schema_with_answers = {
                 "version": self.questions["version"],
-                "schema": list(map(
-                    lambda x: {
-                        "question": x["question"],
-                        "type": x["type"],
-                        "answer": self.get_default_value_for_question_type(x["type"]),
-                    },
-                    self.questions["schema"])
+                "schema": list(
+                    map(
+                        lambda x: {
+                            "question": x["question"],
+                            "type": x["type"],
+                            "answer": self.get_default_value_for_question_type(
+                                x["type"]
+                            ),
+                        },
+                        self.questions["schema"],
+                    )
                 ),
             }
 
@@ -211,8 +192,10 @@ class Schema(models.Model):
 
 class Submission(models.Model):
     schema = models.ForeignKey(Schema, on_delete=models.DO_NOTHING, null=True)
+    poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING, null=True)
     answers = JSONField(default=dict)
     ticket = models.TextField(unique=True)
+    submitted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -220,15 +203,26 @@ class Submission(models.Model):
         verbose_name = "złoszenie"
         verbose_name_plural = "zgłoszenia"
 
+    def __str__(self):
+        return str(self.poll)
+
+    @property
+    def category(self) -> str:
+        if self.poll:
+            return self.poll.category
+
+        return "Ankiety ogólne"
+
     @classmethod
-    def get_or_create(cls, ticket: int, poll: Poll):
+    def get_or_create(cls, poll_with_ticket_id) -> "Submission":
+        ticket, poll = poll_with_ticket_id
         submission = cls.objects.filter(ticket=ticket).first()
         if not submission:
             print("Creating new submission")
             schema = Schema.get_latest(poll_type=poll.type)
             answers = schema.get_schema_with_default_answers()
             print(f"schema={schema}, answers={answers}")
-            submission = cls(schema=schema, answers=answers, ticket=ticket)
+            submission = cls(schema=schema, answers=answers, ticket=ticket, poll=poll)
             submission.save()
 
         return submission

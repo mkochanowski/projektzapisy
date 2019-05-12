@@ -8,29 +8,25 @@
 {% block nav-grade-main %}active{% endblock %}
 
 {% block bread %}
-    <li class="breadcrumb-item"><a href="/">Strona główna</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
+{% include 'grade/poll/_breadcrumbs.html' %}
+<li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
 {% endblock %}
 
 
 {% block all-content %}
 <div id="mainPage-container">
   {% render_bundle "ticket_create-katex" %}
-  {% if user.employee or user.is_superuser %}
-    <div class="alert alert-info" role="alert">
-      Wypróbuj nową funkcjonalność – <a href="{% url 'grade-poll-v2-schemas' %}">edytowanie szablonów</a>. Umożliwia ona rozszerzanie ankiet o dodatkowe, spersonalizowane pytania dla wybranych przedmiotów.  
-    </div>
+  {% if is_grade_active %}
+  {% if not user.employee and not user.is_superuser %}
+  <div class="alert alert-info" role="alert">
+    Ocena jest aktywna. Jeżeli chcesz wypełnić ankietę, przejdź do <a
+      href="{% url 'grade-poll-tickets-enter' %}">wprowadzania kluczy</a>.
+  </div>
+  {% endif %}
   {% else %}
-    {% if is_grade_active %}
-    <div class="alert alert-info" role="alert">
-      Ocena jest aktywna. Jeżeli chcesz wypełnić ankietę, przejdź do <a href="{% url 'grade-poll-v2-tickets-enter' %}">wprowadzania kluczy</a>.   
-    </div>
-    {% else %}
-    <div class="alert alert-danger" role="alert">
-      Ocena nie jest w tej chwili aktywna.
-    </div>
-    {% endif %}
+  <div class="alert alert-danger" role="alert">
+    Ocena nie jest w tej chwili aktywna.
+  </div>
   {% endif %}
   <h2>Ocena Zajęć</h2>
   <div id="od-vote-main-rules">

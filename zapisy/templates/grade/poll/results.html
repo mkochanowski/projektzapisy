@@ -1,0 +1,13 @@
+{% extends "grade/base.html" %}
+
+{% block main-subtitle %}Wyniki oceny{% endblock %}
+{% block nav-grade-results %}active{% endblock %}
+
+{% block bread %}
+{% include 'grade/poll/_breadcrumbs.html' %}
+<li class="breadcrumb-item active" aria-current="page">Wyniki oceny</li>
+{% endblock %}
+
+{% block all-content %}
+Wyniki oceny
+{% endblock %}

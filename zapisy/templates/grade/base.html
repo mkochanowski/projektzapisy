@@ -7,30 +7,27 @@
 {% block title %}System Oceny{% endblock %}
 
 {% block system_menu %}
-    <li class="{% block nav-grade-main %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-main' %}">Zasady</a>
-    </li>
-    {% if user.student and is_grade_active %}
-    <li class="{% block nav-grade-ticket-tickets-generate %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-ticket-tickets-generate' %}">Pobieranie kluczy</a>
-    </li>
-    {% endif %}
-    {% if is_grade_active and not user.employee and not user.is_superuser %}
-    <li class="{% block nav-grade-tickets-enter %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-poll-v2-tickets-enter' %}">Wprowadzanie kluczy</a>
-    </li>
-    {% endif %}
-    {% if user.employee or user.is_superuser %}
-    <li class="{% block nav-grade-results %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-poll-v2-results' %}">Wyniki oceny</a>
-    </li>
-    <li class="{% block nav-grade-schemas %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-poll-v2-schemas' %}">Szablony</a>
-    </li>
-    {% endif %}
-    {% if request.session.grade_poll_current_submission %}
-    <li class="{% block nav-grade-poll-v2-submissions %}{% endblock %}">
-        <a class="nav-link" href="{% url 'grade-poll-v2-submissions' %}">Ankiety</a>
-    </li>
-    {% endif %}
+<li class="{% block nav-grade-main %}{% endblock %}">
+  <a class="nav-link" href="{% url 'grade-main' %}">Zasady</a>
+</li>
+{% if user.student and is_grade_active %}
+<li class="{% block nav-grade-ticket-tickets-generate %}{% endblock %}">
+  <a class="nav-link" href="{% url 'grade-ticket-tickets-generate' %}">Pobieranie kluczy</a>
+</li>
+{% endif %}
+{% if is_grade_active and not user.employee and not user.is_superuser %}
+<li class="{% block nav-grade-tickets-enter %}{% endblock %}">
+  <a class="nav-link" href="{% url 'grade-poll-tickets-enter' %}">Wprowadzanie kluczy</a>
+</li>
+{% endif %}
+{% if user.employee or user.is_superuser %}
+<li class="{% block nav-grade-results %}{% endblock %}">
+  <a class="nav-link" href="{% url 'grade-poll-results' %}">Wyniki oceny</a>
+</li>
+{% endif %}
+{% if request.session.grade_poll_submissions and not user.is_authenticated%}
+<li class="{% block nav-grade-poll-submissions %}{% endblock %}">
+  <a class="nav-link" href="{% url 'grade-poll-submissions' %}">Ankiety</a>
+</li>
+{% endif %}
 {% endblock %}

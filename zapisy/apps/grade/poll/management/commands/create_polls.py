@@ -6,10 +6,11 @@ from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
 
-    
+
 HEADER = "-- "
 MARGIN = "   "
 CREATED = " + "
+
 
 class Command(BaseCommand):
     help = "Creates polls for a given semester. If not specified, current is assumed."
@@ -37,7 +38,9 @@ class Command(BaseCommand):
         else:
             new_poll = Poll(group=None, course=None, semester=semester)
             new_poll.save()
-            self.stdout.write(f"{CREATED}Poll for a selected semester does not exist, creating")
+            self.stdout.write(
+                f"{CREATED}Poll for a selected semester does not exist, creating"
+            )
             created += 1
 
         # Check whether poll exists for courses held in a selected semester
@@ -46,7 +49,7 @@ class Command(BaseCommand):
 
         for course in courses:
             course_poll = Poll.objects.filter(course=course).count() > 0
-            if course_poll:
+            if not course.exam or course_poll:
                 self.stdout.write(f"{MARGIN}{course}")
                 skipped += 1
             else:

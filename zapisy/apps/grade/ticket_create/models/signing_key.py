@@ -159,7 +159,9 @@ class SigningKey(models.Model):
             KeyError: When there is not match between signing request and students polls.
         """
         matched_requests = []
-        student_polls = Poll.get_all_polls_for_student_as_dict(user.student)
+        student_polls = {
+            poll.pk: poll for poll in Poll.get_all_polls_for_student(user.student)
+        }
         for req in signing_requests:
             poll = student_polls[req['id']]
             matched_requests.append((req, poll))

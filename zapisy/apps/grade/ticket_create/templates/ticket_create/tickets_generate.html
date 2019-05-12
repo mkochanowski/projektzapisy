@@ -9,9 +9,8 @@
 {% block main-subtitle %}Pobieranie kluczy{% endblock %}
 
 {% block bread %}
-    <li class="breadcrumb-item"><a href="/">Strona główna</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Pobieranie kluczy</li>
+{% include 'grade/poll/_breadcrumbs.html' %}
+<li class="breadcrumb-item active" aria-current="page">Pobieranie kluczy</li>
 {% endblock %}
 
 {% block all-content %}
@@ -25,7 +24,7 @@
 	{% if error %}
 	<div class="main-error">{{ error }}</div>
 	{% endif %}
-	{% if grade %}
+	{% if is_grade_active %}
 	<div id="grade-tickets-generate">
 		<div id="tickets_generate">
 			<h2>
