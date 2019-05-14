@@ -9,5 +9,41 @@
 {% endblock %}
 
 {% block all-content %}
-Wyniki oceny
+<div class="row">
+  <div class="col-lg-8 col-12">
+    {% if is_grade_active and current_semester == selected_semester %}
+    <div class="alert alert-info">
+      Ocena zajęć jest obecnie aktywna. Przesłane ankiety mogą być modyfikowane przez studentów.
+    </div>
+    {% endif %}
+    {{ selected_semester }}
+
+  </div>
+  <div class="col-lg-4 col-12">
+    <select class="form-control mb-3"
+      onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+      {% for semester in semesters %}
+      <option value="{% url 'grade-poll-results' semester_id=semester.id %}"
+        {% if semester.id == selected_semester.id  %}selected{% endif %}>{{ semester }}</option>
+      {% endfor %}
+    </select>
+    {% for group_name, entries in submissions.items %}
+    <div class="card mb-3">
+      <div class="card-header">
+        {{ group_name }}
+      </div>
+      <div class="list-group list-group-flush">
+        {% for entry in entries %}
+        <a href="{% url 'grade-poll-results' semester_id=selected_semester.id %}"
+          class="list-group-item list-group-item-action">{{ entry }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+      Brak przesłanych ankiet w wybranym semestrze.
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

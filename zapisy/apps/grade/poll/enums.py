@@ -24,13 +24,6 @@ class SchemaPersonalEvaluationAnswers(ChoicesEnum):
     DEFINITELY_WORSE = "definitely_worse", "zdecydowanie gorsze"
 
 
-class SchemaTimeLongAnswers(ChoicesEnum):
-    A_FEW_HOURS = "a_few_hours", "kilka godzin"
-    A_DAY = "a_day", "około 1 dnia"
-    A_FEW_DAYS = "a_few_days", "kilka dni (około 3)"
-    ALMOST_A_WEEK = "almost_a_week", "prawie cały tydzień"
-
-
 class SchemaTimeShortAnswers(ChoicesEnum):
     LESS_THAN_ONE_HOUR = "less_than_one_hour", "mniej niż 1 godzinę"
     ABOUT_TWO_HOURS = "about_two_hours", "około 2 godzin"
@@ -39,9 +32,31 @@ class SchemaTimeShortAnswers(ChoicesEnum):
     MORE_THAN_TWO_DAYS = "more_than_two_days", "więcej niż dwa dni"
 
 
+class SchemaTimeMediumAnswers(ChoicesEnum):
+    A_FEW_HOURS = "a_few_hours", "kilka godzin"
+    A_DAY = "a_day", "około 1 dnia"
+    A_FEW_DAYS = "a_few_days", "kilka dni (około 3)"
+    ALMOST_A_WEEK = "almost_a_week", "prawie cały tydzień"
+
+
+class SchemaTimeLongAnswers(ChoicesEnum):
+    NOT_AT_ALL = "not_at_all", "wcale"
+    ABOUT_A_DAY = "about_a_day", "około 1 dnia"
+    A_FEW_DAYS = "a_few_days", "kilka (2-4) dni"
+    ABOUT_A_WEEK = "about_a_week", "około tygodnia"
+    OVER_TWO_WEEKS = "over_two_weeks", "ponad dwa tygodnie"
+
+
 class SchemaGenericAnswers(ChoicesEnum):
     STRONGLY_AGREE = "strongly_agree", "zdecydowanie tak"
     AGREE = "agree", "raczej tak"
     NEUTRAL = "neutral", "trudno powiedzieć"
     DISAGREE = "disagree", "raczej nie"
     STRONGLY_DISAGREE = "strongly_disagree", "zdecydowanie nie"
+
+
+class SchemaAttendanceAnswers(ChoicesEnum):
+    OFTEN = "often", "regularnie (kilka nieobecności)"
+    IRREGULARLY = "irregularly", "nieregularnie (około połowa nieobecności)"
+    RARLY = "rarly", "rzadko (kilka obecności)"
+    NEVER = "never", "wcale"

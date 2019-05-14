@@ -1,3 +1,7 @@
+import json
+import os.path
+from typing import Union
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import post_save
@@ -7,11 +11,27 @@ from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.records import models as records_models
-from apps.users.models import Student
 from apps.grade.poll.enums import PollType
+from apps.users.models import BaseUser, Student
 
 
 class Poll(models.Model):
+    """Represents the default entity used for identifying a single poll.
+
+    New Polls don't have to be created manually - everything is handled
+    by signal receivers defined in `apps.grade.poll.signals`.
+
+    A new Poll instance should consist of just one reference to one of the
+    following: a group, a course or a semester.
+
+    :param group: if present, the created poll will inherit the type
+        of the group
+    :param course: if present, the created poll will be of
+        `PollType.EXAM` type
+    :param semester: if present, the created poll will be of
+        `PollType.GENERAL` type
+    """
+
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
     semester = models.ForeignKey(Semester, on_delete=models.SET_NULL, null=True)
@@ -21,14 +41,27 @@ class Poll(models.Model):
         verbose_name_plural = "ankiety"
 
     @property
-    def type(self):
-        if self.group == None and self.course == None:
-            return PollType.GENERAL
-        if self.semester == None and self.group == None:
+    def type(self) -> Union[PollType, "CourseGroupType"]:
+        """Determines the PollType by checking foreign keys references"""
+        if self.group:
+            return self.group.type
+        if self.course:
             return PollType.EXAM
-        return self.group.type
+        return PollType.GENERAL
+
+    @property
+    def get_semester(self):
+        """Determines the semester of the poll"""
+        if self.semester:
+            return self.semester
+        if self.course:
+            return self.course.semester
+        if self.group:
+            return self.group.course.semester
 
     def __str__(self):
+        """Provides a human-readable string that serves as the title
+            of the Poll."""
         if self.group:
             group_type = self.group.get_type_display().capitalize()
             teacher_name = self.group.get_teacher_full_name()
@@ -37,12 +70,16 @@ class Poll(models.Model):
         elif self.course:
             return f"Egzamin: {self.course.owner}"
         elif self.semester:
-            return f"Semestr {self.semester}"
+            return "Ogół zajęć w Instytucie"
 
         return "Ankieta ogólna"
 
     @property
     def category(self) -> str:
+        """Determines a category for a Poll.
+
+        This method fetches the name of the course or assumes a general type.
+        """
         if self.course:
             return self.course.name
         elif self.group:
@@ -52,27 +89,26 @@ class Poll(models.Model):
 
     @property
     def subcategory(self) -> str:
-        return self
+        """Determines a subcategory for a Poll.
 
-    def serialize_for_signing_protocol(self):
-        result = {}
+        This method uses `__str__` for type projection by default.
+        """
+        return self.__str__()
 
-        if self.group:
-            result["name"] = self.group.course.name
-            result["type"] = self.group.get_type_display()
-        if self.course:
-            result["name"] = self.course.name
-            result["type"] = "egzamin"
-        if self.semester:
-            result["name"] = self.semester.get_name()
-            result["type"] = "ankieta ogólna"
+    def serialize_for_signing_protocol(self) -> dict:
+        """Serializes the Poll to the format accepted by TicketCreate.
 
-        result["id"] = self.pk
+        :returns: a dictionary consisting of 'id', 'name' and 'type' keys.
+        """
+        result = {"id": self.pk, "name": self.subcategory, "type": self.category}
 
         return result
 
-    def is_student_entitled_to_poll(self, student: Student):
-        """Checks if the student should be able to participate in the poll."""
+    def is_student_entitled_to_poll(self, student: Student) -> bool:
+        """Checks whether the student is allowed to participate in this Poll.
+
+        :param student:
+        """
         if self.group:
             if not records_models.Record.is_enrolled(student.id, self.group_id):
                 return False
@@ -80,13 +116,23 @@ class Poll(models.Model):
         return True
 
     @staticmethod
-    def get_all_polls_for_student(student: Student) -> list:
+    def get_all_polls_for_student(student: Student, semester: Semester = None) -> list:
+        """Checks the eligibility of a student and returns a list of polls.
+
+        :param student: a valid instance of `Student` class.
+        :param semester: if no semester is given, assumes a current one.
+        :returns: a list of all available polls for a given student.
+        """
+        current_semester = semester
+        if current_semester is None:
+            current_semester = Semester.get_current_semester()
+
         polls = []
-        current_semester = Semester.get_current_semester()
         poll_for_semester = Poll.objects.filter(semester=current_semester).first()
         if poll_for_semester:
             polls.append(poll_for_semester)
 
+        # Retrieves only the groups that the Student is enrolled in
         records = records_models.Record.objects.filter(
             student=student, status=records_models.RecordStatus.ENROLLED
         ).select_related("group")
@@ -110,6 +156,30 @@ class Poll(models.Model):
 
 
 class Schema(models.Model):
+    """Handles JSON-based templates for creating submissions.
+
+    An example of a correctly defined schema would be:
+    {
+        "version": 1,
+        "schema": [
+            {
+                "question": "Does participating in the `Project:
+                             Development of the Enrollment System`
+                             bring you joy? Please elaborate on your
+                             feelings without using swear words.",
+                "type": "long_open_answer"
+            },
+            {
+                "question": "Would you rather be doing something else?",
+                "type": "predefined_choices_generic"
+            }
+        ]
+    }
+
+    :param questions: a proprietary schema in JSON format.
+    :param type: a type of poll for the defined `questions` schema.
+    """
+
     questions = JSONField(default=dict)
     type = models.CharField(choices=PollType.choices(), max_length=80)
 
@@ -118,41 +188,46 @@ class Schema(models.Model):
         verbose_name_plural = "szablony"
 
     @classmethod
-    def edit(cls, new_schema):
-        pass
+    def get_schema_from_file(cls, poll_type: PollType, schema_path: str = None):
+        """Fetches the default schema for a given poll type from a local file.
 
-    @classmethod
-    def get_schema_from_file(cls, poll_type):
-        return {
-            "version": 1,
-            "schema": [
-                {"question": "To jest testowe pytanie.", "type": "short_open_answer"},
-                {
-                    "question": "To jest długie otwarte pytanie.",
-                    "type": "long_open_answer",
-                },
-                {
-                    "question": "Uważasz, że w stosunku do otrzymanej oceny, Twoje umiejętności są",
-                    "type": "predefined_choices_personal_evaluation",
-                },
-                {
-                    "question": "Ile czasu tygodniowo, poza zajęciami, regularnie przeznaczasz na studiowanie? ",
-                    "type": "predefined_choices_time_stretched",
-                },
-                {
-                    "question": "Ile średnio czasu tygodniowo poświęcałeś na przygotowanie się do zajęć? ",
-                    "type": "predefined_choices_time_short",
-                },
-                {
-                    "question": "Czy egzamin był trudny?",
-                    "type": "predefined_choices_grade",
-                },
-            ],
-        }
+        The default schema is defined in `assets/default_schema.json`
+        in the Poll app directory.
+
+        :param poll_type: an instance of `PollType` Enum class.
+        :returns: a dictionary containing a schema and it's version.
+        """
+
+        if schema_path is None:
+            schema_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "assets/default_schema.json"
+            )
+        with open(schema_path, "r") as schema_file:
+            # TODO: Decide whether it is the right way of fetching schemas from file
+            schema = json.load(schema_file)
+
+            # For the purposes of compatibility with old GroupType tuple
+            # TODO: Decide whether it should reside in the PollType Enum class
+            if isinstance(poll_type, str):
+                options = PollType.options()
+                values = PollType.values()
+                poll_type = options[values.index(int(poll_type))]
+            elif isinstance(poll_type, tuple):
+                poll_type = poll_type[0]
+            schema_name = f"{poll_type.__class__.__name__}.{poll_type.name}"
+
+            if schema_name in schema:
+                return schema[schema_name]
+            return schema["default"]
 
     @classmethod
     def get_latest(cls, poll_type):
-        schema = cls.objects.filter(type=poll_type).first()
+        """Retrieves the most recent schema defined for a given `poll_type`
+
+        :param poll_type: PollType
+        :returns: an instance of `Schema`
+        """
+        schema = cls.objects.filter(type=poll_type).last()
         if not schema:
             schema = cls(
                 questions=cls.get_schema_from_file(poll_type=poll_type), type=poll_type
@@ -163,13 +238,26 @@ class Schema(models.Model):
 
     @staticmethod
     def get_default_value_for_question_type(question_type):
+        """Retrieves a default value for a question type.
+
+        :param question_type: a type defined in schema object.
+        :returns: a default value for a given question type.
+        """
+        # TODO: Possibly remove.
         return ""
 
     def get_schema_with_default_answers(self):
+        """Fetches the Submission's schema and populates it with
+            default answers.
+
+        :returns: a schema with additional `answer` keys.
+        """
+        # TODO: Possibly rethink.
         if (
-            self.questions
-            and "version" in self.questions
-            and "schema" in self.questions
+            self.questions and
+            "version" in self.questions and
+            self.questions["version"] == 1 and
+            "schema" in self.questions
         ):
             schema_with_answers = {
                 "version": self.questions["version"],
@@ -191,6 +279,19 @@ class Schema(models.Model):
 
 
 class Submission(models.Model):
+    """Represents a single submission for a referenced poll.
+
+    Holds a value for `submitted` which is set only when the user
+    submits correct answers for all required questions defined in
+    the schema.
+
+    Although the schema is referenced by a foreign key, modifying it
+    directly (or unintentionally by a third party) leaves the Submission
+    intact. The schema is fetched at the creation time and stored
+    inside the `answers` JSON field with all the necessary information
+    used for recreating the form.
+    """
+
     schema = models.ForeignKey(Schema, on_delete=models.DO_NOTHING, null=True)
     poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING, null=True)
     answers = JSONField(default=dict)
@@ -208,21 +309,97 @@ class Submission(models.Model):
 
     @property
     def category(self) -> str:
-        if self.poll:
-            return self.poll.category
+        return self.poll.category
 
-        return "Ankiety ogólne"
+    @property
+    def subcategory(self) -> str:
+        return self.__str__()
 
     @classmethod
     def get_or_create(cls, poll_with_ticket_id) -> "Submission":
+        """Makes sure that there exists only submission for a specific
+        poll and ticket id.
+
+        :param poll_with_ticket_id: a tuple of poll instance and ticket
+            id received from grade/tickets_create app
+        :returns: an instance of `Submission` class.
+        """
         ticket, poll = poll_with_ticket_id
         submission = cls.objects.filter(ticket=ticket).first()
         if not submission:
-            print("Creating new submission")
             schema = Schema.get_latest(poll_type=poll.type)
             answers = schema.get_schema_with_default_answers()
-            print(f"schema={schema}, answers={answers}")
             submission = cls(schema=schema, answers=answers, ticket=ticket, poll=poll)
             submission.save()
 
         return submission
+
+    @classmethod
+    def get_all_submissions_for_course(cls, course: Course) -> list:
+        """Lists all submissions tied to a given course.
+
+        Also includes all submissions for all groups of the selected
+        course.
+
+        :returns: a list of submissions.
+        """
+        submissions = set()
+        submissions_for_course = cls.objects.filter(poll__course=course, submitted=True)
+        if submissions_for_course:
+            print(f"submissions_for_course: {submissions_for_course}")
+            submissions.update(submissions_for_course)
+
+        submissions_for_groups = set()
+        groups = Group.objects.filter(course=course)
+        for group in groups:
+            submissions_for_group = cls.objects.filter(
+                poll__group=group, submitted=True
+            )
+            if submissions_for_group:
+                submissions_for_groups.update(submissions_for_group)
+
+        if submissions_for_groups:
+            print(f"submissions_for_groups: {submissions_for_groups}")
+            submissions.update(submissions_for_groups)
+
+        return submissions
+
+    @classmethod
+    def get_all(cls, user, semester=None) -> list:
+        """Lists all submissions that the given user has access to.
+
+        Checks whether the user is an employee or has superadmin
+        priviliges and creates a list of accessible, submitted
+        submissions.
+
+        :param user: possibly, an employee or a superuser.
+        :returns: a list of submissions for a given user.
+        """
+        submissions = set()
+        if not semester:
+            semester = Semester.get_current_semester()
+
+        if BaseUser.is_employee(user):
+            courses = Course.objects.filter(
+                entity__owner=user.employee, semester=semester
+            )
+
+        if user.is_superuser:
+            courses = Course.objects.filter(semester=semester)
+
+        if BaseUser.is_employee(user) or user.is_superuser:
+            general_submissions = cls.objects.filter(
+                poll__semester=semester, submitted=True
+            )
+            if general_submissions:
+                print(f"general_submissions: {general_submissions}")
+                submissions.update(general_submissions)
+
+            for course in courses:
+                print("Course:", course)
+                submissions_for_course = cls.get_all_submissions_for_course(course)
+                if submissions_for_course:
+                    print(f"Submissions_for_course: {submissions_for_course}")
+                    submissions.update(submissions_for_course)
+
+        return submissions

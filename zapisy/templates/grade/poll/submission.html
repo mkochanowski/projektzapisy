@@ -16,39 +16,49 @@
 {% include 'grade/poll/_user_is_authenticated.html' %}
 {% else %}
 <div class="row">
-  <div class="col-lg-8 col-12">
-    <div class="card mb-3 {% if grouped_submissions.submittedd == grouped.submissions.total%}border-success{% else %}border-danger{% endif %}">
+  <div class="col-lg-8 col-12 mb-5">
+    <div
+      class="card mb-3 {% if grouped_submissions.submitted == grouped_submissions.total%}border-success{% else %}border-danger{% endif %}">
       <div class="card-body">
-        {% if grouped_submissions.submittedd == grouped.submissions.total %}
+        {% if grouped_submissions.submitted == grouped_submissions.total %}
         <h5 class="card-title">Wypełniłeś wszystkie ankiety!</h5>
-        <p class="card-text">W każdej chwili możesz wprowadzić poprawki do przesłanych odpowiedzi. Wystarczy, że ponownie wprowadzisz klucze. Jeżeli nie chcesz wprowadzać żadnych zmian, wyczyść sesję.</p>
+        <p class="card-text">Możesz modyfikować przesłane odpowiedzi przez cały okres trwania oceny wprowadzając pobrane wcześniej klucze dostępu. Jeżeli nie chcesz wprowadzać żadnych poprawek, kliknij poniższy przycisk aby wyczyścić sesję i zakończyć ocenianie.</p>
         {% else %}
-        <h5 class="card-title">Dbaj o własną anonimowość</h5>
-        <p class="card-text">System <a href="{% url 'grade-poll-index' %}">oceny zajęć</a> przechowuje informacje o
-          wygenerowanych ankietach w aktywnej sesji.<br> Nie pozwól aby ktoś uzyskał dostęp do Twoich odpowiedzi –
-          wyczyść sesję po zakończeniu oceniania!</p>
+        <h5 class="card-title">Zadbaj o anonimowość!</h5>
+        <p class="card-text">Ankiety, które właśnie edytujesz są przechowywane w aktywnej sesji. Nie pozwól aby ktoś nieupoważniony uzyskał do nich dostęp –
+          aby tego uniknąć, wystarczy, że wyczyścisz sesję po zakończeniu oceniania.<br>Nie musisz wypełniać od razu wszystkich ankiet. Przez cały okres trwania oceny możesz modyfikować przesłane odpowiedzi wprowadzając pobrane wcześniej klucze dostępu.</p>
         {% endif %}
         <div class="row">
           <div class="col">
+            {% if grouped_submissions.submitted %}
             <div class="progress h-100">
               <div
-                class="progress-bar {% if grouped_submissions.submittedd == grouped.submissions.total%}bg-success{% endif %}"
-                role="progressbar" style="width: calc(100% * ({{ grouped_submissions.progress }}))"
+                class="progress-bar {% if grouped_submissions.submitted == grouped_submissions.total%}bg-success{% endif %}"
+                role="progressbar" style="width: calc(100% * ({{ grouped_submissions.progress_numerical|max:0.1 }}))"
                 aria-valuenow="{{ grouped_submissions.submitted }}" aria-valuemin="0"
-                aria-valuemax="{{ grouped_submissions.total }}"><strong>{{ grouped_submissions.progress }}</strong>
+                aria-valuemax="{{ grouped_submissions.total }}">
+                <strong>
+                  {{ grouped_submissions.progress }}
+                </strong>
               </div>
             </div>
+            {% else %}
+            <div class="align-middle h-100">Nie wypełniłeś jeszcze żadnej ankiety.</div>
+            {% endif %}
           </div>
           <div class="col-auto">
-            <a href="{% url 'grade-poll-clear-session' %}"
-              class="btn {% if grouped_submissions.submittedd == grouped.submissions.total%}btn-primary{% else %}btn-dark{% endif %}">Wyczyść sesję</a>
+            {% if grouped_submissions.submitted == grouped_submissions.total%}
+            <a href="{% url 'grade-poll-clear-session' %}" class="btn btn-primary">Zakończ ocenę i wyczyść sesję</a>
+            {% else %}
+            <a href="{% url 'grade-poll-clear-session' %}" class="btn btn-dark">Przerwij ocenę i wyczyść
+              sesję</a>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
-    <h3>{{ active_submission }}</h3>
-    {{ active_submission.category }}
-    <hr>
+    <h3>Ankieta: <span class="text-info">{{ active_submission }}</span></h3>
+    <h5 class="text-secondary">{{ active_submission.category }}</h5>
     <form action="" method="post">
       {% csrf_token %}
       {{ form|crispy }}

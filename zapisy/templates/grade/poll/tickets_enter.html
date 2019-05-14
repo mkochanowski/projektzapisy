@@ -14,7 +14,7 @@
 {% if user.is_authenticated %}
 {% include 'grade/poll/_user_is_authenticated.html' %}
 {% else %}
-<div id='grade-tickets-enter'>
+<div id="grade-tickets-enter">
   <form action="{% url 'grade-poll-tickets-enter' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <h2>Wprowadzanie kluczy</h2>
