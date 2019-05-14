@@ -85,7 +85,8 @@ class SubmissionEntryForm(forms.ModelForm):
                 widget=forms.Textarea, label=question, required=False
             )
         elif question_type.startswith(choices_field_prefix):
-            question_type = question_type[len(choices_field_prefix):]
+            question_type = question_type[len(choices_field_prefix)+1:]
+            print(question_type)
             if question_type == "personal_evaluation":
                 choices = SchemaPersonalEvaluationAnswers.choices()
             elif question_type == "time_long":
