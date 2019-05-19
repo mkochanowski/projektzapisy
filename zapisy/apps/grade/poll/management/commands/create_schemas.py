@@ -3,8 +3,7 @@ from django.core.management.base import BaseCommand
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
-from apps.grade.poll.enums import PollType
-from apps.grade.poll.models import Poll, Schema
+from apps.grade.poll.models import Poll, PollType, Schema
 
 HEADER = "-- "
 MARGIN = "   "

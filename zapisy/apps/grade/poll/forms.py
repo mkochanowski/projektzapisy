@@ -1,22 +1,13 @@
-from django import forms
-from django.contrib import messages
-from django.forms import Form, ModelForm
+from typing import Dict
 
-from apps.enrollment.courses.models.semester import Semester
-from apps.grade.poll.enums import (
-    SchemaAttendanceAnswers,
-    SchemaGenericAnswers,
-    SchemaPersonalEvaluationAnswers,
-    SchemaTimeLongAnswers,
-    SchemaTimeMediumAnswers,
-    SchemaTimeShortAnswers,
-)
+from django import forms
+
 from apps.grade.poll.models import Submission
-from apps.grade.poll.utils import check_grade_status
 
 
 class TicketsEntryForm(forms.Form):
     """A form used for inserting tickets."""
+
     tickets = forms.CharField(widget=forms.Textarea, label="Klucze do głosowania")
 
 
@@ -35,15 +26,14 @@ class SubmissionEntryForm(forms.ModelForm):
     semester, all data will be displayed as `readonly` without the
     opportunity to introduce new changes.
     """
+
     def __init__(self, *args, **kwargs):
         self.jsonfields = kwargs.pop("jsonfields", None)
         super().__init__(*args, **kwargs)
         self.is_grade_active = self.instance.poll.get_semester.is_grade_active
         for index, field in enumerate(self.jsonfields):
             form_field = self.__determine_field_by_type(
-                question=field["question"],
-                question_type=field["type"],
-                active=self.is_grade_active,
+                field=field, active=self.is_grade_active
             )
 
             self.fields[f"field_{index}"] = form_field
@@ -58,11 +48,7 @@ class SubmissionEntryForm(forms.ModelForm):
             updated_answers = self.instance.answers
             for index, field in enumerate(self.jsonfields):
                 field_name = f"field_{index}"
-                updated_answers["schema"][index] = {
-                    "question": field["question"],
-                    "type": field["type"],
-                    "answer": self.cleaned_data.get(field_name),
-                }
+                answer = updated_answers["schema"][index]["answer"] = self.cleaned_data.get(field_name)
 
             self.instance.submitted = True
             self.instance.answers = updated_answers
@@ -70,45 +56,29 @@ class SubmissionEntryForm(forms.ModelForm):
             return super().save(commit)
 
     @staticmethod
-    def __determine_field_by_type(question: str, question_type: str, active=True):
+    def __determine_field_by_type(field: Dict, active=True):
         """Uses the `question_type` to correctly identify what field
         should be used according to the rules defined in schema.
 
-        :param question: a string that will be used as a label for the field.
-        :param question_type: a schema-compatible type of the field.
+        :param field: a single entry in JSON Schema that defines the field.
         :param active: whether the field will be active or disabled.
         :returns: a Django Forms field.
         """
-        choices_field_prefix = "predefined_choices"
-        if question_type == "long_open_answer":
+        if field["type"] == "textarea":
             form_field = forms.CharField(
-                widget=forms.Textarea, label=question, required=False
+                widget=forms.Textarea, label=field["question"], required=False
             )
-        elif question_type.startswith(choices_field_prefix):
-            question_type = question_type[len(choices_field_prefix)+1:]
-            print(question_type)
-            if question_type == "personal_evaluation":
-                choices = SchemaPersonalEvaluationAnswers.choices()
-            elif question_type == "time_long":
-                choices = SchemaTimeLongAnswers.choices()
-            elif question_type == "time_medium":
-                choices = SchemaTimeMediumAnswers.choices()
-            elif question_type == "time_short":
-                choices = SchemaTimeShortAnswers.choices()
-            elif question_type == "attendance":
-                choices = SchemaAttendanceAnswers.choices()
-            else:
-                choices = SchemaGenericAnswers.choices()
-
+        elif field["type"] == "radio" and "choices" in field:
             attrs = {"disabled": "disabled"} if not active else {}
+            choices = tuple(zip(field["choices"], field["choices"]))
             form_field = forms.ChoiceField(
                 choices=choices,
-                label=question,
+                label=field["question"],
                 widget=forms.RadioSelect(choices=choices, attrs=attrs),
                 required=True,
             )
         else:
-            form_field = forms.CharField(label=question, required=False)
+            form_field = forms.CharField(label=field["question"], required=False)
 
         if not active:
             form_field.widget.attrs["readonly"] = True

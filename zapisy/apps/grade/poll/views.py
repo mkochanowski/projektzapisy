@@ -1,9 +1,8 @@
 import itertools
-from collections import namedtuple
 from json import JSONDecodeError
 
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.shortcuts import redirect, render, reverse
 from django.views.generic import TemplateView, UpdateView, View
 
 from apps.enrollment.courses.models.semester import Semester
@@ -15,7 +14,6 @@ from apps.grade.poll.utils import (
 )
 from apps.grade.ticket_create.models import SigningKey
 from apps.users.models import BaseUser
-
 from .forms import SubmissionEntryForm, TicketsEntryForm
 from .models import Submission
 
@@ -67,6 +65,7 @@ class TicketsEntry(TemplateView):
 
 class SubmissionEntry(UpdateView):
     """Allows the user to update and view his submission(s)."""
+
     template_name = "grade/poll/submission.html"
     model = Submission
     slug_field = "submissions"
@@ -164,6 +163,7 @@ class SubmissionEntry(UpdateView):
 
 class PollResults(TemplateView):
     """Displays results for all archived and submitted submissions."""
+
     template_name = "grade/poll/results.html"
 
     def get(self, request, semester_id=None):
@@ -193,6 +193,7 @@ class PollResults(TemplateView):
 
 class GradeDetails(TemplateView):
     """Displays details and rules about how the grade is set up."""
+
     template_name = "grade/main.html"
 
     def get(self, request):
@@ -203,6 +204,7 @@ class GradeDetails(TemplateView):
 
 class ClearSession(View):
     """Removes submissions from the active session."""
+
     def get(self, request):
         del self.request.session["grade_poll_submissions"]
         messages.success(

@@ -1,18 +1,30 @@
 import json
 import os.path
-from typing import Union
+from typing import Union, Set, List
 
+from choicesenum import ChoicesEnum
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.records import models as records_models
-from apps.grade.poll.enums import PollType
 from apps.users.models import BaseUser, Student
+
+
+class PollType(ChoicesEnum):
+    LECTURE = 1, "ankieta dla wykładu"
+    EXERCISE = 2, "ankieta dla ćwiczeń"
+    LABS = 3, "ankieta dla pracowni"
+    EXERCISE_LABS = 5, "ankieta dla ćwiczenio-pracowni"
+    SEMINARY = 6, "ankieta dla seminarium"
+    LECTORATE = 7, "ankieta dla lektoratu"
+    PHYSICAL_EDUCATION = 8, "ankieta dla zajęć wf"
+    REPETITORY = 9, "ankieta dla repetytorium"
+    PROJECT = 10, "ankieta dla projektu"
+    EXAM = 1000, "ankieta dla egzaminu"
+    GENERAL = 1001, "ankieta ogólna"
 
 
 class Poll(models.Model):
@@ -116,7 +128,7 @@ class Poll(models.Model):
         return True
 
     @staticmethod
-    def get_all_polls_for_student(student: Student, semester: Semester = None) -> list:
+    def get_all_polls_for_student(student: Student, semester: Semester = None) -> List:
         """Checks the eligibility of a student and returns a list of polls.
 
         :param student: a valid instance of `Student` class.
@@ -167,11 +179,12 @@ class Schema(models.Model):
                              Development of the Enrollment System`
                              bring you joy? Please elaborate on your
                              feelings without using swear words.",
-                "type": "long_open_answer"
+                "type": "textarea"
             },
             {
                 "question": "Would you rather be doing something else?",
-                "type": "predefined_choices_generic"
+                "type": "radio",
+                "choices": ["absolutely", "obviously!", "ehmm... yes?"]
             }
         ]
     }
@@ -195,6 +208,7 @@ class Schema(models.Model):
         in the Poll app directory.
 
         :param poll_type: an instance of `PollType` Enum class.
+        :param schema_path: path to the file containing the schema. (optional)
         :returns: a dictionary containing a schema and it's version.
         """
 
@@ -252,30 +266,25 @@ class Schema(models.Model):
 
         :returns: a schema with additional `answer` keys.
         """
-        # TODO: Possibly rethink.
         if (
             self.questions and
             "version" in self.questions and
             self.questions["version"] == 1 and
             "schema" in self.questions
         ):
-            schema_with_answers = {
+            updated_schema_entries = []
+            for entry in self.questions["schema"]:
+                entry["answer"] = self.get_default_value_for_question_type(
+                    entry["type"]
+                )
+                updated_schema_entries.append(entry)
+
+            return {
                 "version": self.questions["version"],
-                "schema": list(
-                    map(
-                        lambda x: {
-                            "question": x["question"],
-                            "type": x["type"],
-                            "answer": self.get_default_value_for_question_type(
-                                x["type"]
-                            ),
-                        },
-                        self.questions["schema"],
-                    )
-                ),
+                "schema": updated_schema_entries,
             }
 
-            return schema_with_answers
+        return {"version": 1, "schema": []}
 
 
 class Submission(models.Model):
@@ -335,7 +344,7 @@ class Submission(models.Model):
         return submission
 
     @classmethod
-    def get_all_submissions_for_course(cls, course: Course) -> list:
+    def get_all_submissions_for_course(cls, course: Course) -> Set:
         """Lists all submissions tied to a given course.
 
         Also includes all submissions for all groups of the selected
@@ -365,29 +374,29 @@ class Submission(models.Model):
         return submissions
 
     @classmethod
-    def get_all(cls, user, semester=None) -> list:
+    def get_all(cls, user, semester=None) -> Set:
         """Lists all submissions that the given user has access to.
 
         Checks whether the user is an employee or has superadmin
-        priviliges and creates a list of accessible, submitted
+        privileges and creates a list of accessible, submitted
         submissions.
 
         :param user: possibly, an employee or a superuser.
+        :param semester:
         :returns: a list of submissions for a given user.
         """
         submissions = set()
         if not semester:
             semester = Semester.get_current_semester()
 
-        if BaseUser.is_employee(user):
-            courses = Course.objects.filter(
-                entity__owner=user.employee, semester=semester
-            )
-
-        if user.is_superuser:
-            courses = Course.objects.filter(semester=semester)
-
         if BaseUser.is_employee(user) or user.is_superuser:
+            if user.is_superuser:
+                courses = Course.objects.filter(semester=semester)
+            else:
+                courses = Course.objects.filter(
+                    entity__owner=user.employee, semester=semester
+                )
+
             general_submissions = cls.objects.filter(
                 poll__semester=semester, submitted=True
             )
