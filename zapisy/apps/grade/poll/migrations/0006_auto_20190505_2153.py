@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
             name='share_result',
             field=models.BooleanField(blank=True, default=False, verbose_name='udostępnij wyniki'),
         ),
-        migrations.RunSQL('ALTER TABLE poll_legacy_poll RENAME CONSTRAINT "poll_poll_group_id_ecb9483f_fk_courses_group_id" TO "poll_legacy_poll_group_id_ecb9483f_fk_courses_group_id";'),
-        migrations.RunSQL('ALTER TABLE poll_legacy_poll RENAME CONSTRAINT "poll_poll_semester_id_a37ca66e_fk_courses_semester_id" TO "poll_legacy_poll_semester_id_a37ca66e_fk_courses_semester_id";'),
+        migrations.RunSQL('ALTER TABLE poll_poll RENAME CONSTRAINT "poll_poll_group_id_ecb9483f_fk_courses_group_id" TO "poll_legacy_poll_group_id_ecb9483f_fk_courses_group_id";'),
+        migrations.RunSQL('ALTER TABLE poll_poll RENAME CONSTRAINT "poll_poll_semester_id_a37ca66e_fk_courses_semester_id" TO "poll_legacy_poll_semester_id_a37ca66e_fk_courses_semester_id";'),
     ]
