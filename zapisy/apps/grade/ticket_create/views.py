@@ -75,10 +75,9 @@ def tickets_generate(request):
         return render(
             request, "ticket_create/tickets_generate.html", {"is_grade_active": grade}
         )
-    polls_for_courses, other_polls = get_grouped_polls(request.user.student)
+    polls = get_grouped_polls(request.user.student)
     data = {
-        "polls": polls_for_courses,
-        "general_polls": other_polls,
+        "polls": polls,
         "is_grade_active": grade,
     }
     return render(request, "ticket_create/tickets_generate.html", data)

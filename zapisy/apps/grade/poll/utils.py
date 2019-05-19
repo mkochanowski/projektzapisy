@@ -1,5 +1,5 @@
 from collections import defaultdict, namedtuple
-from typing import List
+from typing import List, Dict
 
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models import Poll, Submission
@@ -23,25 +23,15 @@ GroupedSubmissions = namedtuple(
 def check_grade_status() -> bool:
     """Checks whether any of the semesters has grade enabled."""
     active_semesters = Semester.objects.filter(is_grade_active=True).count()
+
     return active_semesters > 0
 
 
-def get_grouped_polls(student: Student) -> (dict, list):
+def get_grouped_polls(student: Student) -> Dict:
     """Groups polls into a format used by the grade/ticket_create app."""
     polls = Poll.get_all_polls_for_student(student)
 
-    courses = {}
-    general = []
-    for poll in polls:
-        if poll.group or poll.course:
-            course = poll.group.course if poll.group else poll.course
-            if course.id not in courses:
-                courses[course.id] = {"courses": course, "polls": []}
-            courses[course.id]["polls"].append(poll)
-        else:
-            general.append(poll)
-
-    return courses, general
+    return group_submissions(polls)
 
 
 def group_submissions_with_statuses(

@@ -30,41 +30,36 @@
 			<h2>
 				Pobieranie kluczy do następujących ankiet:
 			</h2>
-
-			<h4>Ankiety przypisane do przedmiotu:</h4>
-			<table id="grade-tickets-generate-form">
-				{% for k, poll in polls.items %}
-				<ul>
-					<li>
-						<h4><a href="{% url 'course-page' poll.courses.slug %}">{{ poll.courses }}</a></h4>
-						<ul>
-							{% for g in poll.polls %}
-							<li>{{ g }}</li>
-							{% endfor %}
-						</ul>
-					</li>
-				</ul>
-				{% empty %}
-				<h6>Brak ankiet</h6>
-				{% endfor %}
-				<h4>Ankiety ogólne:</h4>
-				{% if general_polls %}
-				<ul>
-					{% for p in general_polls %}
-					<li>{{ p }}</li>
+			<div class="container">
+				<div class="row">
+					{% for group_name, entries in polls.items %}
+					<div class="col-sm-12 col-md-6 col-lg-4 p-1">
+						<div class="card h-100">
+							<div class="card-body">
+								<h5 class="card-title text-info">{{ group_name }}</h5>
+								<p class="card-text">
+									{% for entry in entries %}
+									{{ entry }}<br>
+									{% endfor %}
+								</p>
+							</div>
+						</div>
+					</div>
+					{% empty %}
+					<div class="alert alert-info">
+						Brak przesłanych ankiet w wybranym semestrze.
+					</div>
 					{% endfor %}
-				</ul>
-				{% else %}
-				<h6>Brak ankiet</h6>
-				{% endif %}
-			</table>
+				</div>
+			</div>
 			{% if general_polls or polls %}
-			<div id='app'></div>
+			<div class="m-3">
+				<div id="app"></div>
+			</div>
 			{% endif %}
 		</div>
+		<div>{{ p }}</div>
 	</div>
-
-	<div>{{ p }}</div>
 	{% endif %}
 </div>
 {% endblock %}
