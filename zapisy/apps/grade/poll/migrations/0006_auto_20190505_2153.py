@@ -17,4 +17,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL('ALTER TABLE poll_poll RENAME CONSTRAINT "poll_poll_group_id_ecb9483f_fk_courses_group_id" TO "poll_legacy_poll_group_id_ecb9483f_fk_courses_group_id";'),
         migrations.RunSQL('ALTER TABLE poll_poll RENAME CONSTRAINT "poll_poll_semester_id_a37ca66e_fk_courses_semester_id" TO "poll_legacy_poll_semester_id_a37ca66e_fk_courses_semester_id";'),
+        migrations.RunSQL('ALTER INDEX IF EXISTS poll_poll_group_id_ecb9483f RENAME TO poll_legacy_poll_group_id_ecb9483f;'),
+        migrations.RunSQL('ALTER INDEX IF EXISTS poll_poll_semester_id_a37ca66e RENAME TO poll_legacy_poll_semester_id_a37ca66e;'),
     ]
