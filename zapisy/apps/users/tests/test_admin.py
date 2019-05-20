@@ -36,8 +36,6 @@ class AdminTestCase(TestCase):
         "/fereol_admin/schedule/specialreservation/",
         "/fereol_admin/schedule/term/",
         "/fereol_admin/sites/site/",
-        "/fereol_admin/ticket_create/signingkey/",
-        "/fereol_admin/ticket_create/studentgraded/",
         "/fereol_admin/users/employee/",
         "/fereol_admin/users/program/",
         "/fereol_admin/users/student/",
