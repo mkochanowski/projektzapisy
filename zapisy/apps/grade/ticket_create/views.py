@@ -23,11 +23,13 @@ def get_poll_data(request):
     response_data = []
     for poll in students_polls:
         poll_data = {
-            "key": poll.signingkey.serialize_for_signing_protocol(),
-            "poll_info": poll.serialize_for_signing_protocol(),
+            'key': poll.signingkey.serialize_for_signing_protocol(),
+            'poll_info': poll.serialize_for_signing_protocol(),
         }
         response_data.append(poll_data)
-    return JsonResponse({"poll_data": response_data})
+    return JsonResponse({
+        'poll_data': response_data,
+    })
 
 
 @require_POST
@@ -38,7 +40,7 @@ def sign_tickets(request):
     used, so user cannot sign them twice. Responds with generated signatures.
     """
     try:
-        signing_requests = json.loads(request.body.decode("utf-8"))
+        signing_requests = json.loads(request.body.decode('utf-8'))
     except json.decoder.JSONDecodeError:
         return HttpResponseBadRequest("Couldn't parse json")
 
@@ -47,17 +49,14 @@ def sign_tickets(request):
         return HttpResponseBadRequest("Invalid request")
     try:
         matched_requests = SigningKey.match_signing_requests_with_polls(
-            valid_ser.validated_data["signing_requests"], request.user
-        )
+            valid_ser.validated_data['signing_requests'], request.user)
     except KeyError:
         return HttpResponseBadRequest("Couldn't match provided id with poll")
 
     response = []
     for signing_request, poll in matched_requests:
-        signing_response = SigningKey.get_signing_response(
-            request.user, poll, signing_request
-        )
-        if signing_response["status"] != "ERROR":
+        signing_response = SigningKey.get_signing_response(request.user, poll, signing_request)
+        if signing_response['status'] != 'ERROR':
             # mark poll used
             poll.signingkey.students.add(request.user.student)
         response.append(signing_response)
