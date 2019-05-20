@@ -3,7 +3,6 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import generateTicketsMain from "./ticketsgenerate";
 import axios from "axios";
-import { get as getCookie } from "js-cookie";
 
 
 @Component
