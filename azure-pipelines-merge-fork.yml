@@ -7,5 +7,7 @@ steps:
     git pull zapisy master-dev
   displayName: Pull latest changes
 
-- bash: 'git status'
+- bash: | 
+    git status
+    git remote -v
   displayName: Update the fork
