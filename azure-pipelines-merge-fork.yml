@@ -3,12 +3,14 @@ pool:
 
 steps:
 - bash: |
+    git checkout $(zapisyRepositoryBranch)
     git remote add zapisy $(zapisyRepositoryURL)
-    git pull zapisy master-dev
+    git pull zapisy $(zapisyRepositoryBranch)
   displayName: Pull latest changes
 
 - bash: | 
     git status
     git remote -v
-    git push origin master-dev
+    git show-ref
+    git push origin $(zapisyRepositoryBranch)
   displayName: Update the fork
