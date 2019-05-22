@@ -10,4 +10,5 @@ steps:
 - bash: | 
     git status
     git remote -v
+    git push origin master-dev
   displayName: Update the fork
