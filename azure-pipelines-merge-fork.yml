@@ -1,0 +1,11 @@
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
+- bash: |
+    git remote add zapisy $(zapisyRepositoryURL)
+    git pull zapisy master-dev
+  displayName: Pull latest changes
+
+- bash: 'git status'
+  displayName: Update the fork
