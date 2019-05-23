@@ -167,6 +167,31 @@ class Poll(models.Model):
         return polls
 
 
+    @staticmethod
+    def get_all_polls_for_semester(user, semester: Semester = None) -> Set:
+        current_semester = semester
+        if current_semester is None:
+            current_semester = Semester.get_current_semester()
+
+        polls = set()
+        poll_for_semester = Poll.objects.filter(semester=current_semester).first()
+        polls.add(poll_for_semester)
+        
+        if user.is_superuser:
+            polls_for_courses = Poll.objects.filter(course__semester=current_semester)
+        elif BaseUser.is_employee(user):
+            polls_for_courses = Poll.objects.filter(course__semester=current_semester, course__entity__owner=user.employee)
+        polls.update(polls_for_courses)
+
+        if user.is_superuser:
+            polls_for_groups = Poll.objects.filter(group__course__semester=current_semester)
+        elif BaseUser.is_employee(user):
+            polls_for_groups = Poll.objects.filter(group__course__semester=current_semester, group__teacher=user.employee)
+        polls.update(polls_for_groups)
+
+        return polls
+
+
 class Schema(models.Model):
     """Handles JSON-based templates for creating submissions.
 
@@ -355,7 +380,6 @@ class Submission(models.Model):
         submissions = set()
         submissions_for_course = cls.objects.filter(poll__course=course, submitted=True)
         if submissions_for_course:
-            print(f"submissions_for_course: {submissions_for_course}")
             submissions.update(submissions_for_course)
 
         submissions_for_groups = set()
@@ -368,7 +392,6 @@ class Submission(models.Model):
                 submissions_for_groups.update(submissions_for_group)
 
         if submissions_for_groups:
-            print(f"submissions_for_groups: {submissions_for_groups}")
             submissions.update(submissions_for_groups)
 
         return submissions
@@ -401,14 +424,11 @@ class Submission(models.Model):
                 poll__semester=semester, submitted=True
             )
             if general_submissions:
-                print(f"general_submissions: {general_submissions}")
                 submissions.update(general_submissions)
 
             for course in courses:
-                print("Course:", course)
                 submissions_for_course = cls.get_all_submissions_for_course(course)
                 if submissions_for_course:
-                    print(f"Submissions_for_course: {submissions_for_course}")
                     submissions.update(submissions_for_course)
 
         return submissions

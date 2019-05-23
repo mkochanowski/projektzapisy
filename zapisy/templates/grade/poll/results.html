@@ -1,5 +1,7 @@
 {% extends "grade/base.html" %}
 
+{% load filters %}
+
 {% block main-subtitle %}Wyniki oceny{% endblock %}
 {% block nav-grade-results %}active{% endblock %}
 
@@ -13,10 +15,26 @@
   <div class="col-lg-8 col-12">
     {% if is_grade_active and current_semester == selected_semester %}
     <div class="alert alert-info">
-      Ocena zajęć jest obecnie aktywna. Przesłane ankiety mogą być modyfikowane przez studentów.
+      Ocena zajęć jest obecnie aktywna. Przesłane ankiety nadal mogą być modyfikowane przez studentów.
     </div>
     {% endif %}
-    {{ selected_semester }}
+    {% if results %}
+    {% for question, answers in results.items %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ question }}</h5>
+        <p class="card-text">
+          {% for answer in answers %}
+          {{ answer }}
+          {% endfor %}
+        </p>
+      </div>
+      <div class="card-footer text-muted">
+        Udzielonych odpowiedzi: {{ answers|length }}
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 
   </div>
   <div class="col-lg-4 col-12">
@@ -27,23 +45,29 @@
         {% if semester.id == selected_semester.id  %}selected{% endif %}>{{ semester }}</option>
       {% endfor %}
     </select>
-    {% for group_name, entries in submissions.items %}
-    <div class="card mb-3">
-      <div class="card-header">
-        {{ group_name }}
+    <div class="accordion" id="course-sections">
+      {% for group_name, entries in polls.items %}
+      {% with index=iterator|next %}
+      <div class="card">
+        <div class="card-header" style="cursor: pointer;" id="course-section-{{ index }}-heading" data-toggle="collapse"
+          data-target="#course-section-{{ index }}" aria-expanded="false" aria-controls="course-section-{{ index }}">
+          {{ group_name }}
+        </div>
+        <div class="border-top collapse list-group list-group-flush" id="course-section-{{ index }}"
+          aria-labelledby="course-section-{{ index }}-heading">
+          {% for entry in entries %}
+          <a href="{% url 'grade-poll-results' semester_id=selected_semester.id poll_id=entry.id %}"
+            class="list-group-item list-group-item-action">{{ entry.subcategory }}</a>
+          {% endfor %}
+        </div>
       </div>
-      <div class="list-group list-group-flush">
-        {% for entry in entries %}
-        <a href="{% url 'grade-poll-results' semester_id=selected_semester.id %}"
-          class="list-group-item list-group-item-action">{{ entry }}</a>
-        {% endfor %}
+      {% endwith %}
+      {% empty %}
+      <div class="alert alert-info">
+        Brak przesłanych ankiet w wybranym semestrze.
       </div>
+      {% endfor %}
     </div>
-    {% empty %}
-    <div class="alert alert-info">
-      Brak przesłanych ankiet w wybranym semestrze.
-    </div>
-    {% endfor %}
   </div>
 </div>
 {% endblock %}

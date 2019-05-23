@@ -1,5 +1,6 @@
 import itertools
-from json import JSONDecodeError
+import json
+from collections import defaultdict
 
 from django.contrib import messages
 from django.shortcuts import redirect, render, reverse
@@ -9,13 +10,15 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.utils import (
     SubmissionWithStatus,
     check_grade_status,
+    group,
     group_submissions,
     group_submissions_with_statuses,
 )
 from apps.grade.ticket_create.models import SigningKey
 from apps.users.models import BaseUser
+
 from .forms import SubmissionEntryForm, TicketsEntryForm
-from .models import Submission
+from .models import Poll, Submission
 
 
 class TicketsEntry(TemplateView):
@@ -44,7 +47,7 @@ class TicketsEntry(TemplateView):
             tickets = form.cleaned_data["tickets"]
             try:
                 correct_polls, failed_polls = SigningKey.parse_raw_tickets(tickets)
-            except JSONDecodeError:
+            except json.JSONDecodeError:
                 messages.error(
                     request, "Wprowadzone klucze nie są w poprawnym formacie."
                 )
@@ -166,13 +169,35 @@ class PollResults(TemplateView):
 
     template_name = "grade/poll/results.html"
 
-    def get(self, request, semester_id=None):
+    @staticmethod
+    def __present_results(submissions):
+        # TODO: Reorganize the nested structure
+        output = defaultdict(list)
+
+        for submission in submissions:
+            answers = submission.answers
+            if "schema" in answers:
+                for entry in answers["schema"]:
+                    if entry["answer"]:
+                        output[entry["question"]].append(entry["answer"])
+
+        return dict(output)
+
+    def get(self, request, semester_id=None, poll_id=None, submission_id=None):
         is_grade_active = check_grade_status()
         if semester_id is None:
             semester_id = Semester.get_current_semester().id
         current_semester = Semester.get_current_semester()
         selected_semester = Semester.objects.filter(pk=semester_id).get()
-        submissions = Submission.get_all(user=request.user, semester=selected_semester)
+
+        if poll_id is not None:
+            submissions = Submission.objects.filter(poll=poll_id, submitted=True)
+        else:
+            submissions = []
+
+        polls = Poll.get_all_polls_for_semester(
+            user=request.user, semester=selected_semester
+        )
         semesters = Semester.objects.all()
 
         if request.user.is_superuser or BaseUser.is_employee(request.user):
@@ -181,10 +206,12 @@ class PollResults(TemplateView):
                 self.template_name,
                 {
                     "is_grade_active": is_grade_active,
-                    "submissions": group_submissions(submissions),
+                    "polls": group(entries=polls, sort=True),
+                    "results": self.__present_results(submissions),
                     "semesters": semesters,
                     "current_semester": current_semester,
                     "selected_semester": selected_semester,
+                    "iterator": itertools.count(),
                 },
             )
 

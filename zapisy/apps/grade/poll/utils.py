@@ -84,3 +84,30 @@ def group_submissions(submissions: List[Submission]) -> dict:
     grouped_submissions = dict(sorted(grouped_submissions.items()))
 
     return grouped_submissions
+
+
+def group(entries: List[Poll], sort=False) -> dict:
+    """Groups a list of polls/submissions into a dictionary of nested
+    categories and original entries.
+
+    This method is structuring data that allows for easy displaying
+    handly tables in views such as the one responsible for summarizing
+    the results of students' submissions.
+    """
+    grouped_entries = defaultdict(list)
+    output = defaultdict(list)
+
+    for entry in entries:
+        category = entry.category
+        subcategory = entry.subcategory
+        if subcategory not in grouped_entries[category]:
+            if entry.semester:  # whether the entry is a general poll
+                output[category].append(entry)
+            grouped_entries[category].append(entry)
+
+    if sort:
+        grouped_entries = sorted(grouped_entries.items())
+
+    output.update(grouped_entries)
+
+    return dict(output)
