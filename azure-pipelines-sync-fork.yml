@@ -6,6 +6,11 @@ steps:
   persistCredentials: true
 
 - bash: |
+    git config --global user.email "$(gitUserEmail)"
+    git config --global user.name "$(gitUserName)"
+  displayName: Set identity
+
+- bash: |
     git checkout $(zapisyRepositoryBranch)
     git remote add zapisy $(zapisyRepositoryURL)
     git pull zapisy $(zapisyRepositoryBranch)
