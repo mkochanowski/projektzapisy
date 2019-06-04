@@ -15,8 +15,8 @@
 {% endblock bread %}
 
 {% block all-content %}
-    <h1>Podsumowanie głosowania</h1> 
-    {% regroup proposals|dictsort:"proposal__semester" by proposal__semester as proposals_per_semester %}
+    <h1>Podsumowanie głosowania</h1>
+    {% regroup proposals|dictsort:"semester" by semester as proposals_per_semester %}
     {% for semester, proposals_in_semester in proposals_per_semester %}
         <h2>Semestr {{ semester|semester_display }}</h2>
         <table class="table table-striped sortable">
@@ -31,10 +31,10 @@
             <tbody>
                 {% for proposal in proposals_in_semester %}
                 <tr>
-                    <td><a href="{% url 'offer-page' slug=proposal.proposal__slug %}">{{ proposal.proposal__name }}</a></td>
+                    <td><a href="{% url 'offer-page' slug=proposal.slug %}">{{ proposal.name }}</a></td>
                     <td class="text-center">{{ proposal.total }}</td>
                     <td class="text-center">{{ proposal.count }}</td>
-                    <td><a href="{% url 'proposal-vote-summary' slug=proposal.proposal__slug %}">lista</a></td>
+                    <td><a href="{% url 'proposal-vote-summary' slug=proposal.slug %}">lista</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

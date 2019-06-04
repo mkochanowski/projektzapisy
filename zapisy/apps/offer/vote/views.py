@@ -4,7 +4,7 @@ from django.db import models
 from django.shortcuts import redirect, render, get_object_or_404
 
 from apps.enrollment.courses.models import Semester
-from apps.offer.proposal.models import Proposal
+from apps.offer.proposal.models import Proposal, ProposalStatus
 from apps.offer.vote.models import SingleVote, SystemState
 from apps.users.decorators import student_required
 
@@ -89,13 +89,20 @@ def vote_summary(request):
         messages.warning(request, "Głosowanie nie jest w tym momencie aktywne.")
         return redirect('/')
 
-    votes_sum_agg = models.Sum('true_val')
-    votes_count_agg = models.Count('id')
+    # Sum all the vote true values for proposal. This is the same as
+    # `true_val()` in SingleVote manager or SingleVote.val property.
+    votes_sum_agg = models.Sum(models.Case(
+        models.When(singlevote__correction=0, then='singlevote__value'),
+        default='singlevote__correction'
+    ), filter=models.Q(singlevote__state=state))
+    # Count all the non-zero votes for the proposal.
+    votes_count_agg = models.Count(
+        'singlevote__id',
+        filter=models.Q(singlevote__state=state) &
+        ~models.Q(singlevote__value=0, singlevote__correction=0),
+        distinct=True)
 
-    proposals = SingleVote.objects.filter(
-        state=state).in_vote().meaningful().true_val().order_by('proposal').values(
-            'proposal', 'proposal__name', 'proposal__slug', 'proposal__semester')
-
+    proposals = Proposal.objects.filter(status=ProposalStatus.IN_VOTE)
     proposals = proposals.annotate(total=votes_sum_agg).annotate(count=votes_count_agg)
 
     return render(request, 'vote/summary.html', {
