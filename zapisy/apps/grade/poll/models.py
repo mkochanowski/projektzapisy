@@ -1,7 +1,7 @@
 import json
 import os.path
-from typing import Union, Set, List
 
+from typing import Union, Set, List
 from choicesenum import ChoicesEnum
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -60,6 +60,10 @@ class Poll(models.Model):
         if self.course:
             return PollType.EXAM
         return PollType.GENERAL
+
+    @property
+    def number_of_submissions(self):
+        return Submission.objects.filter(poll=self.pk, submitted=True).count()
 
     @property
     def get_semester(self):
@@ -166,7 +170,6 @@ class Poll(models.Model):
 
         return polls
 
-
     @staticmethod
     def get_all_polls_for_semester(user, semester: Semester = None) -> Set:
         current_semester = semester
@@ -174,20 +177,31 @@ class Poll(models.Model):
             current_semester = Semester.get_current_semester()
 
         polls = set()
-        poll_for_semester = Poll.objects.filter(semester=current_semester).first()
-        polls.add(poll_for_semester)
-        
-        if user.is_superuser:
-            polls_for_courses = Poll.objects.filter(course__semester=current_semester)
-        elif BaseUser.is_employee(user):
-            polls_for_courses = Poll.objects.filter(course__semester=current_semester, course__entity__owner=user.employee)
-        polls.update(polls_for_courses)
+        is_superuser = user.is_superuser
+        is_employee = BaseUser.is_employee(user)
 
-        if user.is_superuser:
-            polls_for_groups = Poll.objects.filter(group__course__semester=current_semester)
-        elif BaseUser.is_employee(user):
-            polls_for_groups = Poll.objects.filter(group__course__semester=current_semester, group__teacher=user.employee)
-        polls.update(polls_for_groups)
+        if is_superuser or is_employee:
+            poll_for_semester = Poll.objects.filter(semester=current_semester).first()
+            polls.add(poll_for_semester)
+
+            if is_superuser:
+                polls_for_courses = Poll.objects.filter(
+                    course__semester=current_semester
+                )
+                polls_for_groups = Poll.objects.filter(
+                    group__course__semester=current_semester
+                )
+            elif is_employee:
+                polls_for_courses = Poll.objects.filter(
+                    course__semester=current_semester,
+                    course__entity__owner=user.employee,
+                )
+                polls_for_groups = Poll.objects.filter(
+                    group__course__semester=current_semester,
+                    group__teacher=user.employee,
+                )
+            polls.update(polls_for_courses)
+            polls.update(polls_for_groups)
 
         return polls
 
@@ -242,7 +256,6 @@ class Schema(models.Model):
                 os.path.dirname(os.path.abspath(__file__)), "assets/default_schema.json"
             )
         with open(schema_path, "r") as schema_file:
-            # TODO: Decide whether it is the right way of fetching schemas from file
             schema = json.load(schema_file)
 
             # For the purposes of compatibility with old GroupType tuple
@@ -275,16 +288,6 @@ class Schema(models.Model):
 
         return schema
 
-    @staticmethod
-    def get_default_value_for_question_type(question_type):
-        """Retrieves a default value for a question type.
-
-        :param question_type: a type defined in schema object.
-        :returns: a default value for a given question type.
-        """
-        # TODO: Possibly remove.
-        return ""
-
     def get_schema_with_default_answers(self):
         """Fetches the Submission's schema and populates it with
             default answers.
@@ -292,16 +295,14 @@ class Schema(models.Model):
         :returns: a schema with additional `answer` keys.
         """
         if (
-            self.questions and
-            "version" in self.questions and
-            self.questions["version"] == 1 and
-            "schema" in self.questions
+            self.questions
+            and "version" in self.questions
+            and self.questions["version"] == 1
+            and "schema" in self.questions
         ):
             updated_schema_entries = []
             for entry in self.questions["schema"]:
-                entry["answer"] = self.get_default_value_for_question_type(
-                    entry["type"]
-                )
+                entry["answer"] = ""
                 updated_schema_entries.append(entry)
 
             return {
@@ -327,7 +328,7 @@ class Submission(models.Model):
     """
 
     schema = models.ForeignKey(Schema, on_delete=models.DO_NOTHING, null=True)
-    poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING, null=True)
+    poll = models.ForeignKey(Poll,  on_delete=models.DO_NOTHING, null=True)
     answers = JSONField(default=dict)
     ticket = models.TextField(unique=True)
     submitted = models.BooleanField(default=False)

@@ -7,7 +7,11 @@ from django.shortcuts import redirect, render, reverse
 from django.views.generic import TemplateView, UpdateView, View
 
 from apps.enrollment.courses.models.semester import Semester
+from apps.grade.poll.forms import SubmissionEntryForm, TicketsEntryForm
+from apps.grade.poll.models import Poll, Submission
 from apps.grade.poll.utils import (
+    PollSummarizedResults,
+    PollSummarizedResultsEntry,
     SubmissionWithStatus,
     check_grade_status,
     group,
@@ -16,9 +20,6 @@ from apps.grade.poll.utils import (
 )
 from apps.grade.ticket_create.models import SigningKey
 from apps.users.models import BaseUser
-
-from .forms import SubmissionEntryForm, TicketsEntryForm
-from .models import Poll, Submission
 
 
 class TicketsEntry(TemplateView):
@@ -170,34 +171,67 @@ class PollResults(TemplateView):
     template_name = "grade/poll/results.html"
 
     @staticmethod
-    def __present_results(submissions):
-        # TODO: Reorganize the nested structure
-        output = defaultdict(list)
+    def __get_counter_for_categories(polls):
+        number_of_submissions_for_category = defaultdict(int)
+
+        for poll in polls:
+            number_of_submissions_for_category[
+                poll.category
+            ] += poll.number_of_submissions
+
+        return number_of_submissions_for_category
+
+    @staticmethod
+    def __get_processed_results(submissions):
+        poll_results = PollSummarizedResults(
+            display_answers_count=True, display_plots=True
+        )
 
         for submission in submissions:
-            answers = submission.answers
-            if "schema" in answers:
-                for entry in answers["schema"]:
-                    if entry["answer"]:
-                        output[entry["question"]].append(entry["answer"])
+            if "schema" in submission.answers:
+                for entry in submission.answers["schema"]:
+                    choices = None
+                    if "choices" in entry:
+                        choices = entry["choices"]
+                    poll_results.add_entry(
+                        question=entry["question"],
+                        field_type=entry["type"],
+                        answer=entry["answer"],
+                        choices=choices,
+                    )
 
-        return dict(output)
+        return poll_results
 
     def get(self, request, semester_id=None, poll_id=None, submission_id=None):
+        """Controls the main logic of passing the data to the template 
+        responsible for presenting the results of the poll.
+        
+        :param semester_id: if given, fetches polls from requested semester.
+        :param poll_id: if given, displays summary for a given poll.
+        :param submission_id: if given, displays detailed submission view.
+        """
         is_grade_active = check_grade_status()
         if semester_id is None:
             semester_id = Semester.get_current_semester().id
         current_semester = Semester.get_current_semester()
         selected_semester = Semester.objects.filter(pk=semester_id).get()
 
+        available_polls = Poll.get_all_polls_for_semester(
+            user=request.user, semester=selected_semester
+        )
+        current_poll = Poll.objects.filter(id=poll_id).first()
         if poll_id is not None:
             submissions = Submission.objects.filter(poll=poll_id, submitted=True)
+            if current_poll not in available_polls:
+                # User does not have permission to view details about
+                # the selected poll
+                messages.error(
+                    request, "Nie masz uprawnień do wyświetlenia tej ankiety."
+                )
+                return redirect("grade-poll-results", semester_id=semester_id)
         else:
             submissions = []
 
-        polls = Poll.get_all_polls_for_semester(
-            user=request.user, semester=selected_semester
-        )
         semesters = Semester.objects.all()
 
         if request.user.is_superuser or BaseUser.is_employee(request.user):
@@ -206,15 +240,22 @@ class PollResults(TemplateView):
                 self.template_name,
                 {
                     "is_grade_active": is_grade_active,
-                    "polls": group(entries=polls, sort=True),
-                    "results": self.__present_results(submissions),
+                    "polls": group(entries=available_polls, sort=True),
+                    "results": self.__get_processed_results(submissions),
+                    "results_iterator": itertools.count(),
                     "semesters": semesters,
                     "current_semester": current_semester,
+                    "current_poll_id": poll_id,
+                    "current_poll": current_poll,
                     "selected_semester": selected_semester,
+                    "submissions_count": self.__get_counter_for_categories(
+                        available_polls
+                    ),
                     "iterator": itertools.count(),
                 },
             )
 
+        messages.error(request, "Nie masz uprawnień do wyświetlania wyników oceny.")
         return redirect("grade-main")
 
 
