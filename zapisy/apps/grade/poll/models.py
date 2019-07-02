@@ -1,11 +1,12 @@
 import json
 import os.path
 
-from typing import Union, Set, List
+from typing import List, Set, Union
 from choicesenum import ChoicesEnum
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+from apps.cache_utils import cache_result, cache_result_for
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.semester import Semester
@@ -53,6 +54,7 @@ class Poll(models.Model):
         verbose_name_plural = "ankiety"
 
     @property
+    @cache_result
     def type(self) -> Union[PollType, "CourseGroupType"]:
         """Determines the PollType by checking foreign keys references"""
         if self.group:
@@ -62,10 +64,12 @@ class Poll(models.Model):
         return PollType.GENERAL
 
     @property
+    @cache_result
     def number_of_submissions(self):
         return Submission.objects.filter(poll=self.pk, submitted=True).count()
 
     @property
+    @cache_result
     def get_semester(self):
         """Determines the semester of the poll"""
         if self.semester:
@@ -91,6 +95,7 @@ class Poll(models.Model):
         return "Ankieta ogólna"
 
     @property
+    @cache_result
     def category(self) -> str:
         """Determines a category for a Poll.
 
@@ -104,6 +109,7 @@ class Poll(models.Model):
             return "Ankiety ogólne"
 
     @property
+    @cache_result
     def subcategory(self) -> str:
         """Determines a subcategory for a Poll.
 
@@ -111,6 +117,7 @@ class Poll(models.Model):
         """
         return self.__str__()
 
+    @cache_result_for(60 * 60)
     def serialize_for_signing_protocol(self) -> dict:
         """Serializes the Poll to the format accepted by TicketCreate.
 
@@ -128,7 +135,7 @@ class Poll(models.Model):
         if self.group:
             if not records_models.Record.is_enrolled(student.id, self.group_id):
                 return False
-        # TODO: if self.course
+        # TODO: if self.course (?)
         return True
 
     @staticmethod
@@ -150,7 +157,9 @@ class Poll(models.Model):
 
         # Retrieves only the groups that the Student is enrolled in
         records = records_models.Record.objects.filter(
-            student=student, status=records_models.RecordStatus.ENROLLED
+            student=student,
+            status=records_models.RecordStatus.ENROLLED,
+            group__course__semester=current_semester,
         ).select_related("group")
 
         for record in records:
@@ -171,6 +180,7 @@ class Poll(models.Model):
         return polls
 
     @staticmethod
+    @cache_result
     def get_all_polls_for_semester(user, semester: Semester = None) -> Set:
         current_semester = semester
         if current_semester is None:
@@ -295,10 +305,10 @@ class Schema(models.Model):
         :returns: a schema with additional `answer` keys.
         """
         if (
-            self.questions
-            and "version" in self.questions
-            and self.questions["version"] == 1
-            and "schema" in self.questions
+            self.questions and
+            "version" in self.questions and
+            self.questions["version"] == 1 and
+            "schema" in self.questions
         ):
             updated_schema_entries = []
             for entry in self.questions["schema"]:
@@ -328,7 +338,7 @@ class Submission(models.Model):
     """
 
     schema = models.ForeignKey(Schema, on_delete=models.DO_NOTHING, null=True)
-    poll = models.ForeignKey(Poll,  on_delete=models.DO_NOTHING, null=True)
+    poll = models.ForeignKey(Poll, on_delete=models.DO_NOTHING, null=True)
     answers = JSONField(default=dict)
     ticket = models.TextField(unique=True)
     submitted = models.BooleanField(default=False)
@@ -343,10 +353,12 @@ class Submission(models.Model):
         return str(self.poll)
 
     @property
+    @cache_result
     def category(self) -> str:
         return self.poll.category
 
     @property
+    @cache_result
     def subcategory(self) -> str:
         return self.__str__()
 
@@ -370,6 +382,7 @@ class Submission(models.Model):
         return submission
 
     @classmethod
+    @cache_result
     def get_all_submissions_for_course(cls, course: Course) -> Set:
         """Lists all submissions tied to a given course.
 
@@ -378,6 +391,9 @@ class Submission(models.Model):
 
         :returns: a list of submissions.
         """
+        cache_name = f"Submission.get_all_submissions_for_course({course.pk})"
+        print(cache_name)
+
         submissions = set()
         submissions_for_course = cls.objects.filter(poll__course=course, submitted=True)
         if submissions_for_course:
@@ -398,6 +414,7 @@ class Submission(models.Model):
         return submissions
 
     @classmethod
+    @cache_result
     def get_all(cls, user, semester=None) -> Set:
         """Lists all submissions that the given user has access to.
 
@@ -412,6 +429,9 @@ class Submission(models.Model):
         submissions = set()
         if not semester:
             semester = Semester.get_current_semester()
+
+        cache_name = f"Submission.get_all({user.pk}, {semester.pk})"
+        print(cache_name)
 
         if BaseUser.is_employee(user) or user.is_superuser:
             if user.is_superuser:

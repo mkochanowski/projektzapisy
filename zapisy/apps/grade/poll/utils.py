@@ -120,7 +120,7 @@ def group(entries: List[Poll], sort=False) -> dict:
 
 class PollSummarizedResultsEntry:
     """A single entry in a summary view for a Poll.
-    
+
     Contains a question, answers and possible choices (if defined).
     Allows for easy plotting the provided data.
     """
@@ -134,17 +134,17 @@ class PollSummarizedResultsEntry:
 
     @property
     def field_choices(self):
-        """Lists all possible answers that could be selected for 
+        """Lists all possible answers that could be selected for
         radio fields."""
         if self.field_type == "radio":
             return self._choices
         return []
 
     def add_answer(self, answer):
-        """Adds an answer to the container. 
-        
-        If the field_type of the entry is set to `radio`, the answer 
-        will be counted if and only if it is present in the set of 
+        """Adds an answer to the container.
+
+        If the field_type of the entry is set to `radio`, the answer
+        will be counted if and only if it is present in the set of
         predefined choices.
         """
         if self.field_type == "radio" and answer in self._choices:
@@ -159,7 +159,7 @@ class PollSummarizedResultsEntry:
     @property
     def plot(self):
         """Generates an embeddable plot.
-       
+
         https://bokeh.pydata.org/en/latest/docs/user_guide/embed.html#components
 
         :returns: a tuple of (javascript code, html code) that can be
@@ -189,9 +189,9 @@ class PollSummarizedResultsEntry:
 
 
 class PollSummarizedResults:
-    """Acts as a container for all sections (entries) in the summary 
+    """Acts as a container for all sections (entries) in the summary
     results view of the Poll.
-    
+
     A single section is also a self-contained entry, defined by
     the `PollSummarizedResultsEntry` class.
     """

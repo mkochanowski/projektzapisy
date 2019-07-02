@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render, reverse
 from django.views.generic import TemplateView, UpdateView, View
 
+from apps.cache_utils import cache_result, cache_result_for
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.forms import SubmissionEntryForm, TicketsEntryForm
 from apps.grade.poll.models import Poll, Submission
@@ -171,17 +172,20 @@ class PollResults(TemplateView):
     template_name = "grade/poll/results.html"
 
     @staticmethod
+    @cache_result
     def __get_counter_for_categories(polls):
         number_of_submissions_for_category = defaultdict(int)
 
         for poll in polls:
-            number_of_submissions_for_category[
-                poll.category
-            ] += poll.number_of_submissions
+            if poll:
+                number_of_submissions_for_category[
+                    poll.category
+                ] += poll.number_of_submissions
 
         return number_of_submissions_for_category
 
     @staticmethod
+    @cache_result
     def __get_processed_results(submissions):
         poll_results = PollSummarizedResults(
             display_answers_count=True, display_plots=True
@@ -203,9 +207,9 @@ class PollResults(TemplateView):
         return poll_results
 
     def get(self, request, semester_id=None, poll_id=None, submission_id=None):
-        """Controls the main logic of passing the data to the template 
+        """Controls the main logic of passing the data to the template
         responsible for presenting the results of the poll.
-        
+
         :param semester_id: if given, fetches polls from requested semester.
         :param poll_id: if given, displays summary for a given poll.
         :param submission_id: if given, displays detailed submission view.
