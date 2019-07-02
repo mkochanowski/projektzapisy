@@ -1,5 +1,6 @@
 {% extends "grade/base.html" %}
-{% load render_bundle from webpack_loader %}
+{% load cache %}
+{% load render_bundle get_files from webpack_loader %}
 {% load filters %}
 
 {% block main-subtitle %}Wyniki oceny{% endblock %}
@@ -12,10 +13,10 @@
 
 {% block all-content %}
 
-{# If someone can fix the webpack loader to correctly support this package -
-please do so. #}
-{% render_bundle 'poll-bokeh-plotting' 'css' %}
-<link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-1.2.0.min.css" type="text/css" />
+{% render_bundle 'poll-bokeh-plotting' %}
+{% comment %}
+If someone has any idea how the webpack loader can be forced to correctly support this package - please provide some insight.
+{% endcomment %}
 <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-1.2.0.min.js"></script>
 
 <div class="row">
@@ -54,7 +55,13 @@ please do so. #}
       {% endif %}
     </div>
     {% empty %}
-    <div class="mb-3">Nie została wypełniona żadna ankieta.</div>
+    <div class="mb-3">
+      {% if current_poll %}
+      Nie została wypełniona żadna ankieta.
+      {% else %}
+      Nie wybrano żadnej grupy.
+      {% endif %}
+    </div>
     {% endfor %}
     {% endif %}
 
@@ -67,6 +74,7 @@ please do so. #}
         {% if semester.id == selected_semester.id  %}selected{% endif %}>{{ semester }}</option>
       {% endfor %}
     </select>
+    {% cache 500 sidebar request.user.pk %}
     <div class="accordion" id="course-sections">
       {% for group_name, entries in polls.items %}
       {% with index=iterator|next %}
@@ -113,6 +121,7 @@ please do so. #}
       </div>
       {% endfor %}
     </div>
+    {% endcache %}
   </div>
 </div>
 {% endblock %}

@@ -1,1 +1,1 @@
-import "bokehjs";
+import * as Bokeh from "bokehjs";
