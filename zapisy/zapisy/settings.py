@@ -1,7 +1,6 @@
 import os
 import logging
 import environ
-
 from django.contrib.messages import constants as messages
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -56,6 +55,13 @@ RQ_QUEUES = {
         'DB': 0,
         'PASSWORD': '',
         'DEFAULT_TIMEOUT': 360,
+        'ASYNC': RUN_ASYNC,
+    },
+    'dispatch-notifications': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'ASYNC': RUN_ASYNC,
     },
 }
 

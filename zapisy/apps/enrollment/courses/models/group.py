@@ -9,7 +9,9 @@ from django.db import models, transaction
 from django.urls import reverse
 
 from apps.enrollment.courses.models.course import Course
+from apps.notifications.custom_signals import teacher_changed
 from apps.users.models import Employee
+
 
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseGroup.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
@@ -102,7 +104,7 @@ class Group(models.Model):
             '8': 'Zajęcia sportowe',
             '10': 'Projekt',
         }
-        return types[self.type]
+        return types[str(self.type)]
 
     def get_terms_as_string(self):
         return ",".join(["%s %s-%s" % (x.get_dayOfWeek_display(),
@@ -180,3 +182,11 @@ class Group(models.Model):
         """
         group_query = cls.objects.filter(course_id=course_id, type=Group.GROUP_TYPE_LECTURE)
         return list(group_query)
+
+    def save(self, *args, **kwargs):
+        """Overloaded save method - during save check changes and send signals to notifications app"""
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        super(Group, self).save(*args, **kwargs)
+        if old:
+            if old.teacher != self.teacher:
+                teacher_changed.send(sender=self.__class__, instance=self, teacher=self.teacher)

@@ -1,13 +1,14 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
+# Urls: "get", "count", "delete" and "delete/all"
+# are in charge of manage notifications in Widget.vue
+
+app_name = "notifications"
 urlpatterns = [
-    url(r'^notifications/save$', views.save, name='save'),
-    url(r'^notifications$', views.index, name='index'),
-    url(r'^notifications/vote_start$', views.vote_start,
-        name='vote_start'),
-    url(r'^notifications/grade_start$', views.grade_start,
-        name='grade_start'),
-    url(r'^notifications/enrollment_limit$', views.enrollment_limit,
-        name='enrollment_limit'),
+    path('get', views.get_notifications, name='get_notifications'),
+    path('count', views.get_counter, name='get_counter'),
+    path('delete', views.delete_one, name='delete-one-notification'),
+    path('delete/all', views.delete_all, name='delete-all-notifications'),
+    path('preferences/save', views.preferences_save, name='preferences-save'),
 ]
