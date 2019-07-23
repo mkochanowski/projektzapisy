@@ -47,6 +47,7 @@ from datetime import datetime
 from typing import Dict, Iterable, List, Optional, Set
 
 from choicesenum import ChoicesEnum
+from enum import Enum
 from django.contrib.auth.models import User
 from django.db import DatabaseError, models, transaction
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -55,6 +56,7 @@ from apps.enrollment.courses.models import Course, Group, StudentPointsView, Sem
 from apps.enrollment.records.models.opening_times import GroupOpeningTimes
 from apps.enrollment.records.signals import GROUP_CHANGE_SIGNAL
 from apps.users.models import BaseUser, Student
+from apps.notifications.custom_signals import student_pulled, student_not_pulled
 
 LOGGER = logging.getLogger(__name__)
 
@@ -64,6 +66,13 @@ class RecordStatus(ChoicesEnum):
     QUEUED = '0'
     ENROLLED = '1'
     REMOVED = '2'
+
+
+class EnrollStatus(Enum):
+    SUCCESS = True
+    ECTS_ERR = 'ects'
+    NOT_QUEUED_ERR = 'not_queued'
+    OTHER_ERROR = False
 
 
 class Record(models.Model):
@@ -84,13 +93,15 @@ class Record(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     @staticmethod
-    def can_enqueue(student: Optional[Student], group: Group, time: datetime = None) -> bool:
+    def can_enqueue(student: Optional[Student], group: Group, time: datetime = None) -> EnrollStatus:
         """Checks if the student can join the queue of the group.
 
-        Will return False if student is None. The function will not check if the
-        student already belongs to the queue.
+        Will return EnrollStatus.NOT_QUEUED_ERR if student is None.
+        The function will not check if the student already belongs to the queue.
         """
-        return Record.can_enqueue_groups(student, [group], time)[group.pk]
+        if Record.can_enqueue_groups(student, [group], time)[group.pk]:
+            return EnrollStatus.SUCCESS
+        return EnrollStatus.NOT_QUEUED_ERR
 
     @staticmethod
     def can_enqueue_groups(student: Optional[Student], groups: List[Group],
@@ -118,28 +129,33 @@ class Record(models.Model):
         return ret
 
     @classmethod
-    def can_enroll(cls, student: Optional[Student], group: Group, time: datetime = None) -> bool:
+    def can_enroll(cls, student: Optional[Student], group: Group, time: datetime = None) -> EnrollStatus:
         """Checks if the student can join the queue of the group.
 
         At the point the function is purely cosmetic. Some conditions may be
-        added in future. Will return False if student is None. The function will
-        not check if the student is already enrolled into the group or present
-        in its queue.
+        added in future. The function will return:
+         - EnrollStatus.SUCCESS if everything is fine,
+         - EnrollStatus.OTHER_ERROR if student is None,
+         - EnrollStatus.NOT_QUEUED_ERR if function can_enqueue is not EnrollStatus.SUCCESS,
+         - EnrollStatus.ECTS_ERR if student exceed ECTS limit.
+
+        The function will not check if the student is already enrolled
+        into the group or present in its queue.
         """
         if time is None:
             time = datetime.now()
         if student is None:
-            return False
-        if not cls.can_enqueue(student, group, time):
-            return False
+            return EnrollStatus.OTHER_ERROR
+        if cls.can_enqueue(student, group, time) != EnrollStatus.SUCCESS:
+            return EnrollStatus.NOT_QUEUED_ERR
         # Check if enrolling would not make the student exceed the current ECTS
         # limit.
         semester: Semester = group.course.semester
         points = StudentPointsView.student_points_in_semester(
             student, semester, [group.course])
         if points > semester.get_current_limit(time):
-            return False
-        return True
+            return EnrollStatus.ECTS_ERR
+        return EnrollStatus.SUCCESS
 
     @staticmethod
     def can_dequeue(student: Optional[Student], group: Group, time: datetime = None) -> bool:
@@ -470,14 +486,26 @@ class Record(models.Model):
                     if not is_enrolled_into_any_lecture_group:
                         self.status = RecordStatus.REMOVED
                         self.save()
+                        # Send notification to user
+                        student_not_pulled.send_robust(sender=self.__class__,
+                                                       instance=self.group,
+                                                       user=self.student.user,
+                                                       reason='brak możliwości zapisu do grupy wykładowej')
                         LOGGER.info(("Student %s not enrolled into group %s because "
                                      "he is not in any lecture group"), self.student, group)
                         return []
 
             # Check if he can be enrolled at all.
-            if not self.can_enroll(self.student, group):
+            can_enroll_status = self.can_enroll(self.student, group)
+            if can_enroll_status != EnrollStatus.SUCCESS:
                 self.status = RecordStatus.REMOVED
                 self.save()
+
+                #Send notifications
+                if can_enroll_status == EnrollStatus.ECTS_ERR:
+                    student_not_pulled.send_robust(sender=self.__class__, instance=self.group,
+                                                   user=self.student.user, reason='przekroczenie limitu ECTS')
+
                 return []
             # Remove him from all parallel groups (and queues of lower
             # priority). These groups need to be afterwards pulled into
@@ -495,4 +523,6 @@ class Record(models.Model):
             other_groups_query.update(status=RecordStatus.REMOVED)
             self.status = RecordStatus.ENROLLED
             self.save()
+            # Send notification to user
+            student_pulled.send_robust(sender=self.__class__, instance=self.group, user=self.student.user)
             return other_groups_query_list

@@ -28,16 +28,17 @@ from apps.enrollment.courses.models import Group, Semester, StudentPointsView
 from apps.enrollment.records.models import Record, RecordStatus, GroupOpeningTimes, T0Times
 from apps.enrollment.timetable.views import build_group_list
 from apps.enrollment.utils import mailto
+from apps.notifications.views import create_form
 from apps.users.decorators import external_contractor_forbidden
 from apps.grade.ticket_create.models.student_graded import StudentGraded
-from apps.notifications.forms import NotificationFormset
-from apps.notifications.models import NotificationPreferences
+
 from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
 from apps.users.models import Employee, Student, BaseUser, PersonalDataConsent
 from apps.users.forms import EmailChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 from apps.users.exceptions import InvalidUserException
 from libs.ajax_messages import AjaxSuccessMessage
 from mailer.models import Message
+
 
 logger = logging.getLogger()
 
@@ -218,13 +219,9 @@ def my_profile(request):
     consultations).
     """
     semester = Semester.objects.get_next()
-    notifications = NotificationFormset(
-        queryset=NotificationPreferences.objects.create_and_get(request.user)
-    )
 
     data = {
         'semester': semester,
-        'notifications': notifications,
     }
 
     if BaseUser.is_employee(request.user):
@@ -264,6 +261,11 @@ def my_profile(request):
             'semesters_participated_in_grade': semesters_participated_in_grade,
             'current_semester_ects': current_semester_ects,
         })
+
+    notifications_form = create_form(request)
+    data.update({
+        'form': notifications_form,
+    })
 
     return render(request, 'users/my_profile.html', data)
 
