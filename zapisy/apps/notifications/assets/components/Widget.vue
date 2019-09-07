@@ -4,7 +4,7 @@ import Component from "vue-class-component";
 import axios, { AxiosProxyConfig, AxiosPromise } from 'axios';
 import moment from 'moment'
 
-interface NotificationsArray {
+interface Notifications {
     id: string;
     description: string;
     issued_on: string;
@@ -12,7 +12,7 @@ interface NotificationsArray {
 }
 
 interface NotificationsDict {
-    [key: string]: NotificationsArray;
+    [key: string]: Notifications;
 }
 
 interface ServerResponseDict {
@@ -33,18 +33,10 @@ interface ServerResponseCount {
 })
 export default class NotificationsComponent extends Vue{
 
-    n_counter: number|null = null;
     n_list: NotificationsDict = {};
 
-    getCount(): Promise<number> {
-        return axios.get('/notifications/count')
-        .then((result: ServerResponseCount) => {
-            return result.data
-        })
-    }
-
-    async updateCounter(): Promise<void>{
-        this.n_counter = await this.getCount();
+    get n_counter(): number {
+        return Object.keys(this.n_list).length;
     }
 
     getNotifications(): Promise<void> {
@@ -60,8 +52,7 @@ export default class NotificationsComponent extends Vue{
 
         return axios.post('/notifications/delete/all')
         .then((request: ServerResponseDict) => {
-            this.n_list = request.data
-            this.updateCounter();
+            this.n_list = request.data;
         })
     }
 
@@ -81,21 +72,13 @@ export default class NotificationsComponent extends Vue{
                 'Content-Type': 'multipart/form-data',
             }
         }).then((request: ServerResponseDict) => {
-            this.n_list = request.data
-            this.updateCounter();
+            this.n_list = request.data;
         })
     }
 
-    refresh(): void{
-        if(this.n_counter){}
-        else{
-            this.updateCounter();
-        }
-    }
-
     async created() {
-        await this.updateCounter()
-        setInterval(this.refresh, 2000);
+        this.getNotifications();
+        setInterval(this.getNotifications, 30000);
     }
 
 }
@@ -107,26 +90,28 @@ export default class NotificationsComponent extends Vue{
     <li id="notification-dropdown" class="nav-item dropdown">
         <a class="nav-link dropdown-toggle specialdropdown ml-1" href="#" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <div v-if="n_counter" @click="getNotifications()">
-                <i class="fas fa-bell fa-lg"></i>
+            <div v-if="n_counter !== 0">
+                <font-awesome-icon :icon="['fas', 'bell']" size="lg" />
+                <span class="counter-badge">{{ n_counter }}</span>
             </div>
             <div v-else>
-               <i class="far fa-bell fa-lg"></i>
+               <font-awesome-icon :icon="['far', 'bell']" size="lg" />
             </div>
         </a>
-        <div class="dropdown-menu dropdown-menu-right m-2 pb-2 pt-0">
-            <form class="p-2 place-for-notifications">
-                <div v-for="elem in n_list" :key="elem.key" class="toast fade show mw-100 mb-2">
+        <div class="dropdown-menu dropdown-menu-right">
+            <form class="p-1 place-for-notifications">
+                <div v-for="elem in n_list" :key="elem.key" class="toast mb-1 show">
                     <div class="toast-header">
                         <strong class="mr-auto"></strong>
-                        <small class="text-muted">{{ elem.issued_on|Moment }}</small>
-                        <button type="button" class="ml-2 mb-1 close" @click="deleteOne(elem.key)">
+                        <small class="text-muted mx-2">{{ elem.issued_on|Moment }}</small>
+                        <button type="button" class="close" @click="deleteOne(elem.key)">
                             &times;
                         </button>
                     </div>
-                    <div class="toast-body">
-                        <a :href="elem.target" class="text-body">{{ elem.description }}</a>
-                    </div>
+                    <a :href="elem.target" class="toast-link">
+                        <div class="toast-body text-body"
+                        v-html="elem.description"></div>
+                    </a>
                 </div>
             </form>
             <form>
@@ -143,12 +128,13 @@ export default class NotificationsComponent extends Vue{
 </div>
 </template>
 
-<style>
-
+<style lang="scss" scoped>
 /*  Modification of the bootstrap class .dropdown-menu
     for display notifications widget correctly.  */
 #notification-dropdown .dropdown-menu{
-    min-width: 350px;
+    @media (min-width: 992px) {
+        min-width: 350px;
+    }
     max-height: 500px;
     right: -160px;
 }
@@ -159,9 +145,35 @@ export default class NotificationsComponent extends Vue{
     content: none;
 }
 
+a.toast-link:hover {
+    text-decoration: none;
+    .toast-body {
+        background-color: var(--light);
+    }
+}
+
 .place-for-notifications{
     max-height: 395px;
     overflow-y: auto;
+}
+
+.counter-badge {
+    background-color: var(--pink);
+    border-radius: 2px;
+    color: white;
+    font-weight: bold;
+    
+    padding: 1px 3px;
+
+    // Bootstrap breakpoint at which the navbar is fully expanded.
+    @media (min-width: 992px) {
+        font-size: 10px;
+
+        position: absolute; /* Position the badge within the relatively positioned button */
+        top: 2px;
+        right: 2px;
+    }
+    margin-left: .25em;
 }
 
 </style>

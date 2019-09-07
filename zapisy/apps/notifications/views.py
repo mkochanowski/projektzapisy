@@ -1,32 +1,30 @@
 from datetime import datetime
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-
-from django.shortcuts import render
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from apps.notifications.forms import PreferencesFormStudent, PreferencesFormTeacher
 from apps.notifications.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
-from apps.notifications.repositories import get_notifications_repository, RedisNotificationsRepository
+from apps.notifications.repositories import get_notifications_repository
 from apps.notifications.utils import render_description
 from apps.users import views
 from apps.users.models import BaseUser
-from libs.ajax_messages import AjaxFailureMessage
 
 
 @login_required
 def get_notifications(request):
+    def trunc(text):
+        """Cuts text at 200 characters and adds dots if it was indeed longer."""
+        return text[:200] + (text[200:] and '...')
+
     DATE_TIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
-    now = datetime.now()
     repo = get_notifications_repository()
     notifications = [{
         'id': notification.id,
-        'description': render_description(notification.description_id, notification.description_args),
+        'description': trunc(
+            render_description(notification.description_id, notification.description_args)),
         'issued_on': notification.issued_on.strftime(DATE_TIME_FORMAT),
         'target': notification.target,
     } for notification in repo.get_all_for_user(request.user)]
@@ -36,14 +34,6 @@ def get_notifications(request):
         d.update({'key': i})
 
     return JsonResponse(notifications, safe=False)
-
-
-@login_required
-def get_counter(request):
-    repo = get_notifications_repository()
-    notification_counter = repo.get_count_for_user(request.user)
-
-    return JsonResponse(notification_counter, safe=False)
 
 
 @require_POST
@@ -78,10 +68,8 @@ def create_form(request):
 @require_POST
 def delete_all(request):
     """Removes all user's notifications"""
-
-    now = datetime.now()
     repo = get_notifications_repository()
-    repo.remove_all_older_than(request.user, now)
+    repo.remove_all(request.user)
 
     return get_notifications(request)
 
