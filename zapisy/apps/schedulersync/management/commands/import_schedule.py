@@ -34,30 +34,62 @@ LIMITS = {'1': 300, '9': 300, '2': 20, '3': 15, '5': 18, '6': 15, '10': 15}
 
 EMPLOYEE_MAP = {
     'PLISOWSKI': '258497',
-    'TELSNER': 'NN',
+    'PRATIKGHOSAL': '268909',
+    'AHOFFMANN': 'NN',
     'AMORAWIEC': 'NN',
     'AMALINOWSKI': 'NN',
-    'RSZWARC': 'NN',
-    'EDAMEK': 'NN',
-    'GPLEBANEK': 'NN',
     'ARACZYNSKI': 'NN',
+    'EDAMEK': 'NN',
+    'FINGO': 'NN',
     'GKARCH': 'NN',
+    'GPLEBANEK': 'NN',
+    'JDYMARA': 'NN',
+    'JDZIUBANSKI': 'NN',
+    'LNEWELSKI': 'NN',
+    'MDROFISZYN': 'NN',
+    'MPREISNER': 'NN',
+    'PKOWALSKI': 'NN',
+    'RSZWARC': 'NN',
     'SCYGAN': 'NN',
-    'JDZIUBANSKI': 'NN'
+    'TELSNER': 'NN',
+    'TRZEPECKI': 'NN',
+    'WHEBISCH': 'NN',
+    'NN1': 'NN'
 }
 
 COURSES_MAP = {
-    'PRAKTYKA ZAWODOWA - 3 TYGODNIE': 'PRAKTYKA ZAWODOWA - TRZY TYGODNIE',
-    'PRAKTYKA ZAWODOWA - 4 TYGODNIE': 'PRAKTYKA ZAWODOWA - CZTERY TYGODNIE',
-    'PRAKTYKA ZAWODOWA - 5 TYGODNI': 'PRAKTYKA ZAWODOWA - PIĘĆ TYGODNI',
-    'PRAKTYKA ZAWODOWA - 6 TYGODNI': 'PRAKTYKA ZAWODOWA - SZEŚĆ TYGODNI'
+    'MATEMATYKA DYSKRETNA L': 'MATEMATYKA DYSKRETNA (L)',
+    'MATEMATYKA DYSKRETNA M': 'MATEMATYKA DYSKRETNA (M)',
+    'OCHRONA WŁASNOŚCI INTELEKTUALNEJ (ZIMA)': 'OCHRONA WŁASNOŚCI INTELEKTUALNEJ',
+    'PROJEKT DYPLOMOWY (ZIMA)': 'PROJEKT DYPLOMOWY',
+    'PROJEKT: BUDOWA I ROZWÓJ ANALOGU ŁAZIKA MARSJAŃSKIEGO (ZIMA)': 'PROJEKT: BUDOWA I ROZWÓJ ANALOGU ŁAZIKA MARSJAŃSKIEGO',
+    'PROJEKT: ROZWÓJ SCHEDULERA (ZIMA)': 'PROJEKT: ROZWÓJ SCHEDULERA',
+    'PROJEKT: ROZWÓJ SYSTEMU ZAPISÓW (ZIMA)': 'PROJEKT: ROZWÓJ SYSTEMU ZAPISÓW',
+    'TUTORING DATA SCIENCE (ZIMA)': 'MENTORING FOR DATA SCIENCE',
+    'TUTORING INFORMATYKA (ZIMA)': 'TUTORING',
+    'TUTORING ISIM (ZIMA)': 'TUTORING ISIM',
+    'ANALIZA NUMERYCZNA L': 'ANALIZA NUMERYCZNA (L)',
+    'ANALIZA NUMERYCZNA M': 'ANALIZA NUMERYCZNA (M)',
+    'INNOVATIVE PROJECTS BY NOKIA (ZIMA)': 'INNOVATIVE PROJECTS BY NOKIA',
+    'PRAKTYKA ZAWODOWA 3 TYGODNIE': 'PRAKTYKA ZAWODOWA - TRZY TYGODNIE',
+    'PRAKTYKA ZAWODOWA 4 TYGODNIE': 'PRAKTYKA ZAWODOWA - CZTERY TYGODNIE',
+    'PRAKTYKA ZAWODOWA 5 TYGODNI': 'PRAKTYKA ZAWODOWA - PIĘĆ TYGODNI',
+    'PRAKTYKA ZAWODOWA 6 TYGODNI': 'PRAKTYKA ZAWODOWA - SZEŚĆ TYGODNI',
+    'KURS 1/2: ODZYSKIWANIE DANYCH': 'KURS-½: ODZYSKIWANIE DANYCH',
+    'SEMINARIUM: BEZPIECZEŃSTWO I OCHRONA INFORMACJI': 'PROSEMINARIUM: BEZPIECZEŃSTWO I OCHRONA INFORMACJI'
 }
 
 COURSES_DONT_IMPORT = [
+    'ANALIZA MATEMATYCZNA I',
+    'ANALIZA MATEMATYCZNA II',
+    'ANALIZA MATEMATYCZNA III',
+    'ALGEBRA 1',
     'ALGEBRA I',
+    'ALGEBRA II',
+    'ALGEBRA LINIOWA 1R',
     'ALGEBRA LINIOWA 2',
     'ALGEBRA LINIOWA 2R',
-    'ANALIZA MATEMATYCZNA II',
+    'MIARA I CAŁKA',
     'FUNKCJE ANALITYCZNE 1',
     'RÓWNANIA RÓŻNICZKOWE 1',
     'RÓWNANIA RÓŻNICZKOWE 1R',
@@ -88,14 +120,18 @@ class Command(BaseCommand):
             return None
         ce = None
         try:
-            ce = Proposal.objects.get(name_pl__iexact=name)
+            ce = Proposal.objects.get(
+                name__iexact=name, status__in=[ProposalStatus.IN_OFFER,
+                                               ProposalStatus.IN_VOTE])
         except Proposal.DoesNotExist:
             self.stdout.write(
                 self.style.ERROR(">Couldn't find course proposal for {}".format(name))
             )
         except Proposal.MultipleObjectsReturned:
-            ces = Proposal.objects.filter(name_pl__iexact=name,
-                                          status=ProposalStatus.IN_VOTE).order_by('-id')
+            # Prefer proposals IN_VOTE to those IN_OFFER.
+            ces = Proposal.objects.filter(
+                name__iexact=name, status__in=[ProposalStatus.IN_OFFER,
+                                               ProposalStatus.IN_VOTE]).order_by('-status', '-id')
             if self.verbosity >= 1:
                 self.stdout.write(
                     self.style.WARNING('Multiple course proposals. Took first among:'))
