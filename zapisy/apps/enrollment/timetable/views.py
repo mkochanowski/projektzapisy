@@ -16,7 +16,7 @@ from apps.enrollment.courses.models import CourseInstance, Group, Semester
 from apps.enrollment.courses.templatetags.course_types import \
     decode_class_type_singular
 from apps.enrollment.records.models import Record, RecordStatus
-from apps.enrollment.timetable.models import Pin, HiddenGroups
+from apps.enrollment.timetable.models import Pin
 from apps.users.decorators import student_required
 from apps.users.models import BaseUser, Employee, Student
 
@@ -37,6 +37,10 @@ def build_group_list(groups: List[Group]):
             term_dict = model_to_dict(term, fields=['dayOfWeek', 'start_time', 'end_time'])
             term_dict['classrooms'] = term.numbers()
             term_dicts.append(term_dict)
+        guaranteed_spots = [{
+            'role': gs.role.name,
+            'limit': gs.limit,
+        } for gs in group.guaranteed_spots.all()]
         group_dict.update({
             'course': {
                 'url': reverse('course-page', args=(group.course.slug, )),
@@ -52,13 +56,13 @@ def build_group_list(groups: List[Group]):
             },
             'num_enrolled': stats.get(group.pk).get('num_enrolled'),
             'term': term_dicts,
+            'guaranteed_spots': guaranteed_spots,
             'is_enrolled': getattr(group, 'is_enrolled', None),
             'is_enqueued': getattr(group, 'is_enqueued', None),
             'is_pinned': getattr(group, 'is_pinned', None),
             'can_enqueue': getattr(group, 'can_enqueue', None),
             'can_dequeue': getattr(group, 'can_dequeue', None),
             'action_url': reverse('prototype-action', args=(group.pk, )),
-            'is_hidden': getattr(group, 'is_hidden', None),
         })
         group_dicts.append(group_dict)
     return group_dicts
@@ -82,10 +86,11 @@ def student_timetable_data(student: Student):
     semester = Semester.objects.get_next()
     # This costs an additional join, but works if there is no current semester.
     records = Record.objects.filter(
-        student=student, group__course__semester=semester, status=RecordStatus.ENROLLED
-    ).select_related(
-        'group__teacher', 'group__teacher__user', 'group__course'
-    ).prefetch_related('group__term', 'group__term__classrooms')
+        student=student,
+        group__course__semester=semester, status=RecordStatus.ENROLLED).select_related(
+            'group__teacher', 'group__teacher__user', 'group__course').prefetch_related(
+                'group__term', 'group__term__classrooms', 'group__guaranteed_spots',
+                'group__guaranteed_spots__role')
     groups = [r.group for r in records]
     group_dicts = build_group_list(groups)
 
@@ -104,7 +109,7 @@ def employee_timetable_data(employee: Employee):
     semester = Semester.objects.get_next()
     groups = Group.objects.filter(teacher=employee, course__semester=semester).select_related(
         'teacher', 'teacher__user', 'course').prefetch_related(
-            'term', 'term__classrooms')
+            'term', 'term__classrooms', 'guaranteed_spots', 'guaranteed_spots__role')
     group_dicts = build_group_list(groups)
     data = {
         'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
@@ -136,10 +141,12 @@ def my_prototype(request):
 
     # This costs an additional join, but works if there is no current semester.
     records = Record.objects.filter(
-        student=student, group__course__semester=semester
-    ).exclude(status=RecordStatus.REMOVED).select_related(
-        'group__teacher', 'group__teacher__user', 'group__course', 'group__course__semester'
-    ).prefetch_related('group__term', 'group__term__classrooms')
+        student=student,
+        group__course__semester=semester).exclude(status=RecordStatus.REMOVED).select_related(
+            'group__teacher', 'group__teacher__user',
+            'group__course', 'group__course__semester').prefetch_related(
+                'group__term', 'group__term__classrooms', 'group__guaranteed_spots',
+                'group__guaranteed_spots__role')
     pinned = Pin.student_pins_in_semester(student, semester)
     pinned = list(pinned)
     all_groups_by_id = {r.group_id: r.group for r in records}
@@ -156,11 +163,6 @@ def my_prototype(request):
     for pin in pinned:
         group = all_groups_by_id.get(pin.pk)
         group.is_pinned = True
-
-    hidden_groups = HiddenGroups.hidden_groups_for_student(student, all_groups_by_id.keys())
-    for group_id in hidden_groups:
-        group = all_groups_by_id.get(group_id)
-        group.is_hidden = True
 
     all_groups = all_groups_by_id.values()
     for group in all_groups:
@@ -209,8 +211,8 @@ def prototype_action(request, group_id):
             # enqueued in that). We hence send him the information about these
             # groups.
             groups = Group.objects.filter(pk__in=group_ids).select_related(
-                'teacher', 'teacher__user', 'course', 'course__semester'
-            ).prefetch_related('term', 'term__classrooms')
+                'teacher', 'teacher__user', 'course', 'course__semester').prefetch_related(
+                    'term', 'term__classrooms', 'guaranteed_spots', 'guaranteed_spots__role')
             for group in groups:
                 group.is_enqueued = True
             groups_dicts = build_group_list(groups)
@@ -235,15 +237,12 @@ def prototype_get_course(request, course_id):
     course = CourseInstance.objects.get(pk=course_id)
     groups = course.groups.exclude(extra='hidden').select_related(
         'course', 'teacher', 'course__semester', 'teacher__user'
-    ).prefetch_related('term', 'term__classrooms')
+    ).prefetch_related('term', 'term__classrooms', 'guaranteed_spots', 'guaranteed_spots__role')
     can_enqueue_dict = Record.can_enqueue_groups(student, groups)
     can_dequeue_dict = Record.can_dequeue_groups(student, groups)
-    hidden_groups = HiddenGroups.hidden_groups_for_student(student, groups)
-    hidden_groups_set = set(hidden_groups)
     for group in groups:
         group.can_enqueue = can_enqueue_dict.get(group.pk)
         group.can_dequeue = can_dequeue_dict.get(group.pk)
-        group.is_hidden = group.pk in hidden_groups_set
     group_dicts = build_group_list(groups)
     return JsonResponse(group_dicts, safe=False)
 
@@ -275,18 +274,15 @@ def prototype_update_groups(request):
     groups_all = groups_from_ids | groups_enrolled_or_enqueued
     groups = groups_all.annotate(num_enrolled=num_enrolled).annotate(
         is_enrolled=is_enrolled).annotate(is_enqueued=is_enqueued).select_related(
-            'course', 'teacher', 'course__semester',
-            'teacher__user').prefetch_related('term', 'term__classrooms')
+            'course', 'teacher', 'course__semester', 'teacher__user').prefetch_related(
+                'term', 'term__classrooms', 'guaranteed_spots', 'guaranteed_spots__role')
 
     can_enqueue_dict = Record.can_enqueue_groups(student, groups)
     can_dequeue_dict = Record.can_dequeue_groups(student, groups)
-    hidden_groups = HiddenGroups.hidden_groups_for_student(student, groups)
-    hidden_groups_set = set(hidden_groups)
     for group in groups:
         group.can_enqueue = can_enqueue_dict.get(group.pk)
         group.can_dequeue = can_dequeue_dict.get(group.pk)
         group.is_enqueued = bool(group.is_enqueued)
         group.is_enrolled = bool(group.is_enrolled)
-        group.is_hidden = group.pk in hidden_groups_set
     group_dicts = build_group_list(groups)
     return JsonResponse(group_dicts, safe=False)

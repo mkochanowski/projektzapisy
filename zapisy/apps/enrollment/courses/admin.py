@@ -6,7 +6,7 @@ from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.course_instance import CourseInstance
 from apps.enrollment.courses.models.course_type import Type
 from apps.enrollment.courses.models.effects import Effects
-from apps.enrollment.courses.models.group import Group
+from apps.enrollment.courses.models.group import Group, GuaranteedSpots
 from apps.enrollment.courses.models.semester import Semester, Freeday, ChangedDay
 from apps.enrollment.courses.models.tag import Tag
 from apps.enrollment.courses.models.term import Term
@@ -88,6 +88,15 @@ class TermInline(admin.TabularInline):
     extra = 0
 
 
+class GuaranteedSpotsInline(admin.StackedInline):
+    model = GuaranteedSpots
+    extra = 0
+    fieldsets = ((None, {
+        'fields': ('role', 'limit'),
+        'description': "<strong style='color: red'>Grupy użytkowników, którym gwarantujemy miejsca w jednej grupie zajęciowej muszą być rozłączne!</strong>",
+    }), )
+
+
 class RecordInline(admin.TabularInline):
     model = Record
     extra = 0
@@ -120,7 +129,7 @@ class GroupAdmin(admin.ModelAdmin):
         'teacher__user__last_name',
         'course__name')
     inlines = [
-        TermInline, RecordInline
+        TermInline, RecordInline, GuaranteedSpotsInline
     ]
 
     raw_id_fields = ('course', 'teacher')

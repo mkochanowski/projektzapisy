@@ -3,7 +3,7 @@
 A group may have multiple terms - that is, students may meet with the teacher
 more than one time a week.
 """
-from typing import Iterable
+from typing import Optional
 
 from django.db import models, transaction
 from django.urls import reverse
@@ -37,9 +37,6 @@ GROUP_EXTRA_CHOICES = [('', ''),
                        ('pracownia linuksowa', 'pracownia linuksowa'),
                        ('grupa anglojęzyczna', 'grupa anglojęzyczna'),
                        ('I rok', 'I rok'), ('II rok', 'II rok'), ('ISIM', 'ISIM'),
-                       ('tura1', 'grupa wirtualna dla pierwszej 1/3 pierwszaków'),
-                       ('tura2', 'grupa wirtualna dla drugiej 1/3 pierwszaków'),
-                       ('tura3', 'grupa wirtualna dla trzeciej 1/3 pierwszaków'),
                        ('hidden', 'grupa ukryta'),
                        ]
 
@@ -175,14 +172,17 @@ class Group(models.Model):
         return copy
 
     @classmethod
-    def get_lecture_groups(cls, course_id: int) -> Iterable['Group']:
+    def get_lecture_group(cls, course_id: int) -> Optional['Group']:
         """Given a course_id returns a lecture group for this course, if one exists.
 
         The Group.MultipleObjectsReturned exception will be raised when many
         lecture groups exist for course.
         """
         group_query = cls.objects.filter(course_id=course_id, type=Group.GROUP_TYPE_LECTURE)
-        return list(group_query)
+        try:
+            return group_query.get()
+        except cls.DoesNotExist:
+            return None
 
     def save(self, *args, **kwargs):
         """Overloaded save method - during save check changes and send signals to notifications app"""
@@ -191,3 +191,36 @@ class Group(models.Model):
         if old:
             if old.teacher != self.teacher:
                 teacher_changed.send(sender=self.__class__, instance=self, teacher=self.teacher)
+
+
+class GuaranteedSpotsManager(models.Manager):
+    """This thin manager always pulls auth.Group names for efficiency."""
+    def get_queryset(self):
+        return super().get_queryset().select_related('role')
+
+
+class GuaranteedSpots(models.Model):
+    """Defines an additional pool of spots in a course group reserved for a role.
+
+    Normally a course group would have a single limit defining how many students
+    can be enrolled to it at the same time. Sometimes we would however like to
+    reserve a number of spots to a group of students (i.e. freshmen, or ISIM).
+    This mechanism will allow us to do that.
+    """
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        related_name='guaranteed_spots',
+        verbose_name="grupa zajęciowa")
+    role = models.ForeignKey(
+        'auth.Group', on_delete=models.CASCADE, related_name='+', verbose_name='grupa użytkowników')
+    limit = models.PositiveSmallIntegerField("liczba miejsc")
+
+    objects = GuaranteedSpotsManager()
+
+    class Meta:
+        verbose_name = 'miejsca gwarantowane'
+        verbose_name_plural = 'miejsca gwarantowane'
+
+    def __str__(self):
+        return f"{self.limit} miejsc gwarantowanych w grupie {self.group} dla użytkowników {self.role}"
