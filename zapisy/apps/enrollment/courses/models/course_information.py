@@ -5,6 +5,7 @@ CourseInformation is a base class instantiated in Proposal (an abstract
 Course entity spanning the years) and CourseInstance (Course being given in a
 single semester).
 """
+from typing import Dict
 
 import choicesenum
 from django.db import models
@@ -117,16 +118,29 @@ class CourseInformation(models.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'short_name': self.get_short_name(),
-            'slug': self.slug,
-            'type': self.course_type_id,
-            'english': self.language == Language.ENGLISH,
-            'exam': self.has_exam,
-            'suggested_for_first_year': self.recommended_for_first_year,
-            'teacher': self.owner_id,
+            'courseType': self.course_type_id,
+            'recommendedForFirstYear': self.recommended_for_first_year,
+            'owner': self.owner_id,
             'effects': [effect.pk for effect in self.effects.all()],
             'tags': [tag.pk for tag in self.tags.all()],
         }
 
     def get_short_name(self):
         return self.short_name or self.name
+
+    @staticmethod
+    def prepare_filter_data(qs: models.QuerySet) -> Dict:
+        """Prepares the data for course filter based on a given queryset."""
+        all_effects = Effects.objects.all().values_list('id', 'group_name', named=True)
+        all_tags = Tag.objects.all().values_list('id', 'full_name', named=True)
+        all_owners = qs.values_list(
+            'owner', 'owner__user__first_name', 'owner__user__last_name', named=True).distinct()
+        all_types = qs.values_list('course_type', 'course_type__name', named=True).distinct()
+        return {
+            'allEffects': {e.id: e.group_name for e in all_effects},
+            'allTags': {t.id: t.full_name for t in all_tags},
+            'allOwners': {
+                o.owner: [o.owner__user__first_name, o.owner__user__last_name] for o in all_owners
+            },
+            'allTypes': {c.course_type: c.course_type__name for c in all_types},
+        }

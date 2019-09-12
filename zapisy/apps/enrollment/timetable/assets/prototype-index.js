@@ -8,16 +8,12 @@
 // `store/{groups.ts, courses.ts}`.
 
 import Vue from "vue";
+
 import Prototype from "./components/Prototype.vue";
+import CourseList from "./components/CourseList.vue";
+import CourseFilter from "./components/CourseFilter.vue";
 import store from "./store";
 
-Vue.config.productionTip = false
-
-let timetable_app = new Vue({
-    el: "#timetable",
-    components: {
-        Prototype,
-    },
-    store,
-    render: h => { return h(Prototype); },
-})
+new Vue({ el: '#timetable', render: h => h(Prototype), store });
+new Vue({ el: '#course-filter', render: h => h(CourseFilter), store });
+new Vue({ el: '#course-list', render: h => h(CourseList), store });
