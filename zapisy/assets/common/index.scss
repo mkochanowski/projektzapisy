@@ -115,3 +115,35 @@ colgroup col.table-info-type  {
   padding-left: .25em;
   color: var(--red);
 }
+
+// News items on the main page and the news page.
+.od-news-item {
+  margin: 2rem 0;
+  padding: 4rem;
+  background: var(--light);
+
+  .od-news-date {
+    color: var(--dark);
+    font-style: italic;
+    display: block;
+    @media (min-width: 992px) {
+      float: right;
+    }
+  }
+
+  .od-news-author {
+    font-style: italic;
+    font-variant: small-caps;
+    font-size: 120%;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  // The news pops out slightly on hover.
+  &:hover {
+    transform: scale(1.01, 1.01);
+    transition: transform 250ms;
+  }
+}
