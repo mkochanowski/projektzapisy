@@ -51,12 +51,7 @@ export default class Prototype extends Vue {
 </script>
 
 <template>
-<div class="row">
-    <div class="col-md-9 ">
+    <div class="col">
         <PrototypeTimetable :groups="groupsGetter"/>
     </div>
-    <div class="col-md-3  course-list-sidebar-wrapper">
-      <CourseList :courses="courses"/>
-    </div>
-</div>
 </template>

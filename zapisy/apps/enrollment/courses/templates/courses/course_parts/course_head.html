@@ -1,0 +1,103 @@
+{% load render_bundle from webpack_loader %}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="d-inline-block">
+        {{ course.name }}
+        <small class="text-muted">{{ course.semester.get_short_name }}</small>
+    </h1>
+    {% if user.is_staff or course.owner == request.user.employee %}
+        {% if course.semester.is_current_semester %}
+            <a class="btn btn-sm btn-outline-info float-right align-bottom" href="{% url 'proposal-edit' course.offer.slug %}">Edytuj</a>
+        {% endif %}
+    {% endif %}
+</div>
+
+<table class="table table-bordered table-md-responsive" id="table-info">
+    <colgroup>
+        <col class="table-info-type"></col>
+    </colgroup>
+    <tbody>
+        <tr>
+            <th scope="row">Język wykładowy</th>
+            <td>{{ course.get_language_display|capfirst }}</td>
+        </tr>
+        <tr>
+            <th>Opiekun</th>
+            <td>
+                <a href="{% url 'employee-profile' course.owner.user_id %}"
+                    class="person">{{ course.owner.user.get_full_name }}</a>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Liczba godzin</th>
+            <td id="hours">
+                <style>
+                    #hours span + span::before {
+                        content: '+';
+                        margin: 0 .5em;
+                    }
+                </style>
+                {% if course.hours_lecture %}<span>{{ course.hours_lecture }} (wyk.)</span>{% endif %}
+                {% if course.hours_exercise %}<span>{{ course.hours_exercise }} (ćw.)</span>{% endif %}
+                {% if course.hours_lab %}<span>{{ course.hours_lab }} (prac.)</span>{% endif %}
+                {% if course.hours_exercise_lab %}<span>{{ course.hours_exercise_lab }} (ćw-prac.)</span>{% endif %}
+                {% if course.hours_seminar %}<span>{{ course.hours_seminar }} (sem.)</span>{% endif %}
+                {% if course.hours_recap %}<span>{{ course.hours_recap }} (rep.)</span>{% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Rodzaj</th>
+            <td>{{ course.course_type }}</td>
+        </tr>
+        <tr>
+            <th><abbr title="European Credit Transfer System">ECTS</abbr></th>
+            <td>
+                {{ course.points }}
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Polecany dla I roku</th>
+            <td>{{ course.recommended_for_first_year|yesno|capfirst }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Egzamin</th>
+            <td>{{ course.has_exam|yesno|capfirst }}</td>
+        </tr>
+        {% if course.tags.all %}
+        <tr>
+            <th scope="row">Tagi</th>
+            <td>
+                {% for tag in course.tags.all %}
+                    <span class="badge badge-success mr-2">{{ tag }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+        {% if course.effects.all %}
+        <tr>
+            <th>Grupy efektów kształcenia</th>
+            <td>
+                {% for effect in course.effects.all %}
+                    <span class="badge badge-info mr-2">{{ effect }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+        {% for group_of_waiting_students in grouped_waiting_students %}
+            {# This will only be non-empty when the requesting user is staff #}
+            {% if group_of_waiting_students.students_amount %}
+                <tr>
+                    <th scope="row">Liczba chętnych na {{ group_of_waiting_students.type_name }}</th>
+                    <td>{{ group_of_waiting_students.students_amount }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="description">
+    <h2>Opis przedmiotu:</h2>
+    <div class="markdown">{{ course.description|default:"Brak" }}</div>
+</div>
+
+{% render_bundle 'proposal-render-markdown' %}

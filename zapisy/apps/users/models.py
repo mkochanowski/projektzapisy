@@ -11,15 +11,6 @@ from django.core.validators import MaxLengthValidator
 
 from apps.users.exceptions import NonUserException
 
-# The TYPE_CHECKING constant is always False at runtime, so the import won't be evaluated,
-# but mypy (and other type-checking tools) will evaluate the contents of that block.
-# It protects us from circular imports.
-
-if TYPE_CHECKING:
-    from apps.enrollment.courses.models.semester import Semester
-    from apps.enrollment.courses.models.course import Course
-    from apps.offer.preferences.models import Preference
-
 logger = logging.getLogger()
 
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
@@ -40,15 +31,6 @@ class BaseUser(models.Model):
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
     """
-    receive_mass_mail_enrollment = models.BooleanField(
-        default=True,
-        verbose_name="otrzymuje mailem ogłoszenia Zapisów")
-    receive_mass_mail_offer = models.BooleanField(
-        default=True,
-        verbose_name="otrzymuje mailem ogłoszenia OD")
-    receive_mass_mail_grade = models.BooleanField(
-        default=True,
-        verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now)
 
     objects = Related()
@@ -135,9 +117,8 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_actives() -> QuerySet:
-        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name'). extra(
-            where=["(SELECT COUNT(*) FROM courses_courseentity WHERE courses_courseentity.status > 0 AND NOT courses_courseentity.deleted AND courses_courseentity.owner_id=users_employee.id)>0"]
-        )
+        return Employee.objects.filter(user__is_active=True).order_by('user__last_name',
+                                                                      'user__first_name')
 
     @staticmethod
     def get_list(begin: str ='All') -> QuerySet:
@@ -168,8 +149,12 @@ class Employee(BaseUser):
             ("mailto_all_students", "Może wysyłać maile do wszystkich studentów"),
         )
 
-    def __str__(self) -> str:
-        return self.user.get_full_name()
+    def get_full_name_with_academic_title(self) -> str:
+        """Same as `get_full_name`, but prepends the employee's academic title
+        if one is defined.
+        """
+        base_name = super().get_full_name()
+        return f'{self.title} {base_name}' if self.title else base_name
 
 
 class Student(BaseUser):
@@ -285,19 +270,12 @@ class Student(BaseUser):
         app_label: str = 'users'
         ordering: List[str] = ['user__last_name', 'user__first_name']
 
-    def __str__(self) -> str:
-        return self.user.get_full_name()
-
 
 class Program(models.Model):
     """
         Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
-    type_of_points = models.ForeignKey(
-        'courses.PointTypes',
-        verbose_name='rodzaj punktów',
-        on_delete=models.CASCADE)
 
     class Meta:
         verbose_name: str = 'Program studiów'

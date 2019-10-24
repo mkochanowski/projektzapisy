@@ -3,11 +3,12 @@
 <table class="table table-striped">
     <thead>
     <tr>
-        <th scope="col">{% trans "Imię" %}</th>
-        <th scope="col">{% trans "Nazwisko" %}</th>
-        <th scope="col">{% trans "Nr indeksu" %}</th>
-        <th scope="col">{% trans "Rodzaj studiów" %}</th>
-        <th scope="col">{% trans "Semestr" %}</th>
+        <th scope="col">Imię</th>
+        <th scope="col">Nazwisko</th>
+        <th scope="col">Nr indeksu</th>
+        <th scope="col">Rodzaj studiów</th>
+        <th scope="col">Semestr</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -16,16 +17,22 @@
             <td>{% if can_user_see_all_students_here or student.consent_granted %}<a href="{% url 'student-profile' student.user.id %}" class="person">
                 {{ student.user.first_name }}</a>{% endif %}</td>
             <td>{% if can_user_see_all_students_here or student.consent_granted %}<a href="{% url 'student-profile' student.user.id %}" class="person">
-                {{ student.user.last_name }}</a>{% endif %}</td>
+                {{ student.user.last_name }}</a>{% endif %}
+            </td>
             <td>{{ student.matricula }}</td>
             <td>
                 {{ student.program }}
             </td>
             <td>{{ student.semestr }}</td>
+            <td>
+                {% for tag in student.guaranteed %}
+                    <span class="badge badge-dark">{{ tag }}</span>
+                {% endfor %}
+            </td>
         </tr>
 
     {% empty %}
-        {% trans "Brak zapisanych osób" %}.
+        Brak zapisanych osób.
     {% endfor %}
     </tbody>
 </table>

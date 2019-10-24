@@ -1,4 +1,3 @@
-import re
 from datetime import time
 import json
 import os
@@ -11,17 +10,14 @@ import requests
 
 from apps.users.models import Employee
 from apps.enrollment.courses.models.classroom import Classroom
-from apps.enrollment.courses.models.course import Course, CourseEntity
+from apps.enrollment.courses.models import CourseInstance
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.term import Term
 from apps.enrollment.courses.models.group import Group
+from apps.offer.proposal.models import Proposal, ProposalStatus
 from apps.schedulersync.models import TermSyncData
 
 URL_LOGIN = 'http://scheduler.gtch.eu/admin/login/'
-
-SLACK_WEBHOOK_URL = (
-    'https://hooks.slack.com/services/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'
-)
 
 # The mapping between group types in scheduler and enrollment system
 # w (wykład), p (pracownia), c (ćwiczenia), s (seminarium), r (ćwiczenio-pracownia),
@@ -34,35 +30,67 @@ LIMITS = {'1': 300, '9': 300, '2': 20, '3': 15, '5': 18, '6': 15, '10': 15}
 
 EMPLOYEE_MAP = {
     'PLISOWSKI': '258497',
-    'TELSNER': 'NN',
+    'PRATIKGHOSAL': '268909',
     'AMORAWIEC': 'NN',
     'AMALINOWSKI': 'NN',
-    'RSZWARC': 'NN',
-    'EDAMEK': 'NN',
-    'GPLEBANEK': 'NN',
     'ARACZYNSKI': 'NN',
+    'EDAMEK': 'NN',
+    'FINGO': 'NN',
     'GKARCH': 'NN',
+    'GPLEBANEK': 'NN',
+    'JDYMARA': 'NN',
+    'JDZIUBANSKI': 'NN',
+    'LNEWELSKI': 'NN',
+    'MPREISNER': 'NN',
+    'PKOWALSKI': 'NN',
+    'RSZWARC': 'NN',
     'SCYGAN': 'NN',
-    'JDZIUBANSKI': 'NN'
+    'TELSNER': 'NN',
+    'TRZEPECKI': 'NN',
+    '5323': 'PAWEL.LASKOS-GRABOWSKI',
+    'NN1': 'NN',
+    'IM': 'NN',
 }
 
 COURSES_MAP = {
-    'PRAKTYKA ZAWODOWA - 3 TYGODNIE': 'PRAKTYKA ZAWODOWA - TRZY TYGODNIE',
-    'PRAKTYKA ZAWODOWA - 4 TYGODNIE': 'PRAKTYKA ZAWODOWA - CZTERY TYGODNIE',
-    'PRAKTYKA ZAWODOWA - 5 TYGODNI': 'PRAKTYKA ZAWODOWA - PIĘĆ TYGODNI',
-    'PRAKTYKA ZAWODOWA - 6 TYGODNI': 'PRAKTYKA ZAWODOWA - SZEŚĆ TYGODNI'
+    'MATEMATYKA DYSKRETNA L': 'MATEMATYKA DYSKRETNA (L)',
+    'MATEMATYKA DYSKRETNA M': 'MATEMATYKA DYSKRETNA (M)',
+    'OCHRONA WŁASNOŚCI INTELEKTUALNEJ (ZIMA)': 'OCHRONA WŁASNOŚCI INTELEKTUALNEJ',
+    'PROJEKT DYPLOMOWY (ZIMA)': 'PROJEKT DYPLOMOWY',
+    'PROJEKT: BUDOWA I ROZWÓJ ANALOGU ŁAZIKA MARSJAŃSKIEGO (ZIMA)': 'PROJEKT: BUDOWA I ROZWÓJ ANALOGU ŁAZIKA MARSJAŃSKIEGO',
+    'PROJEKT: ROZWÓJ SCHEDULERA (ZIMA)': 'PROJEKT: ROZWÓJ SCHEDULERA',
+    'PROJEKT: ROZWÓJ SYSTEMU ZAPISÓW (ZIMA)': 'PROJEKT: ROZWÓJ SYSTEMU ZAPISÓW',
+    'TUTORING DATA SCIENCE (ZIMA)': 'MENTORING FOR DATA SCIENCE',
+    'TUTORING INFORMATYKA (ZIMA)': 'TUTORING',
+    'TUTORING ISIM (ZIMA)': 'TUTORING ISIM',
+    'ANALIZA NUMERYCZNA L': 'ANALIZA NUMERYCZNA (L)',
+    'ANALIZA NUMERYCZNA M': 'ANALIZA NUMERYCZNA (M)',
+    'INNOVATIVE PROJECTS BY NOKIA (ZIMA)': 'INNOVATIVE PROJECTS BY NOKIA',
+    'PRAKTYKA ZAWODOWA 3 TYGODNIE': 'PRAKTYKA ZAWODOWA - TRZY TYGODNIE',
+    'PRAKTYKA ZAWODOWA 4 TYGODNIE': 'PRAKTYKA ZAWODOWA - CZTERY TYGODNIE',
+    'PRAKTYKA ZAWODOWA 5 TYGODNI': 'PRAKTYKA ZAWODOWA - PIĘĆ TYGODNI',
+    'PRAKTYKA ZAWODOWA 6 TYGODNI': 'PRAKTYKA ZAWODOWA - SZEŚĆ TYGODNI',
+    'KURS 1/2: ODZYSKIWANIE DANYCH': 'KURS-½: ODZYSKIWANIE DANYCH',
+    'SEMINARIUM: BEZPIECZEŃSTWO I OCHRONA INFORMACJI': 'PROSEMINARIUM: BEZPIECZEŃSTWO I OCHRONA INFORMACJI'
 }
 
 COURSES_DONT_IMPORT = [
+    'ANALIZA MATEMATYCZNA I',
+    'ANALIZA MATEMATYCZNA II',
+    'ANALIZA MATEMATYCZNA III',
+    'ALGEBRA 1',
     'ALGEBRA I',
+    'ALGEBRA II',
+    'ALGEBRA LINIOWA 1R',
     'ALGEBRA LINIOWA 2',
     'ALGEBRA LINIOWA 2R',
-    'ANALIZA MATEMATYCZNA II',
+    'MIARA I CAŁKA',
     'FUNKCJE ANALITYCZNE 1',
     'RÓWNANIA RÓŻNICZKOWE 1',
     'RÓWNANIA RÓŻNICZKOWE 1R',
     'TEORIA PRAWDOPODOBIEŃSTWA 1',
-    'TOPOLOGIA']
+    'TOPOLOGIA',
+    'INSTYTUT MATEMATYCZNY']
 
 
 class Command(BaseCommand):
@@ -80,7 +108,7 @@ class Command(BaseCommand):
         parser.add_argument('--slack', action='store_true', dest='write_to_slack')
         parser.add_argument('--delete-groups', action='store_true', dest='delete_groups')
 
-    def get_entity(self, name):
+    def get_proposal(self, name):
         name = name.upper()
         if name in COURSES_MAP:
             name = COURSES_MAP[name]
@@ -88,39 +116,36 @@ class Command(BaseCommand):
             return None
         ce = None
         try:
-            ce = CourseEntity.objects.get(name_pl__iexact=name)
-        except CourseEntity.DoesNotExist:
+            ce = Proposal.objects.get(
+                name__iexact=name, status__in=[ProposalStatus.IN_OFFER,
+                                               ProposalStatus.IN_VOTE])
+        except Proposal.DoesNotExist:
             self.stdout.write(
-                self.style.ERROR(">Couldn't find course entity for {}".format(name))
+                self.style.ERROR(">Couldn't find course proposal for {}".format(name))
             )
-        except CourseEntity.MultipleObjectsReturned:
-            ces = CourseEntity.objects.filter(name_pl__iexact=name, status=2).order_by('-id')
+        except Proposal.MultipleObjectsReturned:
+            # Prefer proposals IN_VOTE to those IN_OFFER.
+            ces = Proposal.objects.filter(
+                name__iexact=name, status__in=[ProposalStatus.IN_OFFER,
+                                               ProposalStatus.IN_VOTE]).order_by('-status', '-id')
             if self.verbosity >= 1:
-                self.stdout.write(self.style.WARNING('Multiple course entity. Took first among:'))
+                self.stdout.write(
+                    self.style.WARNING('Multiple course proposals. Took first among:'))
                 for ce in ces:
                     self.stdout.write(self.style.WARNING('  {}'.format(str(ce))))
                 self.stdout.write('')
             ce = ces[0]
         return ce
 
-    def get_course(self, entity, create_courses=False):
+    def get_course(self, proposal, create_courses=False):
         course = None
         try:
-            course = Course.objects.get(semester=self.semester, entity=entity)
+            course = CourseInstance.objects.get(semester=self.semester, offer=proposal)
             self.used_courses.add(course)
-        except Course.DoesNotExist:
-            if entity.slug is None:
-                self.stdout.write(
-                    self.style.ERROR("Couldn't find slug for {}".format(entity))
-                )
-            else:
-                newslug = '{}_{}'.format(entity.slug,
-                                         re.sub(r'[^\w]', '_', self.semester.get_short_name()))
-                if create_courses:
-                    course = Course(entity=entity, information=entity.information,
-                                    semester=self.semester, slug=newslug)
-                    course.save()
-                    self.created_courses += 1
+        except CourseInstance.DoesNotExist:
+            if create_courses:
+                course = CourseInstance.create_proposal_instance(proposal, self.semester)
+                self.created_courses += 1
         return course
 
     def get_classrooms(self, rooms):
@@ -262,7 +287,7 @@ class Command(BaseCommand):
             return None
         group = {
             'id': g['id'],
-            'entity_name': g['extra']['course'],
+            'course_name': g['extra']['course'],
             'group_type': GROUP_TYPES[g['extra']['group_type']],
             'teacher': self.get_employee(g['teachers'][0])
         }
@@ -347,12 +372,12 @@ class Command(BaseCommand):
         groups = self.get_groups()
         for g in groups:
             self.scheduler_ids.add(int(g['id']))
-            entity = self.get_entity(g['entity_name'])
-            if entity is not None:
-                course = self.get_course(entity, create_courses)
+            proposal = self.get_proposal(g['course_name'])
+            if proposal is not None:
+                course = self.get_course(proposal, create_courses)
                 if course is None:
-                    raise CommandError('Course {} does not exist! Check your input file.'
-                                       .format(entity))
+                    raise CommandError(
+                        f'Course {proposal.name} does not exist! Check your input file.')
                 self.create_or_update_group(course, g, create_terms)
         self.remove_groups()
         self.stdout.write(self.style.SUCCESS('Created {} courses successfully! '
@@ -397,8 +422,10 @@ class Command(BaseCommand):
             'text': "The following groups were updated in fereol (scheduler's sync):",
             'attachments': self.prepare_slack_message()
         }
+        secrets_env = self.get_secrets_env()
+        slack_webhook_url = secrets_env.str('SLACK_WEBHOOK_URL')
         response = requests.post(
-            SLACK_WEBHOOK_URL, data=json.dumps(slack_data),
+            slack_webhook_url, data=json.dumps(slack_data),
             headers={'Content-Type': 'application/json'}
         )
         if response.status_code != 200:

@@ -12,19 +12,27 @@ export enum DayOfWeek {
     Thursday,
     Friday,
     Saturday,
-    Sunday,
+    Sunday
 }
 
 export function nameDay(day: DayOfWeek): string {
     switch (day) {
-        case DayOfWeek.Monday: return "Poniedziałek";
-        case DayOfWeek.Tuesday: return "Wtorek";
-        case DayOfWeek.Wednesday: return "Środa";
-        case DayOfWeek.Thursday: return "Czwartek";
-        case DayOfWeek.Friday: return "Piątek";
-        case DayOfWeek.Saturday: return "Sobota";
-        case DayOfWeek.Sunday: return "Niedziela";
-        default: return "";
+        case DayOfWeek.Monday:
+            return "Poniedziałek";
+        case DayOfWeek.Tuesday:
+            return "Wtorek";
+        case DayOfWeek.Wednesday:
+            return "Środa";
+        case DayOfWeek.Thursday:
+            return "Czwartek";
+        case DayOfWeek.Friday:
+            return "Piątek";
+        case DayOfWeek.Saturday:
+            return "Sobota";
+        case DayOfWeek.Sunday:
+            return "Niedziela";
+        default:
+            return "";
     }
 }
 
@@ -88,17 +96,21 @@ export class Term {
 // Teacher is defined in apps/users/models.py as Employee, but we add the name
 // field corresponding to `self.user.get_full_name()`.
 export class Teacher {
-    constructor(public name: string, public id: number, public url: string) { }
-}
-
-export class CourseEntity {
-    constructor(public name: string, public shortName: string) { }
+    constructor(public name: string, public id: number, public url: string) {}
 }
 
 // Course is defined in apps/enrollment/courses/models/course.py.
 export class Course {
-    constructor(public entity: CourseEntity, public url: string) { }
+    constructor(
+        public name: string,
+        public shortName: string,
+        public url: string
+    ) {}
+}
 
+export interface GuaranteedSpot {
+    role: string;
+    limit: number;
 }
 
 // GroupJSON is used to cast JSON into it and translate it into proper Group
@@ -113,6 +125,7 @@ export interface GroupJSON {
     teacher: Teacher;
     url: string;
     term: Array<TermJSON>;
+    guaranteed_spots: Array<GuaranteedSpot>;
 
     is_enrolled?: boolean;
     is_enqueued?: boolean;
@@ -120,7 +133,6 @@ export interface GroupJSON {
     can_enqueue?: boolean;
     can_dequeue?: boolean;
     action_url?: string;
-    is_hidden?: boolean;
 }
 
 // Group is defined in apps/enrollment/courses/models/group.py.
@@ -134,6 +146,7 @@ export class Group {
     public teacher: Teacher;
     public url: string;
     public terms: Array<Term>;
+    public guaranteedSpots: Array<GuaranteedSpot>;
 
     public isEnrolled = false;
     public isEnqueued = false;
@@ -141,7 +154,6 @@ export class Group {
     public isSelected = false;
     public canEnqueue = false;
     public canDequeue = false;
-    public isHidden = false;
 
     // The URL for performing actions involving the group.
     public actionURL: string;
@@ -159,6 +171,7 @@ export class Group {
         for (const term of json.term) {
             this.terms.push(new Term(term, this));
         }
+        this.guaranteedSpots = json.guaranteed_spots;
 
         this.isEnrolled = json.is_enrolled || false;
         this.isEnqueued = json.is_enqueued || false;
@@ -166,21 +179,20 @@ export class Group {
         this.canEnqueue = json.can_enqueue || false;
         this.canDequeue = json.can_dequeue || false;
         this.actionURL = json.action_url || "";
-        this.isHidden = json.is_hidden || false;
     }
+}
 
-    // shouldBeHidden decides if the group should be hidden in the prototype.
-    // isHidden is a strong indication that the group should be hidden, but if
-    // it is available for the student, or he already is in that group, he
-    // should be able to see it.
-    public shouldBeHidden(): boolean {
-        if (!this.isHidden) {
-            return false;
-        }
-        if (this.canEnqueue || this.isEnqueued || this.isEnrolled 
-            || this.isPinned) {
-            return false;
-        }
-        return true;
-    }
+export interface KVDict {
+    [key: number]: string;
+}
+
+export interface PersonDict {
+    [key: number]: [string, string]
+}
+
+export interface FilterDataJSON {
+    allEffects: KVDict;
+    allTags: KVDict;
+    allOwners: PersonDict;
+    allTypes: KVDict;
 }

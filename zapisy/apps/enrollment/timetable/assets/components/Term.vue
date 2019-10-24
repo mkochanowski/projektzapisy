@@ -71,10 +71,10 @@ export default class TermComponent extends TermProps {
   // Returns a short name of the course if available. Otherwise sticks with a
   // regular name.
   get courseShortName(): string {
-    if (this.term.group.course.entity.shortName) {
-      return this.term.group.course.entity.shortName;
+    if (this.term.group.course.shortName) {
+      return this.term.group.course.shortName;
     }
-    return this.term.group.course.entity.name;
+    return this.term.group.course.name;
   }
 
   // Transforms a TimeTouple into css grid row number. It assumes that there is
@@ -102,7 +102,7 @@ export default class TermComponent extends TermProps {
   <transition name="fade">
     <div v-if="popupVisible" class="popup" @mouseleave="hidePopup()">
         <span class="popup-name">
-          <a :href="group.course.url">{{ group.course.entity.name }}</a>
+          <a :href="group.course.url">{{ group.course.name }}</a>
         </span>
         <p class="popup-info">
             {{ group.type }}
@@ -115,7 +115,7 @@ export default class TermComponent extends TermProps {
         <p class="popup-info">Sala: {{ term.classrooms }}</p>
         <a class="group-link" :href="group.url">
           lista studentów zapisanych do grupy
-          ({{ group.numEnrolled }}/{{ group.limit }})
+          ({{ group.numEnrolled }}/{{ group.limit }}<span v-for="gs of group.guaranteedSpots" :key="gs.role" title="">+{{ gs.limit }}</span>)
         </a>
     </div>
   </transition>

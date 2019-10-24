@@ -1,13 +1,10 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.urls import path
 from django_cas_ng import views as cas_views
 
 import apps.news.views
 from apps.api.rest.v1.urls import router as api_router_v1
-from apps.enrollment.courses import admin_views as courses_admin_views
-from apps.feeds import LatestNews
 from apps.users import views as users_views
 
 admin.autodiscover()
@@ -21,18 +18,15 @@ urlpatterns = [
     path('timetable/', include('apps.enrollment.timetable.urls')),
     url(r'^statistics/', include(('apps.statistics.urls', 'statistics'), namespace='statistics')),
     url(r'^consultations/$', users_views.consultations_list, name="consultations-list"),
+    path('theses/', include(('apps.theses.urls', 'theses'), namespace='theses')),
 
     url(r'^news/', include('apps.news.urls')),
     url(r'^users/', include('apps.users.urls')),
 
     url(r'^grade/', include('apps.grade.urls')),
-    url(r'^feeds/news/$', LatestNews()),
     url(r'^s/(?P<query>.*)/$', users_views.students_list, name='users-list-search'),
     url(r'^e/(?P<query>.*)/$', users_views.employees_list, name='users-list-search'),
 
-    url(r'^fereol_admin/courses/import_semester', courses_admin_views.import_semester),
-    url(r'^fereol_admin/courses/import_schedule', courses_admin_views.import_schedule),
-    url(r'^fereol_admin/courses/refresh_semester', courses_admin_views.refresh_semester),
     url(r'^offer/', include('apps.offer.proposal.urls')),
     url(r'^prefs/', include('apps.offer.preferences.urls')),
     url(r'^desiderata/', include('apps.offer.desiderata.urls')),

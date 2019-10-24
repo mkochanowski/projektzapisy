@@ -1,7 +1,9 @@
 """Proposal views"""
 import copy
+import json
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -24,12 +26,32 @@ def offer(request, slug=None):
         proposal = None
 
     filter_statuses = [ProposalStatus.IN_OFFER, ProposalStatus.IN_VOTE, ProposalStatus.WITHDRAWN]
-    proposal_list = Proposal.objects.filter(
-        status__in=filter_statuses).select_related('course_type', 'owner__user').order_by('name')
+    qs = Proposal.objects.filter(status__in=filter_statuses).order_by('name')
+    proposal_list = []
+    for p in qs.prefetch_related('effects', 'tags'):
+        proposal_dict = p.__json__()
+        proposal_dict.update({
+            'status': ProposalStatus(p.status)._name_,
+            'semester': p.semester,
+            'url': reverse('offer-page', args=(p.slug,)),
+        })
+        proposal_list.append(proposal_dict)
+    filter_data = Proposal.prepare_filter_data(qs)
 
     return render(request, 'proposal/offer.html', {
         "proposal": proposal,
-        "proposals": proposal_list,
+        "proposals": json.dumps(proposal_list),
+        "filters_json": json.dumps(filter_data),
+    })
+
+
+@login_required
+def syllabus(request, slug):
+    """Prints the syllabus for a proposal."""
+    proposal = get_object_or_404(Proposal, slug=slug)
+
+    return render(request, 'proposal/syllabus.html', {
+        'proposal': proposal,
     })
 
 

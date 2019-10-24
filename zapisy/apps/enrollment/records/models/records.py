@@ -52,7 +52,8 @@ from django.contrib.auth.models import User
 from django.db import DatabaseError, models, transaction
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.enrollment.courses.models import Course, Group, StudentPointsView, Semester
+from apps.enrollment.courses.models import CourseInstance, Group, Semester
+from apps.enrollment.courses.models.group import GuaranteedSpots
 from apps.enrollment.records.models.opening_times import GroupOpeningTimes
 from apps.enrollment.records.signals import GROUP_CHANGE_SIGNAL
 from apps.users.models import BaseUser, Student
@@ -151,11 +152,27 @@ class Record(models.Model):
         # Check if enrolling would not make the student exceed the current ECTS
         # limit.
         semester: Semester = group.course.semester
-        points = StudentPointsView.student_points_in_semester(
-            student, semester, [group.course])
+        points = cls.student_points_in_semester(student, semester, [group.course])
         if points > semester.get_current_limit(time):
             return EnrollStatus.ECTS_ERR
         return EnrollStatus.SUCCESS
+
+    @classmethod
+    def student_points_in_semester(cls, student: Student, semester: Semester,
+                                   additional_courses: Iterable[CourseInstance] = []) -> int:
+        """Returns total points the student has accumulated in semester.
+
+        Args:
+            additional_courses is a list of potential courses a student might
+            also want to enroll into.
+        """
+        records = cls.objects.filter(
+            student=student,
+            group__course__semester=semester, status=RecordStatus.ENROLLED).select_related(
+                'group', 'group__course')
+        courses = set(r.group.course for r in records)
+        courses.update(additional_courses)
+        return sum(c.points for c in courses)
 
     @staticmethod
     def can_dequeue(student: Optional[Student], group: Group, time: datetime = None) -> bool:
@@ -198,7 +215,7 @@ class Record(models.Model):
         return {k.id: True for k in groups}
 
     @staticmethod
-    def get_number_of_waiting_students(course: Course, group_type: str) -> int:
+    def get_number_of_waiting_students(course: CourseInstance, group_type: str) -> int:
         """Returns number of students waiting to be enrolled.
 
         Returned students aren't enrolled in any group of given type within
@@ -212,10 +229,10 @@ class Record(models.Model):
                 only('student').values_list('student')).distinct('student').count()
 
     @classmethod
-    def is_enrolled(cls, student_id: int, group_id: int) -> bool:
+    def is_enrolled(cls, student: Student, group: Group) -> bool:
         """Checks if the student is already enrolled into the group."""
         records = cls.objects.filter(
-            student_id=student_id, group_id=group_id, status=RecordStatus.ENROLLED)
+            student=student, group=group, status=RecordStatus.ENROLLED)
         return records.exists()
 
     @classmethod
@@ -275,6 +292,39 @@ class Record(models.Model):
         return ret_dict
 
     @classmethod
+    def free_spots_by_role(cls, group: Group) -> Dict[str, int]:
+        """Counts the number of free spots indexed by user role.
+
+        The purpose of this is to establish if the group has free place in it at
+        all and how many students are enrolled according to which
+        GuaranteedSpots rule. Note, that this function will only work
+        deterministically and sanely, if the roles defined in GuaranteedSpots
+        rules are distinct for this groups.
+
+        The number of students not matched to any GuaranteedSpots rule will be
+        indexed with '-'.
+        """
+        ret: Dict[str, int] = {}
+        guaranteed_spots_rules = GuaranteedSpots.objects.filter(group=group)
+        all_enrolled_records = cls.objects.filter(
+            group=group, status=RecordStatus.ENROLLED).select_related(
+                'student', 'student__user').prefetch_related('student__user__groups')
+        all_enrolled_students = set(r.student.user for r in all_enrolled_records)
+
+        for gsr in guaranteed_spots_rules:
+            role = gsr.role
+            counter = 0
+            for user in all_enrolled_students.copy():
+                if role in user.groups.all():
+                    all_enrolled_students.remove(user)
+                    counter += 1
+                    if counter == gsr.limit:
+                        break
+            ret[gsr.role.name] = gsr.limit - counter
+        ret['-'] = group.limit - len(all_enrolled_students)
+        return ret
+
+    @classmethod
     def common_groups(cls, user: User, groups: List[Group]) -> Set[int]:
         """Returns ids of those of groups that user is involved in.
 
@@ -313,11 +363,12 @@ class Record(models.Model):
             return []
         enqueued_groups = []
         if group.type != Group.GROUP_TYPE_LECTURE:
-            lecture_groups = Group.get_lecture_groups(group.course_id)
-            for lecture_group in lecture_groups:
-                enqueued_groups.extend(cls.enqueue_student(student, lecture_group))
-            if lecture_groups and not enqueued_groups:
-                return []
+            lecture_group = Group.get_lecture_group(group.course_id)
+            if lecture_group is not None:
+                enqueued_lecture_groups = cls.enqueue_student(student, lecture_group)
+                if not enqueued_lecture_groups:
+                    return []
+                enqueued_groups.extend(enqueued_lecture_groups)
         Record.objects.create(
             group=group, student=student, status=RecordStatus.QUEUED, created=cur_time)
         LOGGER.info('User %s is enqueued into group %s', student, group)
@@ -354,7 +405,7 @@ class Record(models.Model):
         # If this is a lecture, remove him from all other groups as well.
         if record.group.type == Group.GROUP_TYPE_LECTURE:
             other_groups_query = Record.objects.filter(
-                student=student, group__course__id=record.group.course_id).exclude(
+                student=student, group__course_id=record.group.course_id).exclude(
                     status=RecordStatus.REMOVED).exclude(pk=record.pk)
             removed_groups = list(other_groups_query.values_list('group_id', flat=True))
             other_groups_query.update(status=RecordStatus.REMOVED)
@@ -406,8 +457,8 @@ class Record(models.Model):
         # student enqueues into the groups at the same time, and this group is
         # being worked before the lecture group.
         if group.type != Group.GROUP_TYPE_LECTURE:
-            lecture_groups = Group.get_lecture_groups(group.course_id)
-            for lecture_group in lecture_groups:
+            lecture_group = Group.get_lecture_group(group.course_id)
+            if lecture_group is not None:
                 cls.fill_group(lecture_group.pk)
 
         # Groups that will need to be pulled into afterwards.
@@ -417,14 +468,26 @@ class Record(models.Model):
             # We obtain a lock on the records in this group.
             records = cls.objects.filter(group_id=group_id).exclude(
                 status=RecordStatus.REMOVED).select_for_update()
-            num_enrolled = records.filter(status=RecordStatus.ENROLLED).count()
-            if num_enrolled >= group.limit:
+            free_spots_by_role = cls.free_spots_by_role(group)
+            no_one_waiting = True
+            # We rely here on the fact, that '-' will be in the order before all
+            # the role names.
+            for role in sorted(free_spots_by_role):
+                if free_spots_by_role[role] <= 0:
+                    continue
+                try:
+                    queue_query = records.filter(status=RecordStatus.QUEUED)
+                    if role != '-':
+                        queue_query = queue_query.filter(student__user__groups__name=role)
+                    first_in_line = queue_query.earliest('created')
+                    no_one_waiting = False
+                    trigger_groups = first_in_line.enroll_or_remove(group)
+                except cls.DoesNotExist:
+                    pass
+
+            if no_one_waiting:
                 return False
-            try:
-                first_in_line = records.filter(status=RecordStatus.QUEUED).earliest('created')
-                trigger_groups = first_in_line.enroll_or_remove(group)
-            except cls.DoesNotExist:
-                return False
+
         # The tasks should be triggered outside of the transaction
         for trigger_group_id in trigger_groups:
             GROUP_CHANGE_SIGNAL.send(None, group_id=trigger_group_id)
@@ -477,22 +540,20 @@ class Record(models.Model):
 
             # Check if he is enrolled into the lecture group.
             if group.type != Group.GROUP_TYPE_LECTURE:
-                lecture_groups = Group.get_lecture_groups(group.course_id)
-                if lecture_groups:
-                    lecture_groups_is_recorded = self.is_recorded_in_groups(
-                        self.student, lecture_groups)
-                    is_enrolled_into_any_lecture_group = any(
-                        [r['enrolled'] for r in lecture_groups_is_recorded.values()])
-                    if not is_enrolled_into_any_lecture_group:
+                lecture_group = Group.get_lecture_group(group.course_id)
+                if lecture_group is not None:
+                    lecture_group_is_enrolled = self.is_enrolled(self.student.id, lecture_group.id)
+                    if not lecture_group_is_enrolled:
                         self.status = RecordStatus.REMOVED
                         self.save()
                         # Send notification to user
-                        student_not_pulled.send_robust(sender=self.__class__,
-                                                       instance=self.group,
-                                                       user=self.student.user,
-                                                       reason='brak możliwości zapisu do grupy wykładowej')
+                        student_not_pulled.send_robust(
+                            sender=self.__class__,
+                            instance=self.group,
+                            user=self.student.user,
+                            reason="brak możliwości zapisu do grupy wykładowej")
                         LOGGER.info(("Student %s not enrolled into group %s because "
-                                     "he is not in any lecture group"), self.student, group)
+                                     "he is not in a lecture group"), self.student, group)
                         return []
 
             # Check if he can be enrolled at all.
@@ -503,8 +564,11 @@ class Record(models.Model):
 
                 #Send notifications
                 if can_enroll_status == EnrollStatus.ECTS_ERR:
-                    student_not_pulled.send_robust(sender=self.__class__, instance=self.group,
-                                                   user=self.student.user, reason='przekroczenie limitu ECTS')
+                    student_not_pulled.send_robust(
+                        sender=self.__class__,
+                        instance=self.group,
+                        user=self.student.user,
+                        reason="przekroczenie limitu ECTS")
 
                 return []
             # Remove him from all parallel groups (and queues of lower
@@ -524,5 +588,6 @@ class Record(models.Model):
             self.status = RecordStatus.ENROLLED
             self.save()
             # Send notification to user
-            student_pulled.send_robust(sender=self.__class__, instance=self.group, user=self.student.user)
+            student_pulled.send_robust(
+                sender=self.__class__, instance=self.group, user=self.student.user)
             return other_groups_query_list

@@ -10,17 +10,20 @@ import { mapGetters } from "vuex";
 import Component from "vue-class-component";
 
 import { Group } from "../models";
-import { CourseShell } from "../store/courses";
+import courses, { CourseInfo } from "../store/courses";
 
-export type CourseObject = { id: number; course__entity: string; url: string };
+export type CourseObject = { id: number; name: string; url: string };
 
 @Component({
-  props: {
-    courses: Array as () => CourseObject[],
+  computed: {
+    ...mapGetters("courses", {
+      selectionState: "selection",
+      courses: "courses"
+    }),
+    ...mapGetters("filters", {
+      tester: "visible"
+    })
   },
-  computed: mapGetters("courses", {
-    selectionState: "selection"
-  }),
 })
 export default class CourseList extends Vue {
   // The computed property selectionState comes from store.
@@ -31,17 +34,32 @@ export default class CourseList extends Vue {
   set selection(value: number[]) {
     this.$store.dispatch("courses/updateSelection", value);
   }
+
+  // The list should be initialised to contain all the courses and then apply
+  // filters whenever they update.
+  visibleCourses: CourseInfo[] = [];
+  mounted() {
+    this.visibleCourses = this.courses;
+
+    this.$store.subscribe((mutation, state) => {
+      switch(mutation.type) {
+        case "filters/registerFilter":
+          this.visibleCourses = this.courses.filter(this.tester);
+          break;
+      }
+    });
+  }
 }
 </script>
 
 <template>
   <div class="course-list-wrapper">
-    <a @click="selection = []">Odznacz wszystkie</a>
+    <a class="btn btn-small btn-light" @click="selection = []">Odznacz wszystkie</a>
     <div class="course-list-sidebar">
       <ul class="course-list-sidebar-inner">
-        <li v-for="c of courses" :key="c.id">
+        <li v-for="c of visibleCourses" :key="c.id">
           <input type="checkbox" :id="c.id" :value="c.id" v-model="selection">
-          <label :for="c.id">{{ c.entity__name }}</label>
+          <label :for="c.id">{{ c.name }}</label>
         </li>
       </ul>
     </div>
@@ -71,19 +89,6 @@ label {
   text-align: left;
   width: auto;
   float: initial;
-}
-
-.course-list-wrapper {
-  margin-top: 30px;
-}
-
-.course-list-sidebar {
-  margin-top: 5px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  z-index: 10;
-  max-height: 600px;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
 .course-list-sidebar-inner {

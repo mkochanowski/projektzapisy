@@ -184,6 +184,14 @@ $('.checkall').on('click', function(){
                 </tr>
                 {% endfor %}
             {% endif %}
+
+
+            {% if t0_time %}
+                <tr>
+                    <th>Czas T0</th>
+                    <td>{{ t0_time|date:dateFormatStr }}</td>
+                </tr>
+            {% endif %}
             {% endwith %}
         </table>
     </div>

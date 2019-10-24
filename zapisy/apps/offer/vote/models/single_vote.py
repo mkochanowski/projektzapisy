@@ -11,13 +11,9 @@ class SingleVoteQuerySet(models.QuerySet):
     """Defines chainable filters on SingleVote querysets."""
 
     def in_semester(self, semester: Semester):
-        """Filters only votes for courses taught in a given semester.
-
-        NOTE: This function will need to be modified when CourseEntity is
-        fully replaced with proposal model.
-        """
+        """Filters only votes for courses taught in a given semester."""
         system_state = SystemState.get_state_for_semester(semester)
-        return self.filter(state=system_state, proposal__entity__course__semester=semester)
+        return self.filter(state=system_state, proposal__courseinstance__semester=semester)
 
     def in_vote(self):
         """Filters only votes for courses in vote."""
@@ -80,11 +76,11 @@ class SingleVote(models.Model):
         Only votes for proposals that aren't free are counted. The purpose is to
         set the limit for correction.
         """
-        agg_dict = SingleVote.objects.filter(student=student,
-                                             state=state,
-                                             proposal__semester=semester,
-                                             proposal__course_type__free_in_vote=False).aggregate(
-                                                 models.Sum('value'))
+        agg_dict = SingleVote.objects.filter(
+            student=student,
+            state=state,
+            proposal__semester__in=[semester, SemesterChoices.UNASSIGNED],
+            proposal__course_type__free_in_vote=False).aggregate(models.Sum('value'))
         return agg_dict.get('value__sum')
 
     @staticmethod

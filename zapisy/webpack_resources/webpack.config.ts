@@ -347,7 +347,7 @@ const webpackConfig: webpack.Configuration = {
                 })
             },
             {
-                test: /\.(png|jpg|gif)$/,
+                test: /\.(png|jpg|gif|ico)$/,
                 use: [{
                     loader: "url-loader",
                     options: {
@@ -364,10 +364,12 @@ const webpackConfig: webpack.Configuration = {
             path.resolve(ASSET_DIR),
             path.resolve("./node_modules"),
         ],
-        extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
+        extensions: [".ts", ".js", ".vue", ".jsx", ".tsx", ".png", ".jpg", ".gif", ".ico"],
         alias: {
             vue$: "vue/dist/vue.runtime.esm.js",
             vuex$: "vuex/dist/vuex.esm.js",
+            // Allow absolute imports from other apps.
+            "@": path.resolve(ASSET_DEF_SEARCH_DIR),
         },
     },
     resolveLoader: {

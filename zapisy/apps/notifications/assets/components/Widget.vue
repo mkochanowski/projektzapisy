@@ -1,132 +1,105 @@
 <script lang="ts">
+import axios from "axios";
+import moment from "moment";
 import Vue from "vue";
 import Component from "vue-class-component";
-import axios, { AxiosProxyConfig, AxiosPromise } from 'axios';
-import moment from 'moment'
+import { parse, ParseFn, fromMap, aString, anArrayContaining } from "spicery";
 
-interface NotificationsArray {
-    id: string;
-    description: string;
-    issued_on: string;
-    target: string;
+class Notification {
+    constructor(
+        public id: string,
+        public description: string,
+        public issuedOn: string,
+        public target: string,
+    ) {}
 }
 
-interface NotificationsDict {
-    [key: string]: NotificationsArray;
-}
-
-interface ServerResponseDict {
-    data: NotificationsDict;
-}
-
-interface ServerResponseCount {
-    data: number;
-}
-
+// Defines a parser that validates and parses Notifications from JSON.
+const notifications: ParseFn<Notification> = (x: any) => new Notification(
+    fromMap(x, 'id', aString),
+    fromMap(x, 'description', aString),
+    fromMap(x, 'issued_on', aString),
+    fromMap(x, 'target', aString),
+)
+const notificationsArray = anArrayContaining(notifications);
 
 @Component({
     filters: {
         Moment: function(str: string) {
-    	    return moment(str).locale('pl').fromNow();
+    	    return moment(str).locale("pl").fromNow();
         }
     }
 })
-export default class NotificationsComponent extends Vue{
+export default class NotificationsComponent extends Vue {
+    n_list: Notification[] = [];
 
-    n_counter: number|null = null;
-    n_list: NotificationsDict = {};
-
-    getCount(): Promise<number> {
-        return axios.get('/notifications/count')
-        .then((result: ServerResponseCount) => {
-            return result.data
-        })
+    get n_counter(): number {
+        return this.n_list.length;
     }
 
-    async updateCounter(): Promise<void>{
-        this.n_counter = await this.getCount();
-    }
-
-    getNotifications(): Promise<void> {
-        return axios.get('/notifications/get')
-        .then((result: ServerResponseDict) => {
-            this.n_list = result.data
-        })
+    getNotifications() {
+        return axios
+            .get("/notifications/get")
+            .then(r => parse(notificationsArray)(r.data))
+            .then(t => { this.n_list = t });
     }
 
     deleteAll(): Promise<void> {
-        axios.defaults.xsrfCookieName = 'csrftoken';
-        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        axios.defaults.xsrfCookieName = "csrftoken";
+        axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-        return axios.post('/notifications/delete/all')
-        .then((request: ServerResponseDict) => {
-            this.n_list = request.data
-            this.updateCounter();
-        })
+        return axios
+            .post("/notifications/delete/all")
+            .then(r => parse(notificationsArray)(r.data))
+            .then(t => { this.n_list = t });
     }
 
     deleteOne(i: number): Promise<void> {
-        axios.defaults.xsrfCookieName = 'csrftoken';
-        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        axios.defaults.xsrfCookieName = "csrftoken";
+        axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-        var FormBody = new FormData();
-        FormBody.append('issued_on', this.n_list[i].issued_on);
-        FormBody.append('id', this.n_list[i].id);
-
-       return axios.request({
-            method: 'post',
-            url: '/notifications/delete',
-            data: FormBody,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            }
-        }).then((request: ServerResponseDict) => {
-            this.n_list = request.data
-            this.updateCounter();
-        })
-    }
-
-    refresh(): void{
-        if(this.n_counter){}
-        else{
-            this.updateCounter();
-        }
+        return axios
+            .post("/notifications/delete", {
+                uuid: i,
+            })
+            .then(r => parse(notificationsArray)(r.data))
+            .then(t => { this.n_list = t });
     }
 
     async created() {
-        await this.updateCounter()
-        setInterval(this.refresh, 2000);
+        this.getNotifications();
+        setInterval(this.getNotifications, 30000);
     }
-
 }
 </script>
-
 
 <template>
 <div>
     <li id="notification-dropdown" class="nav-item dropdown">
         <a class="nav-link dropdown-toggle specialdropdown ml-1" href="#" id="navbarDropdown" role="button"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <div v-if="n_counter" @click="getNotifications()">
-                <i class="fas fa-bell fa-lg"></i>
+            <div v-if="n_counter !== 0">
+                <font-awesome-icon :icon="['fas', 'bell']" size="lg" />
+                <span class="counter-badge">{{ n_counter }}</span>
             </div>
             <div v-else>
-               <i class="far fa-bell fa-lg"></i>
+               <font-awesome-icon :icon="['far', 'bell']" size="lg" />
             </div>
         </a>
-        <div class="dropdown-menu dropdown-menu-right m-2 pb-2 pt-0">
-            <form class="p-2 place-for-notifications">
-                <div v-for="elem in n_list" :key="elem.key" class="toast fade show mw-100 mb-2">
+        <div class="dropdown-menu dropdown-menu-right">
+            <form class="p-1 place-for-notifications">
+                <div v-for="elem in n_list" :key="elem.id" class="toast mb-1 show">
                     <div class="toast-header">
                         <strong class="mr-auto"></strong>
-                        <small class="text-muted">{{ elem.issued_on|Moment }}</small>
-                        <button type="button" class="ml-2 mb-1 close" @click="deleteOne(elem.key)">
+                        <small class="text-muted mx-2">{{ elem.issuedOn|Moment }}</small>
+                        <button type="button" class="close" @click="deleteOne(elem.id)">
                             &times;
                         </button>
                     </div>
-                    <div class="toast-body">
-                        <a :href="elem.target" class="text-body">{{ elem.description }}</a>
-                    </div>
+                    <a :href="elem.target" class="toast-link">
+                        <div class="toast-body text-body"
+                        v-html="elem.description"></div>
+                    </a>
                 </div>
             </form>
             <form>
@@ -139,29 +112,53 @@ export default class NotificationsComponent extends Vue{
             </form>
         </div>
     </li>
-
 </div>
 </template>
 
-<style>
-
-/*  Modification of the bootstrap class .dropdown-menu
-    for display notifications widget correctly.  */
-#notification-dropdown .dropdown-menu{
-    min-width: 350px;
+<style lang="scss" scoped>
+// Modifies the bootstrap class .dropdown-menu display notifications widget
+// correctly.
+#notification-dropdown .dropdown-menu {
+    @media (min-width: 992px) {
+        min-width: 350px;
+    }
     max-height: 500px;
     right: -160px;
 }
 
-/*  Hide arrow, what is default
-    for tag <a> in .dropdown-menu  */
-.specialdropdown::after{
+// Hide arrow, displayed by default for tag <a> in .dropdown-menu.
+.specialdropdown::after {
     content: none;
 }
 
-.place-for-notifications{
+a.toast-link:hover {
+    text-decoration: none;
+    .toast-body {
+        background-color: var(--light);
+    }
+}
+
+.place-for-notifications {
     max-height: 395px;
     overflow-y: auto;
 }
 
+.counter-badge {
+    background-color: var(--pink);
+    border-radius: 2px;
+    color: white;
+    font-weight: bold;
+
+    padding: 1px 3px;
+
+    // Bootstrap breakpoint at which the navbar is fully expanded.
+    @media (min-width: 992px) {
+        font-size: 10px;
+
+        position: absolute; // Position the badge within the relatively positioned button.
+        top: 2px;
+        right: 2px;
+    }
+    margin-left: 0.25em;
+}
 </style>
