@@ -20,12 +20,6 @@ class Term(models.Model):
         verbose_name='dzień tygodnia')
     start_time = models.TimeField(verbose_name='rozpoczęcie')
     end_time = models.TimeField(verbose_name='zakończenie')
-    classroom = models.ForeignKey(
-        'Classroom',
-        verbose_name='sala',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE)
     group = models.ForeignKey(
         'Group',
         verbose_name='grupa',
