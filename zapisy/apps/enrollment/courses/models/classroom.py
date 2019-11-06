@@ -121,9 +121,9 @@ class Classroom(models.Model):
 
             # get courses data
 
-            course_terms = Term.objects.filter(dayOfWeek=weekday,
-                                               group__course__semester=selected_semester)\
-                .select_related('classroom', 'group').prefetch_related('classrooms')
+            course_terms = Term.objects.filter(
+                dayOfWeek=weekday, group__course__semester=selected_semester).select_related(
+                    'group').prefetch_related('classrooms')
 
             # fill courses data
 
@@ -131,13 +131,9 @@ class Classroom(models.Model):
                 for classroom in course_term.classrooms.all():
                     if classroom not in rooms:
                         continue
-                    result[classroom.number]['terms'].append(make_dict(course_term.start_time,
-                                                                       course_term.end_time,
-                                                                       course_term.group.course.name))
-                if course_term.classroom is None:
-                    continue
-                result[course_term.classroom.number]['terms'].append(make_dict(
-                    course_term.start_time, course_term.end_time, course_term.group.course.name))
+                    result[classroom.number]['terms'].append(
+                        make_dict(course_term.start_time, course_term.end_time,
+                                  course_term.group.course.name))
         return json.dumps(result)
 
     @classmethod

@@ -126,7 +126,7 @@ def group_view(request, group_id):
     try:
         group = Group.objects.select_related(
             'course', 'course__semester', 'teacher', 'teacher__user'
-        ).prefetch_related('term', 'term__classroom').get(id=group_id)
+        ).prefetch_related('term', 'term__classrooms').get(id=group_id)
     except Group.DoesNotExist:
         raise Http404
 
