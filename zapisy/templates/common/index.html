@@ -1,10 +1,7 @@
 {% extends "base.html" %}
 
-{% load compressed %}
-
-{% block styles %}
-{% compressed_css 'mainpage' %}
-{% endblock %}
+{% load render_bundle from webpack_loader %}
+{% load filters %}
 
 {% block main-subtitle %}Strona główna{% endblock %}
 
@@ -19,7 +16,9 @@
             <span class="od-news-date">{{ news.date|date:"l, d.m.Y · G:i" }}</span>
             <span class="od-news-author">{{ news.author.get_full_name }}</span>
         </div>
-        <div class="my-3">{{ news.body|safe }}</div>
+        <div class="my-3">
+            {{ news.body|markdown }}
+        </div>
     </div>
     {% endfor %}
     <div class="row justify-content-end px-3">
@@ -43,4 +42,6 @@
             <a class="btn btn-secondary" href="{% url 'grade-main' %}">Przejdź</a>
         </div>
     </div>
+
+    {% render_bundle 'render-markdown' %}
 {% endblock %}
