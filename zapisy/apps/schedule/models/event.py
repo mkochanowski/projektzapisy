@@ -44,9 +44,7 @@ class Event(models.Model):
     description = models.TextField(verbose_name='Opis', blank=True)
     type = models.CharField(choices=TYPES, max_length=1, verbose_name='Typ')
     visible = models.BooleanField(verbose_name='Wydarzenie jest publiczne', default=False)
-
     status = models.CharField(choices=STATUSES, max_length=1, verbose_name='Stan', default='0')
-
     course = models.ForeignKey(CourseInstance, null=True, blank=True, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.CASCADE)
     reservation = models.ForeignKey(
