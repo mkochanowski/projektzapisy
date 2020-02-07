@@ -11,11 +11,9 @@ from apps.grade.poll.forms import SubmissionEntryForm, TicketsEntryForm
 from apps.grade.poll.models import Poll, Submission
 from apps.grade.poll.utils import (
     PollSummarizedResults,
-    PollSummarizedResultsEntry,
     SubmissionWithStatus,
     check_grade_status,
     group,
-    group_submissions,
     group_submissions_with_statuses,
 )
 from apps.grade.ticket_create.models.rsa_keys import RSAKeys
@@ -55,6 +53,9 @@ class TicketsEntry(TemplateView):
                 messages.error(
                     request, "Wprowadzone klucze nie są w poprawnym formacie."
                 )
+                return redirect('grade-poll-tickets-enter')
+            except ValueError as e:
+                messages.error(request, f"Niepoprawne klucze: {e}")
                 return redirect('grade-poll-tickets-enter')
 
             entries = []
@@ -185,7 +186,6 @@ class PollResults(TemplateView):
     @staticmethod
     def __get_counter_for_categories(polls):
         number_of_submissions_for_category = defaultdict(int)
-
         for poll in polls:
             if poll:
                 number_of_submissions_for_category[
@@ -287,7 +287,7 @@ class ClearSession(View):
     """Removes submissions from the active session."""
 
     def get(self, request):
-        del self.request.session['grade_poll_submissions']
+        self.request.session.flush()
         messages.success(
             request,
             "Dziękujemy za wzięcie udziału w ocenie zajęć! "

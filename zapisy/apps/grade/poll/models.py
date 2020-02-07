@@ -1,7 +1,7 @@
 import json
 import os.path
 
-from typing import List, Set, Union
+from typing import List, Union
 from choicesenum import ChoicesEnum
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -66,10 +66,6 @@ class Poll(models.Model):
         if self.course:
             return PollType.EXAM
         return PollType.GENERAL
-
-    @property
-    def number_of_submissions(self):
-        return Submission.objects.filter(poll=self.pk, submitted=True).count()
 
     @property
     def get_semester(self):
@@ -191,39 +187,44 @@ class Poll(models.Model):
         return polls
 
     @staticmethod
-    def get_all_polls_for_semester(user, semester: Semester = None) -> Set:
+    def get_all_polls_for_semester(user, semester: Semester = None) -> List['Poll']:
+        """Returns all polls that user may see the submissions for.
+
+        The polls will be annotated with submission counts.
+        """
         current_semester = semester
         if current_semester is None:
             current_semester = Semester.get_current_semester()
 
-        polls = set()
         is_superuser = user.is_superuser
         is_employee = BaseUser.is_employee(user)
 
-        if is_superuser or is_employee:
-            poll_for_semester = Poll.objects.filter(semester=current_semester).first()
-            polls.add(poll_for_semester)
+        if not is_superuser and not is_employee:
+            return Poll.objects.none()
+        poll_for_semester = Poll.objects.filter(semester=current_semester)
 
-            if is_superuser:
-                polls_for_courses = Poll.objects.filter(
-                    course__semester=current_semester
-                )
-                polls_for_groups = Poll.objects.filter(
-                    group__course__semester=current_semester
-                )
-            elif is_employee:
-                polls_for_courses = Poll.objects.filter(
-                    course__semester=current_semester,
-                    course__owner=user.employee,
-                )
-                polls_for_groups = Poll.objects.filter(
-                    group__course__semester=current_semester,
-                    group__teacher=user.employee,
-                )
-            polls.update(polls_for_courses)
-            polls.update(polls_for_groups)
+        if is_superuser:
+            polls_for_courses = Poll.objects.filter(
+                course__semester=current_semester
+            )
+            polls_for_groups = Poll.objects.filter(
+                group__course__semester=current_semester
+            )
+        elif is_employee:
+            polls_for_courses = Poll.objects.filter(
+                course__semester=current_semester,
+                course__owner=user.employee,
+            ) | Poll.objects.filter(group__course__semester=current_semester,
+                                    group__course__owner=user.employee)
+            polls_for_groups = Poll.objects.filter(
+                group__course__semester=current_semester,
+                group__teacher=user.employee,
+            )
 
-        return polls
+        qs = poll_for_semester | polls_for_courses | polls_for_groups
+
+        sub_count_ann = models.Count('submission', filter=models.Q(submission__submitted=True))
+        return list(qs.annotate(number_of_submissions=sub_count_ann))
 
 
 class Schema(models.Model):
@@ -397,68 +398,3 @@ class Submission(models.Model):
             submission.save()
 
         return submission
-
-    @classmethod
-    def get_all_submissions_for_course(cls, course: CourseInstance) -> Set:
-        """Lists all submissions tied to a given course.
-
-        Also includes all submissions for all groups of the selected
-        course.
-
-        :returns: a list of submissions.
-        """
-        submissions = set()
-        submissions_for_course = cls.objects.filter(poll__course=course, submitted=True)
-        if submissions_for_course:
-            submissions.update(submissions_for_course)
-
-        submissions_for_groups = set()
-        groups = Group.objects.filter(course=course)
-        for group in groups:
-            submissions_for_group = cls.objects.filter(
-                poll__group=group, submitted=True
-            )
-            if submissions_for_group:
-                submissions_for_groups.update(submissions_for_group)
-
-        if submissions_for_groups:
-            submissions.update(submissions_for_groups)
-
-        return submissions
-
-    @classmethod
-    def get_all(cls, user, semester=None) -> Set:
-        """Lists all submissions that the given user has access to.
-
-        Checks whether the user is an employee or has superadmin
-        privileges and creates a list of accessible, submitted
-        submissions.
-
-        :param user: possibly, an employee or a superuser.
-        :param semester:
-        :returns: a list of submissions for a given user.
-        """
-        submissions = set()
-        if not semester:
-            semester = Semester.get_current_semester()
-
-        if BaseUser.is_employee(user) or user.is_superuser:
-            if user.is_superuser:
-                courses = CourseInstance.objects.filter(semester=semester)
-            else:
-                courses = CourseInstance.objects.filter(
-                    owner=user.employee, semester=semester
-                )
-
-            general_submissions = cls.objects.filter(
-                poll__semester=semester, submitted=True
-            )
-            if general_submissions:
-                submissions.update(general_submissions)
-
-            for course in courses:
-                submissions_for_course = cls.get_all_submissions_for_course(course)
-                if submissions_for_course:
-                    submissions.update(submissions_for_course)
-
-        return submissions
