@@ -234,7 +234,8 @@ class PollResults(TemplateView):
         )
         current_poll = Poll.objects.filter(id=poll_id).first()
         if poll_id is not None:
-            submissions = Submission.objects.filter(poll=poll_id, submitted=True)
+            submissions = Submission.objects.filter(poll=poll_id,
+                                                    submitted=True).order_by('modified')
             if current_poll not in available_polls:
                 # User does not have permission to view details about
                 # the selected poll
