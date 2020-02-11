@@ -62,19 +62,27 @@ class RSAKeys(models.Model):
         # Make sure all provided ids exist in database
         if len(polls) != len(tickets_list):
             raise ValueError("Provided id doesn't exist in database")
-        tickets_list.sort(key=lambda ticket: ticket['id'])
+        try:
+            tickets_list.sort(key=lambda ticket: ticket['id'])
+        except KeyError as e:
+            raise ValueError(f"W słowniku brakuje pola {e}")
 
         valid_polls = []
         error_polls = []
 
         for poll, tickets in zip(polls, tickets_list):
             keys = RSAKeys.objects.get(poll=poll)
-            ticket = int(tickets['ticket'].encode())
-            signed_ticket = int(tickets['signature'].encode())
-            if keys.verify_ticket(signed_ticket, ticket):
-                valid_polls.append((tickets['ticket'], poll))
-            else:
-                error_polls.append(poll)
+            try:
+                ticket = int(tickets['ticket'].encode())
+                signed_ticket = int(tickets['signature'].encode())
+                if keys.verify_ticket(signed_ticket, ticket):
+                    valid_polls.append((tickets['ticket'], poll))
+                else:
+                    error_polls.append(poll)
+            except KeyError as e:
+                raise ValueError(f"W słowniku brakuje pola {e}")
+            except TypeError as e:
+                raise ValueError(f"{e}")
         return valid_polls, error_polls
 
     def sign_ticket(self, ticket):
