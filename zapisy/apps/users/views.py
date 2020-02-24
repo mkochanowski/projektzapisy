@@ -4,7 +4,7 @@ import logging
 import re
 import urllib
 
-from typing import Any, Optional
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -27,18 +27,14 @@ import unidecode
 from apps.enrollment.courses.models import Group, Semester
 from apps.enrollment.records.models import Record, RecordStatus, GroupOpeningTimes, T0Times
 from apps.enrollment.timetable.views import build_group_list
-from apps.enrollment.utils import mailto
 from apps.notifications.views import create_form
 from apps.users.decorators import external_contractor_forbidden
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 
-from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
-from apps.users.models import Employee, Student, BaseUser, PersonalDataConsent
+from apps.users.models import Employee, Student, PersonalDataConsent, BaseUser
 from apps.users.forms import EmailChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 from apps.users.exceptions import InvalidUserException
-from libs.ajax_messages import AjaxSuccessMessage
 from mailer.models import Message
-
 
 logger = logging.getLogger()
 
@@ -51,91 +47,101 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 
 @login_required
 @external_contractor_forbidden
-def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
-    """student profile"""
-    try:
-        student: Student = Student.objects.select_related('user', 'consent').get(user_id=user_id)
-    except Student.DoesNotExist:
-        raise Http404
+def students_view(request: HttpRequest, user_id: int = None) -> HttpResponse:
+    """View for students list and student profile if user id in URL is provided"""
+    students_queryset = Student.get_active_students().select_related('user')
+    if not BaseUser.is_employee(request.user) or BaseUser.is_external_contractor(request.user):
+        students_queryset = students_queryset.filter(consent__granted=True)
+    students = {
+        s.pk: {
+            'last_name': s.user.last_name,
+            'first_name': s.user.first_name,
+            'id': s.user.id,
+            'album': s.matricula,
+            'email': s.user.email
+        }
+        for s in students_queryset
+    }
+    data = {
+        'students': students,
+        'user_link': reverse('students-list'),
+    }
 
-    # We will not show the student profile if he decides to hide it.
-    if not BaseUser.is_employee(request.user) and not student.consent_granted():
-        return HttpResponseRedirect(reverse('students-list'))
+    if user_id is not None:
+        try:
+            student: Student = Student.objects.select_related('user', 'consent').get(user_id=user_id)
+        except Student.DoesNotExist:
+            raise Http404
 
-    semester = Semester.objects.get_next()
+        # We will not show the student profile if he decides to hide it.
+        if not BaseUser.is_employee(request.user) and not student.consent_granted():
+            return HttpResponseRedirect(reverse('students-list'))
 
-    records = Record.objects.filter(
-        student=student,
-        group__course__semester=semester, status=RecordStatus.ENROLLED).select_related(
+        semester = Semester.objects.get_next()
+
+        records = Record.objects.filter(
+            student=student,
+            group__course__semester=semester, status=RecordStatus.ENROLLED).select_related(
             'group__teacher', 'group__teacher__user', 'group__course').prefetch_related(
-                'group__term', 'group__term__classrooms')
-    groups = [r.group for r in records]
+            'group__term', 'group__term__classrooms')
+        groups = [r.group for r in records]
 
-    # Highlight groups shared with the viewer in green.
-    viewer_groups = Record.common_groups(request.user, groups)
-    for g in groups:
-        g.is_enrolled = g.pk in viewer_groups
+        # Highlight groups shared with the viewer in green.
+        viewer_groups = Record.common_groups(request.user, groups)
+        for g in groups:
+            g.is_enrolled = g.pk in viewer_groups
 
-    group_dicts = build_group_list(groups)
+        group_dicts = build_group_list(groups)
+
+        data.update({
+            'student': student,
+            'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
+        })
+    return render(request, 'users/users_view.html', data)
+
+
+def employees_view(request: HttpRequest, user_id: int = None) -> HttpResponse:
+    """View for employees list and employee profile if user id in URL is provided"""
+    employees_queryset = Employee.get_actives().select_related('user')
+    employees = {
+        e.pk: {
+            'last_name': e.user.last_name,
+            'first_name': e.user.first_name,
+            'id': e.user.id,
+            'email': e.user.email,
+        }
+        for e in employees_queryset
+    }
     data = {
-        'student': student,
-        'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
+        'employees': employees_queryset,
+        'employees_dict': employees,
+        'user_link': reverse('employees-list'),
     }
 
-    if request.is_ajax():
-        return render(request, 'users/student_profile_contents.html', data)
+    if user_id is not None:
+        try:
+            employee = Employee.objects.select_related('user').get(user_id=user_id)
+        except Employee.DoesNotExist:
+            raise Http404
 
-    active_students = Student.get_list(
-        begin='All', restrict_list_consent=not BaseUser.is_employee(request.user))
-    data.update({
-        'students': active_students,
-        'char': "All",
-    })
-    return render(request, 'users/student_profile.html', data)
-
-
-def employee_profile(request: HttpRequest, user_id: int) -> HttpResponse:
-    """employee profile"""
-    try:
-        employee = Employee.objects.select_related('user').get(user_id=user_id)
-    except Employee.DoesNotExist:
-        raise Http404
-
-    semester = Semester.objects.get_next()
-    groups = Group.objects.filter(
-        course__semester_id=semester.pk, teacher=employee).select_related(
+        semester = Semester.objects.get_next()
+        groups = Group.objects.filter(
+            course__semester_id=semester.pk, teacher=employee).select_related(
             'teacher', 'teacher__user', 'course').prefetch_related('term', 'term__classrooms')
-    groups = list(groups)
+        groups = list(groups)
 
-    # Highlight groups shared with the viewer in green.
-    viewer_groups = Record.common_groups(request.user, groups)
-    for g in groups:
-        g.is_enrolled = g.pk in viewer_groups
+        # Highlight groups shared with the viewer in green.
+        viewer_groups = Record.common_groups(request.user, groups)
+        for g in groups:
+            g.is_enrolled = g.pk in viewer_groups
 
-    group_dicts = build_group_list(groups)
+        group_dicts = build_group_list(groups)
 
-    data = {
-        'employee': employee,
-        'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
-    }
-
-    if request.is_ajax():
-        return render(request, 'users/employee_profile_contents.html', data)
-
-    current_groups = Group.objects.filter(course__semester_id=semester.pk).select_related(
-        'teacher', 'teacher__user').distinct('teacher')
-    active_teachers = map(lambda g: g.teacher, current_groups)
-    for e in active_teachers:
-        e.short_new = (e.user.first_name[:1] +
-                       e.user.last_name[:2]) if e.user.first_name and e.user.last_name else None
-        e.short_old = (e.user.first_name[:2] +
-                       e.user.last_name[:2]) if e.user.first_name and e.user.last_name else None
-
-    data.update({
-        'employees': active_teachers,
-        'char': "All",
-    })
-    return render(request, 'users/employee_profile.html', data)
+        data.update({
+            'employee': employee,
+            'groups_json': json.dumps(group_dicts, cls=DjangoJSONEncoder),
+        })
+    return render(request, 'users/users_view.html', data)
 
 
 @login_required
@@ -235,8 +241,8 @@ def my_profile(request):
         student: Student = request.user.student
         groups_opening_times = GroupOpeningTimes.objects.filter(
             student_id=student.pk, group__course__semester_id=semester.pk).select_related(
-                'group', 'group__course', 'group__teacher',
-                'group__teacher__user').prefetch_related('group__term', 'group__term__classrooms')
+            'group', 'group__course', 'group__teacher',
+            'group__teacher__user').prefetch_related('group__term', 'group__term__classrooms')
         groups_times = []
         got: GroupOpeningTimes
         for got in groups_opening_times:
@@ -267,57 +273,13 @@ def my_profile(request):
     return render(request, 'users/my_profile.html', data)
 
 
-def employees_list(request: HttpRequest, begin: str='All', query: Optional[str]=None) -> HttpResponse:
-
-    employees = Employee.get_list(begin)
-
-    if request.is_ajax():
-        employees = prepare_ajax_employee_list(employees)
-        return AjaxSuccessMessage(message="ok", data=employees)
-    else:
-        data = {
-            "employees": employees,
-            "char": begin,
-            "query": query
-        }
-
-    return render(request, 'users/employees_list.html', data)
-
-
-def consultations_list(request: HttpRequest, begin: str='A') -> HttpResponse:
-
-    employees = Employee.get_list('All')
+def consultations_list(request: HttpRequest) -> HttpResponse:
+    employees = Employee.objects.filter(status=0)
     semester = Semester.get_current_semester()
     employees = Group.teacher_in_present(employees, semester)
 
-    if request.is_ajax():
-        employees = prepare_ajax_employee_list(employees)
-        return AjaxSuccessMessage(message="ok", data=employees)
-    else:
-        data = {
-            "employees": employees,
-            "char": begin
-        }
-        return render(request, 'users/consultations_list.html', data)
-
-
-@login_required
-@external_contractor_forbidden
-def students_list(request: HttpRequest, begin: str='All', query: Optional[str]=None) -> HttpResponse:
-    students = Student.get_list(begin, not BaseUser.is_employee(request.user))
-
-    if request.is_ajax():
-        students = prepare_ajax_students_list(students)
-        return AjaxSuccessMessage(message="ok", data=students)
-    else:
-        data = {
-            "students": students,
-            "char": begin,
-            "query": query,
-            'mailto_group': mailto(request.user, students),
-            'mailto_group_bcc': mailto(request.user, students, True)
-        }
-        return render(request, 'users/students_list.html', data)
+    data = {'employees': employees}
+    return render(request, 'users/consultations_list.html', data)
 
 
 @login_required
@@ -426,7 +388,7 @@ def create_ical_file(request: HttpRequest) -> HttpResponse:
                     + ', Instytut Informatyki Uniwersytetu Wrocławskiego'
 
             event.add('description').value = 'prowadzący: ' \
-                + group.get_teacher_full_name()
+                                             + group.get_teacher_full_name()
             event.add('dtstart').value = start_datetime
             event.add('dtend').value = end_datetime
 
@@ -440,7 +402,7 @@ def create_ical_file(request: HttpRequest) -> HttpResponse:
 @permission_required('users.mailto_all_students')
 def email_students(request: HttpRequest) -> HttpResponse:
     """function that enables mailing all students"""
-    students = Student.get_list('All')
+    students = Student.objects.filter(status=0)
     if students:
         studentsmails = ','.join([student.user.email for student in students])
 
