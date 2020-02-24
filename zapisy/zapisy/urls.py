@@ -16,15 +16,12 @@ urlpatterns = [
     url(r'^records/', include('apps.enrollment.records.urls')),
     path('timetable/', include('apps.enrollment.timetable.urls')),
     url(r'^statistics/', include(('apps.statistics.urls', 'statistics'), namespace='statistics')),
-    url(r'^consultations/$', users_views.consultations_list, name="consultations-list"),
     path('theses/', include(('apps.theses.urls', 'theses'), namespace='theses')),
 
     url(r'^news/', include('apps.news.urls')),
     url(r'^users/', include('apps.users.urls')),
 
     url(r'^grade/', include('apps.grade.urls')),
-    url(r'^s/(?P<query>.*)/$', users_views.students_list, name='users-list-search'),
-    url(r'^e/(?P<query>.*)/$', users_views.employees_list, name='users-list-search'),
 
     url(r'^offer/', include('apps.offer.proposal.urls')),
     url(r'^prefs/', include('apps.offer.preferences.urls')),
@@ -33,7 +30,6 @@ urlpatterns = [
     url(r'^vote/', include('apps.offer.vote.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', admin.site.urls),
-
 
     path('accounts/', include('apps.email_change.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
