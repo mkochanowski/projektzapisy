@@ -167,7 +167,7 @@ class Command(BaseCommand):
         sync_data_objects = TermSyncData.objects.filter(term__group__course__semester=self.semester)
         for sync_data_object in sync_data_objects:
             if sync_data_object.scheduler_id not in self.summary.used_scheduler_ids:
-                groups_to_remove.add(sync_data_object.term.group)
+                groups_to_remove.add(sync_data_object.term.group_id)
                 self.summary.deleted_terms.append((str(sync_data_object.term),
                                                    str(sync_data_object.term.group)))
                 sync_data_object.term.delete()
