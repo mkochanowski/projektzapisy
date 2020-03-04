@@ -42,9 +42,10 @@ Record Lifetime:
     filled by an asynchronous process, so the GROUP_CHANGE_SIGNAL is sent.
 """
 
+from collections import defaultdict
 import logging
 from datetime import datetime
-from typing import Dict, Iterable, List, Optional, Set
+from typing import DefaultDict, Dict, Iterable, List, Optional, Set
 
 from choicesenum import ChoicesEnum
 from enum import Enum
@@ -215,18 +216,30 @@ class Record(models.Model):
         return ret
 
     @staticmethod
-    def get_number_of_waiting_students(course: CourseInstance, group_type: str) -> int:
-        """Returns number of students waiting to be enrolled.
+    def list_waiting_students(
+            courses: List[CourseInstance]) -> DefaultDict[int, DefaultDict[int, int]]:
+        """Returns students waiting to be enrolled.
 
         Returned students aren't enrolled in any group of given type within
         given course, but they are enqueued into at least one.
+
+        Returns:
+            A dict indexed by a course_id. Every entry is a dict mapping
+            group_type to a number of waiting students.
         """
-        return Record.objects.filter(
-            status=RecordStatus.QUEUED, group__course=course,
-            group__type=group_type).only('student').exclude(
-                student__in=Record.objects.filter(
-                    status=RecordStatus.ENROLLED, group__course=course, group__type=group_type).
-                only('student').values_list('student')).distinct('student').count()
+        queued = Record.objects.filter(
+            status=RecordStatus.QUEUED, group__course__in=courses).values(
+                'group__course', 'group__type', 'student__user',
+                'student__user__first_name', 'student__user__last_name')
+        enrolled = Record.objects.filter(
+            status=RecordStatus.ENROLLED, group__course__in=courses).values(
+                'group__course', 'group__type', 'student__user', 'student__user__first_name',
+                'student__user__last_name')
+        waiting = queued.difference(enrolled)
+        ret = defaultdict(lambda: defaultdict(int))
+        for w in waiting:
+            ret[w['group__course']][w['group__type']] += 1
+        return ret
 
     @classmethod
     def is_enrolled(cls, student: Student, group: Group) -> bool:
