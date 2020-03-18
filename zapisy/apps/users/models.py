@@ -1,15 +1,12 @@
-import datetime
 import logging
-from typing import List, TYPE_CHECKING, Optional
+from typing import List, Optional
 
-from django.db import models
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.db.models import QuerySet
 from django.core.validators import MaxLengthValidator
+from django.db import models
+from django.db.models import QuerySet
 
-from apps.users.exceptions import NonUserException
 
 logger = logging.getLogger()
 
@@ -17,77 +14,28 @@ EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 ISIM_PROGRAM_NAME = 'ISIM, dzienne I stopnia'
 
 
-class Related(models.Manager):
-    def get_queryset(self) -> QuerySet:
-        return super(Related, self).get_queryset().select_related('user')
+def is_student(user: User) -> bool:
+    return hasattr(user, 'student_ptr')
+
+
+def is_employee(user: User) -> bool:
+    return hasattr(user, 'employee_ptr')
+
+
+def is_external_contractor(user: User) -> bool:
+    return is_user_in_group(user, 'external_contractors')
 
 
 def is_user_in_group(user: User, group_name: str) -> bool:
     return user.groups.filter(name=group_name).exists() if user else False
 
 
-class BaseUser(models.Model):
-    """
-    User abstract class. For every app user there is entry in django.auth.
-    We do not inherit after User directly, because of problems with logging beckend etc.
-    """
-    last_news_view = models.DateTimeField(default=datetime.datetime.now)
-
-    objects = Related()
-
-    def get_full_name(self) -> str:
-        return self.user.get_full_name()
-    get_full_name.short_description = 'Użytkownik'
-
-    def get_number_of_news(self) -> int:
-        from apps.news.models import News
-        if not hasattr(self, '_count_news'):
-            self._count_news = News.objects.exclude(
-                category='-').filter(date__gte=self.last_news_view).count()
-
-        return self._count_news
-
-    @staticmethod
-    def get(user_id: int) -> User:
-        """Returns user with specified id.
-
-        Raises:
-            NonUserException: If user with specified id doesn't exist.
-        """
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            logger.error(
-                'Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' %
-                user_id)
-            raise NonUserException
-        return user
-
-    @staticmethod
-    def is_student(user: User) -> bool:
-        return hasattr(user, 'student')
-
-    @staticmethod
-    def is_employee(user: User) -> bool:
-        return hasattr(user, 'employee')
-
-    @staticmethod
-    def is_external_contractor(user: User) -> bool:
-        return is_user_in_group(user, 'external_contractors')
-
-    def __str__(self) -> str:
-        return self.get_full_name()
-
-    class Meta:
-        abstract: bool = True
-
-
-class Employee(BaseUser):
-
+class Employee(models.Model):
     user = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
-        related_name='employee',
+        related_name='employee_ptr',
+        related_query_name='employee',
         on_delete=models.CASCADE)
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True, validators=[MaxLengthValidator(4200)])
     homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
@@ -115,6 +63,10 @@ class Employee(BaseUser):
                 group_id)
         return False
 
+    def get_full_name(self) -> str:
+        return self.user.get_full_name()
+    get_full_name.short_description = 'Użytkownik'
+
     @staticmethod
     def get_actives() -> QuerySet:
         return Employee.objects.filter(user__is_active=True).order_by('user__last_name',
@@ -133,16 +85,17 @@ class Employee(BaseUser):
         """Same as `get_full_name`, but prepends the employee's academic title
         if one is defined.
         """
-        base_name = super().get_full_name()
+        base_name = self.get_full_name()
         return f'{self.title} {base_name}' if self.title else base_name
 
 
-class Student(BaseUser):
+class Student(models.Model):
 
     user = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
-        related_name='student',
+        related_name='student_ptr',
+        related_query_name='student',
         on_delete=models.CASCADE)
     matricula = models.CharField(
         max_length=20,
@@ -211,6 +164,10 @@ class Student(BaseUser):
     def participated_in_last_grades(self) -> int:
         from apps.grade.ticket_create.models.student_graded import StudentGraded
         return StudentGraded.objects.filter(student=self, semester__in=[45, 239]).count()
+
+    def get_full_name(self) -> str:
+        return self.user.get_full_name()
+    get_full_name.short_description = 'Użytkownik'
 
     @classmethod
     def get_active_students(cls) -> QuerySet:

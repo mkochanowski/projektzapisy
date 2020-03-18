@@ -19,7 +19,7 @@ from apps.enrollment.records.models import Record, RecordStatus
 from apps.enrollment.timetable.models import Pin
 from apps.offer.proposal.models import Proposal
 from apps.users.decorators import student_required
-from apps.users.models import BaseUser, Employee, Student
+from apps.users.models import Employee, Student
 
 
 def build_group_list(groups: List[Group]):
@@ -124,9 +124,9 @@ def employee_timetable_data(employee: Employee):
 @login_required
 def my_timetable(request):
     """Shows the student/employee his own timetable page."""
-    if BaseUser.is_student(request.user):
+    if request.user.student:
         data = student_timetable_data(request.user.student)
-    elif BaseUser.is_employee(request.user):
+    elif request.user.employee:
         data = employee_timetable_data(request.user.employee)
     else:
         messages.error(

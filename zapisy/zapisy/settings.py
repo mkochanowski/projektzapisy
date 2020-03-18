@@ -226,7 +226,6 @@ INSTALLED_APPS = (
     # 'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
-    'apps.email_change',
     'apps.schedulersync',
     'apps.theses.apps.ThesesConfig',
     'django_extensions',

@@ -30,9 +30,9 @@ from apps.notifications.views import create_form
 from apps.users.decorators import employee_required, external_contractor_forbidden
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 
-from apps.users.models import Employee, Student, PersonalDataConsent, BaseUser
-from apps.users.forms import EmailChangeForm, ConsultationsChangeForm
-from apps.users.exceptions import InvalidUserException
+from .exceptions import InvalidUserException
+from .forms import EmailChangeForm, ConsultationsChangeForm
+from .models import Employee, Student, PersonalDataConsent
 
 logger = logging.getLogger()
 
@@ -48,7 +48,7 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 def students_view(request: HttpRequest, user_id: int = None) -> HttpResponse:
     """View for students list and student profile if user id in URL is provided"""
     students_queryset = Student.get_active_students().select_related('user')
-    if not BaseUser.is_employee(request.user) or BaseUser.is_external_contractor(request.user):
+    if not request.uset.employee:
         students_queryset = students_queryset.filter(consent__granted=True)
     students = {
         s.pk: {
@@ -72,7 +72,8 @@ def students_view(request: HttpRequest, user_id: int = None) -> HttpResponse:
             raise Http404
 
         # We will not show the student profile if he decides to hide it.
-        if not BaseUser.is_employee(request.user) and not student.consent_granted():
+        if not request.user.employee and not student.consent_granted():
+            messages.warning(request, "Student ukrył swój profil")
             return HttpResponseRedirect(reverse('students-list'))
 
         semester = Semester.objects.get_next()
@@ -223,7 +224,7 @@ def my_profile(request):
         'semester': semester,
     }
 
-    if BaseUser.is_employee(request.user):
+    if request.user.employee:
         data.update({
             'consultations': request.user.employee.consultations,
             'room': request.user.employee.room,
@@ -231,7 +232,7 @@ def my_profile(request):
             'title': request.user.employee.title,
         })
 
-    if semester and BaseUser.is_student(request.user):
+    if semester and request.user.student:
         student: Student = request.user.student
         groups_opening_times = GroupOpeningTimes.objects.filter(
             student_id=student.pk, group__course__semester_id=semester.pk).select_related(
@@ -344,14 +345,14 @@ def create_ical_file(request: HttpRequest) -> HttpResponse:
     cal.add('calname').value = "{} - schedule".format(user.get_full_name())
     cal.add('method').value = 'PUBLISH'
 
-    if BaseUser.is_student(user):
+    if request.user.student:
         student = user.student
         records = Record.objects.filter(
             student_id=student.pk, group__course__semester_id=semester.pk,
             status=RecordStatus.ENROLLED
         ).select_related('group', 'group__course')
         groups = [r.group for r in records]
-    elif BaseUser.is_employee(user):
+    elif request.user.employee:
         groups = list(Group.objects.filter(course__semester=semester, teacher=user.employee))
     else:
         raise InvalidUserException()
