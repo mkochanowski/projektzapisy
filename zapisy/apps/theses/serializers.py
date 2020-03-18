@@ -11,7 +11,7 @@ from rest_framework import serializers, exceptions
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.contrib.auth.models import User
 
-from apps.users.models import Employee, Student, BaseUser
+from apps.users.models import Employee, Student
 from .models import (
     Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN,
     VotesToProcess, VoteToProcess,
@@ -44,7 +44,7 @@ class ThesesPersonSerializer(serializers.Serializer):
         self.queryset = kwargs.pop("queryset", None)
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, instance: BaseUser):
+    def to_representation(self, instance: User):
         result = {
             "id": instance.pk,
             "name": get_theses_user_full_name(instance)
@@ -329,16 +329,16 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             return ThesisUserType.ADMIN
         elif is_theses_regular_employee(user):
             return ThesisUserType.REGULAR_EMPLOYEE
-        elif BaseUser.is_student(user):
+        elif user.student:
             return ThesisUserType.STUDENT
         # We're generally not expecting this to happen
         return ThesisUserType.NONE
 
     @staticmethod
     def _to_base_person(user: User):
-        if BaseUser.is_employee(user):
+        if user.employee:
             return user.employee
-        elif BaseUser.is_student(user):
+        elif user.student:
             return user.student
         raise exceptions.NotFound()
 

@@ -28,10 +28,10 @@ urlpatterns = [
     url(r'^desiderata/', include('apps.offer.desiderata.urls')),
     url(r'^', include(('apps.schedule.urls', 'events'), namespace='events')),
     url(r'^vote/', include('apps.offer.vote.urls')),
+    url(r'^plan/', include('apps.offer.plan.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', admin.site.urls),
 
-    path('accounts/', include('apps.email_change.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/login', cas_views.LoginView.as_view(), name='cas_ng_login'),
     path('accounts/logout', users_views.cas_logout, name='cas_ng_logout'),

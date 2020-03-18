@@ -1,10 +1,11 @@
 from typing import List
 import json
 
+from django.contrib.auth.models import User
 from rest_framework import status
 from django.urls import reverse
 
-from apps.users.models import BaseUser, Employee
+from apps.users.models import Employee
 from ..users import get_theses_user_full_name
 from ..enums import ThesisUserType
 from .base import ThesesBaseTestCase
@@ -19,7 +20,7 @@ class OtherEndpointsTestCase(ThesesBaseTestCase):
         response = self.client.get(reverse("theses:theses_board-list"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def _test_theses_board_ok_for_user(self, user: BaseUser):
+    def _test_theses_board_ok_for_user(self, user: User):
         """Ensure the specified user can access the theses board and gets correct results"""
         self.login_as(user)
         response = self.client.get(reverse("theses:theses_board-list"))
@@ -41,7 +42,7 @@ class OtherEndpointsTestCase(ThesesBaseTestCase):
         response = self.client.get(reverse("theses:theses_employees-list"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def _test_theses_employees_ok_for_user(self, user: BaseUser):
+    def _test_theses_employees_ok_for_user(self, user: User):
         """Ensure that the "get all employees" endpoint works correctly"""
         self.login_as(user)
         response = self.client.get(reverse("theses:theses_employees-list"))
@@ -65,7 +66,7 @@ class OtherEndpointsTestCase(ThesesBaseTestCase):
         response = self.client.get(reverse("theses:current_user"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def _test_current_user_for_user(self, user: BaseUser, expected_type: ThesisUserType):
+    def _test_current_user_for_user(self, user: User, expected_type: ThesisUserType):
         self.login_as(user)
         response = self.client.get(reverse("theses:current_user"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -93,7 +94,7 @@ class OtherEndpointsTestCase(ThesesBaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def _test_autocomplete_filtering(
-        self, url: str, matching_users: List[BaseUser], search_filter: str
+        self, url: str, matching_users: List[User], search_filter: str
     ):
         response = self.client.get(url, {"filter": search_filter})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -137,7 +138,7 @@ class OtherEndpointsTestCase(ThesesBaseTestCase):
         response = self.client.get(reverse("theses:num_ungraded"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def get_num_ungraded_response_for_user(self, user: BaseUser) -> int:
+    def get_num_ungraded_response_for_user(self, user: User) -> int:
         self.login_as(user)
         return self.client.get(reverse("theses:num_ungraded"))
 
