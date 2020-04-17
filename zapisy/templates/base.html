@@ -37,7 +37,7 @@
     {% block js %}{% endblock %}
     {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
-    
+
 </head>
 
 <body>
@@ -63,9 +63,9 @@
                         <a href="{% url 'events:classrooms' %}" class="nav-link">Sale</a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li {% block theses_active %}{% endblock %} class="nav-item">
-                        <a href="{% url 'theses:main' %}" class="nav-link">Prace dyplomowe</a>
-                    </li>
+                        <li {% block theses_active %}{% endblock %} class="nav-item">
+                            <a href="{% url 'theses:main' %}" class="nav-link">Prace dyplomowe</a>
+                        </li>
                     {% endif %}
                 </ul>
             {% if user.is_authenticated %}
@@ -113,8 +113,8 @@
                                 </a>
                             </div>
                             <form class="m-3">
-                                <a class="btn btn-primary" data-toggle="collapse" 
-                                        href="#login-without-usos" role="button" 
+                                <a class="btn btn-primary" data-toggle="collapse"
+                                        href="#login-without-usos" role="button"
                                         aria-expanded="false" aria-controls="login-without-usos">
                                     lub użyj konta Systemu Zapisów
                                 </a>
@@ -144,7 +144,7 @@
                                                     required>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Zaloguj</button>
-                                        <a class="btn btn-primary" href="{% url 'password_reset' %}">Resetuj hasło</a> 
+                                        <a class="btn btn-primary" href="{% url 'password_reset' %}">Resetuj hasło</a>
                                     </form>
                             </div>
                         </div>
@@ -163,7 +163,7 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div id="system_menu"> 
+                    <div id="system_menu">
                         <ul class="nav nav-tabs" id="main-menu-list" role="tablist">
                             {% block system_menu %}
                             {% endblock %}
@@ -197,14 +197,18 @@
                 </div>
             </div>
             <div class="row my-4">
-                <div class="col-lg-9 col-12" id="main-content">
-                    {# WARNING ajaxCourseLoad.ts depends on this #}
-                        {% block content %}
-                        {% endblock %}
-                </div>
-                <nav class="col-lg-3 col-12 d-print-none" id="sidebar">
-                    {% block sidebar %}
+                <div class="col-lg-9 col-12 order-last order-lg-first" id="main-content">
+                    {% block content %}
                     {% endblock %}
+                </div>
+                <nav class="col-lg-3 col-12
+                        d-print-none order-first
+                        order-lg-last mb-3" id="sidebar">
+                    <div class="folded" id="sidebar-inner">
+                        {% block sidebar %}
+                        {% endblock %}
+                    </div>
+                    <a class="text-dark" href="#" id="fold-toggler">zwiń / rozwiń</a>
                 </nav>
             </div>
             {% endblock %}
