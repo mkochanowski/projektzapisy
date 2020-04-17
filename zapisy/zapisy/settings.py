@@ -227,7 +227,7 @@ INSTALLED_APPS = (
     'apps.grade.poll',
     'apps.grade.ticket_create',
     'apps.schedulersync',
-    'apps.theses.apps.ThesesConfig',
+    'apps.theses',
     'django_extensions',
     'django_filters',
     'bootstrap_pagination',
