@@ -1,9 +1,6 @@
 {# Base template for an entire System #}
 
 {% load static %}
-{% load should_display_debug %}
-{% load debug_info %}
-{% load i18n %}
 {% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
@@ -29,7 +26,7 @@
         gtag('config', 'UA-109984921-1');
     </script>
 
-    {% render_bundle "main" %}
+    {% render_bundle "common-main" %}
     {% render_bundle "polyfill" %}
     {% render_bundle "vendors" %}
     {% block styles %}
@@ -40,7 +37,7 @@
 
 </head>
 
-<body>
+<body{% if debug %} class="debug"{% endif %}>
     <div class="container-fluid p-0 d-print-none">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -225,12 +222,6 @@
                     {% endif %}
                     | Błędy i uwagi: <a href="https://github.com/iiuni/projektzapisy/issues">[link]</a>
                     Wygenerowano: {% now "H:i:s" %}
-                    {% should_display_debug as display_debug %}
-                    {% if display_debug is True %}
-                    {% autoescape off %}
-                    {% debug_info %}
-                    {% endautoescape %}
-                    {% endif %}
                 </p>
             </div>
         </div>
