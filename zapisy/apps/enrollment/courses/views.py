@@ -185,7 +185,7 @@ def recorded_students_csv(group_id: int, status: RecordStatus) -> HttpResponse:
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="group-{}-{}.csv"'.format(
-        group_id, status.display
+        group_id, status.label
     )
 
     writer = csv.writer(response)

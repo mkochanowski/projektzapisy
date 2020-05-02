@@ -4,7 +4,7 @@ import factory
 from factory.django import DjangoModelFactory
 
 from ..models.course_instance import CourseInstance
-from ..models.group import Group
+from ..models.group import Group, GroupType
 from ..models.semester import ChangedDay, Semester
 from ..models.classroom import Classroom
 from ..models.course_information import CourseInformation
@@ -86,7 +86,7 @@ class GroupFactory(DjangoModelFactory):
         model = Group
 
     course = factory.SubFactory(CourseInstanceFactory)
-    type = '2'  # GROUP_TYPE_CHOICES: exercises.
+    type = GroupType.EXERCISES
     limit = 10
     teacher = factory.SubFactory(EmployeeFactory)
 

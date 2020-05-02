@@ -9,7 +9,7 @@ from django.db.models import Avg, Count, Q, Sum, Value
 from django.db.models.functions import Concat
 
 from apps.enrollment.courses.models.course_instance import CourseInstance
-from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES, Group
+from apps.enrollment.courses.models.group import Group
 from apps.enrollment.records.models.records import Record, RecordStatus
 from apps.offer.proposal.models import (Proposal, ProposalStatus,
                                         SemesterChoices)

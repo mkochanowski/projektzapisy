@@ -37,10 +37,10 @@ class ThesisFormBase(forms.ModelForm):
         queryset=Employee.objects.none(), label="Promotor", required=True)
     supporting_advisor = forms.ModelChoiceField(queryset=Employee.objects.none(),
                                                 label="Promotor wspierający", required=False)
-    kind = forms.ChoiceField(choices=ThesisKind.choices(), label="Typ")
+    kind = forms.ChoiceField(choices=ThesisKind.choices, label="Typ")
     students = forms.ModelMultipleChoiceField(queryset=Student.objects.all(), required=False, label="Przypisani studenci",
                                               widget=forms.SelectMultiple(attrs={'size': '10'}))
-    status = forms.ChoiceField(choices=ThesisStatus.choices(), label="Status")
+    status = forms.ChoiceField(choices=ThesisStatus.choices, label="Status")
     reserved_until = forms.DateField(widget=forms.TextInput(attrs={'type': 'date'}),
                                      label="Zarezerwowana do", required=False)
     description = forms.CharField(

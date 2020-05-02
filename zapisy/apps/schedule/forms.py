@@ -7,7 +7,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms import HiddenInput
 from django.forms.models import inlineformset_factory
 
-from apps.enrollment.courses.models.classroom import Classroom, floors
+from apps.enrollment.courses.models.classroom import Classroom, Floors
 from apps.enrollment.courses.models.course_instance import CourseInstance
 from apps.enrollment.courses.models.semester import Semester
 from apps.schedule.models.event import Event
@@ -128,7 +128,7 @@ class TableReportForm(forms.Form):
         super().__init__(*args, **kwargs)
         classrooms = Classroom.objects.filter(can_reserve=True)
         by_floor = defaultdict(list)
-        floor_names = dict(floors)
+        floor_names = dict(Floors)
         for r in classrooms:
             by_floor[floor_names[r.floor]].append((r.pk, r.number))
         self.fields['rooms'].choices = by_floor.items()
@@ -144,7 +144,7 @@ class DoorChartForm(forms.Form):
         super().__init__(*args, **kwargs)
         classrooms = Classroom.objects.filter(can_reserve=True)
         by_floor = defaultdict(list)
-        floor_names = dict(floors)
+        floor_names = dict(Floors)
         for r in classrooms:
             by_floor[floor_names[r.floor]].append((r.pk, r.number))
         self.fields['rooms'].choices = by_floor.items()
