@@ -81,9 +81,9 @@ class Thesis(models.Model):
         Employee, on_delete=models.PROTECT, blank=True, null=True,
         related_name='thesis_supporting_advisor'
     )
-    kind = models.SmallIntegerField(choices=ThesisKind.choices())
+    kind = models.SmallIntegerField(choices=ThesisKind.choices)
     status = models.SmallIntegerField(
-        choices=ThesisStatus.choices(), blank=True, null=True)
+        choices=ThesisStatus.choices, blank=True, null=True)
     # How long the assigned student(s) has/have to complete their work on this thesis
     # Note that this is only a convenience field for the users, the system
     # does not enforce this in any way
@@ -170,7 +170,7 @@ class Vote(models.Model):
     """
     owner = models.ForeignKey(
         Employee, on_delete=models.CASCADE, related_name="vote_owner")
-    vote = models.SmallIntegerField(choices=ThesisVote.choices())
+    vote = models.SmallIntegerField(choices=ThesisVote.choices)
     thesis = models.ForeignKey(
         Thesis, on_delete=models.CASCADE, blank=True, related_name="thesis_votes")
 

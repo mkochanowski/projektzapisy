@@ -15,6 +15,8 @@ RELEASE = env.bool('RELEASE')
 # With DEBUG = False Django will refuse to serve requests to hosts different than this one.
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
+INTERNAL_IPS = ('127.0.0.1',)
+
 EMAIL_BACKEND = env.str('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
@@ -165,6 +167,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.request',
+                'django.template.context_processors.debug',
                 'apps.users.context_processors.roles',
             ],
         },
@@ -184,7 +187,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'middleware.error_handling.ErrorHandlerMiddleware',
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
@@ -221,7 +223,7 @@ INSTALLED_APPS = (
     'apps.offer.desiderata',
     'apps.offer.plan',
 
-    'apps.utils',
+    'apps.common',
     'apps.schedule',
     # 'debug_toolbar',
     'apps.grade.poll',
@@ -387,6 +389,6 @@ REST_FRAMEWORK = {
         # Limit the number of rest calls made by unauthenticated users.
         'anon': '100/day',
     },
-    # default filter backends for views - enables querying/filtering after specifying `filter_fields` in a view
+    # default filter backends for views - enables querying/filtering after specifying `filterset_fields` in a view
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }

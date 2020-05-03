@@ -12,7 +12,7 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models.group import GroupType
 from apps.offer.plan.sheets import (create_sheets_service, read_entire_sheet,
                                     update_plan_proposal_sheet,
                                     update_voting_results_sheet)
@@ -285,8 +285,8 @@ def generate_scheduler_file(request, slug, format):
         return render(request, '404.html')
 
     groups = {}
-    for group in GROUP_TYPE_CHOICES:
-        groups[group[1]] = group[0]
+    for group in GroupType:
+        groups[group.label] = group.value
 
     for employee in employees:
         # if pensum is not castable to float, just skip this row
