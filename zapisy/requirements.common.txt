@@ -14,7 +14,6 @@ django-webpack-loader==0.6.0
 djangorestframework==3.11.0
 django-pagedown~=2.0.3
 
-Fabric3==1.14.post1
 ipdb==0.11
 prompt-toolkit==3.0.5
 ipython==7.13.0
