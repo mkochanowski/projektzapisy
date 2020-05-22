@@ -1,7 +1,7 @@
 import os
+
 import environ
 from django.contrib.messages import constants as messages
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -394,6 +394,7 @@ REST_FRAMEWORK = {
         # Limit the number of rest calls made by unauthenticated users.
         'anon': '100/day',
     },
-    # default filter backends for views - enables querying/filtering after specifying `filterset_fields` in a view
+    # default filter backends for views - enables querying/filtering after
+    # specifying `filterset_fields` in a view
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
