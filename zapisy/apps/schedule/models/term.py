@@ -63,7 +63,7 @@ class Term(models.Model):
                 raise ValidationError(
                     message={
                         '__all__': [
-                            'W tym samym czasie w tej sali odbywają się zajęcia: ' +
+                            'W tym samym czasie w tej sali odbywają się zajęcia: ' +
                             course_terms[0].group.course.name +
                             ' ' +
                             str(
@@ -72,7 +72,7 @@ class Term(models.Model):
 
     def clean(self):
         """Overloaded method from models.Model."""
-        if self.start >= self.end:
+        if self.start and self.end and self.start >= self.end:
             raise ValidationError(
                 message={'end': ['Koniec musi następować po początku']},
                 code='overlap')
@@ -80,7 +80,7 @@ class Term(models.Model):
         if not self.room and not self.place:
             raise ValidationError(
                 message={'room': ['Musisz wybrać salę lub miejsce zewnętrzne'],
-                         'place': ['Musisz wybrać salę lub miejsce zewnętrzne']},
+                         'place': ['Musisz wybrać salę lub miejsce zewnętrzne']},
                 code='invalid'
             )
 
@@ -91,7 +91,7 @@ class Term(models.Model):
                     code='invalid'
                 )
 
-            if not self.ignore_conflicts:
+            if self.day and self.start and self.end and not self.ignore_conflicts:
                 self.validate_against_event_terms()
                 self.validate_against_course_terms()
 
