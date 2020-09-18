@@ -2,31 +2,13 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "sourceMap": true,
-    "target": "esnext",
-    "alwaysStrict": true,
-    "strictNullChecks": true,
+    "target": "ESNext",
     "strict": true,
-    "jsx": "react",
-    "module": "esnext",
-    "baseUrl": "./common/assets",
-    "noUnusedParameters": true,
+    "esModuleInterop": true,
     "noUnusedLocals": true,
-    "types": [
-      "jquery",
-      "lodash",
-      "bootstrap",
-      "popper.js"
-    ],
-  },
-  "files": [
-    "./webpack_resources/typescript_decls.d.ts",
-  ],
-  "exclude": [
-    "./node_modules",
-    // Config files are compiled separately, see tsconfig.webpack-config
-    "./webpack_resources/webpack-utils.ts",
-    "./webpack_resources/webpack.config.ts",
-    "./compiled_assets",
-  ]
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["apps/*"]
+    }
+  }
 }

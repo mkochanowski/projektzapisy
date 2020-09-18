@@ -1,13 +1,13 @@
 [Unit]
-Description=Yarn service
+Description=Yarn install service
 
 [Service]
 User=vagrant
 Group=vagrant
 TimeoutStartSec=900
 WorkingDirectory=/vagrant/zapisy/
-ExecStart=/usr/local/bin/yarn
+ExecStart=/usr/bin/yarnpkg
 Type=oneshot
 
 [Install]
-WantedBy=vagrant.mount vagrant-zapisy-node_modules.mount
+WantedBy=vagrant.mount
