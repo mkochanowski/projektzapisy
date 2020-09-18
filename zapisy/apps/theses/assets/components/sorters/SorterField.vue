@@ -1,5 +1,4 @@
 <script lang="ts">
-import { property } from "lodash";
 import Vue from "vue";
 import { mapMutations, mapGetters } from "vuex";
 
@@ -8,14 +7,14 @@ export default Vue.extend({
   props: {
     // Property of a thesis on which we are filtering.
     property: String,
-    label: String
+    label: String,
   },
   data: () => {
     return {
-      order: 0
+      order: 0,
     };
   },
-  mounted: function() {
+  mounted: function () {
     this.$store.subscribe((mutation, state) => {
       switch (mutation.type) {
         case "sorting/changeSorting":
@@ -26,34 +25,34 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters("sorting", {
-      getSortingProperty: "getProperty"
-    })
+      getSortingProperty: "getProperty",
+    }),
   },
   methods: {
     ...mapMutations("sorting", ["changeSorting"]),
-    sort: function() {
+    sort: function () {
       if (this.order == 2) {
         this.changeSorting({
           k: "modified",
-          f: false
+          f: false,
         });
         this.order = 0;
       } else {
         this.changeSorting({
           k: this.property,
-          f: this.order + 1 == 1
+          f: this.order + 1 == 1,
         });
         this.order += 1;
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
 <template>
-  <div style="cursor: pointer;" v-on:click="sort()">
+  <div style="cursor: pointer" v-on:click="sort()">
     {{ label }}
-    <span v-if="order==1">&darr;</span>
-    <span v-if="order==2">&uarr;</span>
+    <span v-if="order == 1">&darr;</span>
+    <span v-if="order == 2">&uarr;</span>
   </div>
 </template>

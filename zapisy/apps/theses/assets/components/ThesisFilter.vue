@@ -1,6 +1,5 @@
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 
 import TextFilter from "./filters/TextFilter.vue";
 import SelectFilter from "./filters/SelectFilter.vue";
@@ -10,27 +9,28 @@ export default Vue.extend({
   components: {
     TextFilter,
     SelectFilter,
-    CheckFilter
+    CheckFilter,
   },
-  data: function() {
+  data: function () {
     return {
-      allKinds: {}
+      allKinds: [] as [string, string][],
+      allStatuses: [] as [number, string][],
     };
   },
-  created: function() {
+  created: function () {
     this.allKinds = [
       ["mgr", "Magisterska"],
       ["inż", "Inżynierska"],
       ["lic", "Licencjacka"],
       ["isim", "ISIM"],
       ["lic+inż", "Licencjat+inżynierska"],
-      ["lic+inż+isim", "Licencjat+inżynierska+ISIM"]
+      ["lic+inż+isim", "Licencjat+inżynierska+ISIM"],
     ];
     this.allStatuses = [
       [0, "W trakcie weryfikacji"],
-      [1, "Zaakceptowane"]
+      [1, "Zaakceptowane"],
     ];
-  }
+  },
 });
 </script>
 

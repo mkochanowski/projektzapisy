@@ -1,7 +1,7 @@
 import Vue from "vue";
 import ClassroomPicker from "./components/ClassroomPicker.vue";
 
-let schedule_reservation_widget_app = new Vue({
+new Vue({
   el: "#reservation-widget",
   components: {
     ClassroomPicker,

@@ -1,4 +1,9 @@
-import moment from "moment";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(duration);
 
 // This interface stores all data needed for proper display of term block
 // in classroom field. It contains width attribute (as a % of lenght of
@@ -36,16 +41,11 @@ export function isFree(
   return isFree;
 }
 
-export function calculateLength(
-  startTime: string,
-  endTime: string
-) {
-  let momentStartTime = moment(startTime, "HH:mm");
-  let momentEndTime = moment(endTime, "HH:mm");
-
-  var duration = moment
+export function calculateLength(startTime: string, endTime: string) {
+  const momentStartTime = dayjs(startTime, "HH:mm");
+  const momentEndTime = dayjs(endTime, "HH:mm");
+  const duration = dayjs
     .duration(momentEndTime.diff(momentStartTime))
     .asHours();
-
   return String((duration / 14) * 100) + "%";
 }

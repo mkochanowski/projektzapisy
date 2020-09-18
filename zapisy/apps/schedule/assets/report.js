@@ -1,13 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   // zaznacz wszystkie sale do raportu
-  document.querySelectorAll(".select-all-button").forEach(e => {
+  document.querySelectorAll(".select-all-button").forEach((e) => {
     const grandpa = e.parentElement.parentElement;
     const select = grandpa.querySelector("select[name=rooms]");
     if (select === undefined) {
       return;
     }
-    e.onclick = event => {
-      for (let opt of select.options) {
+    e.onclick = (event) => {
+      for (const opt of select.options) {
         opt.selected = true;
       }
     };
@@ -21,9 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const room_selects = document.querySelectorAll("select[name=rooms]");
-  room_selects.forEach(el => {
-    console.log(el);
+  const roomSelects = document.querySelectorAll("select[name=rooms]");
+  roomSelects.forEach((el) => {
     el.classList.add("form-control");
   });
 
