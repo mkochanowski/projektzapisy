@@ -3,8 +3,6 @@
 A group may have multiple terms - that is, students may meet with the teacher
 more than one time a week.
 """
-from typing import Optional
-
 from django.db import models, transaction
 from django.urls import reverse
 
@@ -52,6 +50,14 @@ class Group(models.Model):
         on_delete=models.CASCADE)
     type = models.CharField(max_length=2, choices=GroupType.choices, verbose_name='typ zajęć')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
+    auto_enrollment = models.BooleanField(
+        "grupa z auto-zapisem",
+        default=False,
+        help_text=(
+            "Blokuje zapisywanie do grupy. Zamiast tego, studenci są do niej automatycznie "
+            "zapisani jeśli zapiszą się do jakiejkolwiek innej grupy z tego przedmiotu. "
+            "Nie należy blokować wszystkich grup z przedmiotu ani grup, gdzie studenci powinni "
+            "mieć wybór (np. jest kilka równoległych grup ćwiczeniowych)."))
     extra = models.CharField(
         "dodatkowe informacje",
         max_length=255,
@@ -61,9 +67,6 @@ class Group(models.Model):
                    "przedmiotu. Nie ma żadnych dozwolonych tagów, ale dla wybranych tagów zostanie "
                    f"dodany tooltip z wyjaśnieniem: {GroupTooltips}"))
     export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
-
-    disable_update_signal = False
-
     usos_nr = models.IntegerField(
         null=True,
         blank=True,
@@ -165,19 +168,6 @@ class Group(models.Model):
         copy.save()
         copy.term.set(copied_terms)
         return copy
-
-    @classmethod
-    def get_lecture_group(cls, course_id: int) -> Optional['Group']:
-        """Given a course_id returns a lecture group for this course, if one exists.
-
-        The Group.MultipleObjectsReturned exception will be raised when many
-        lecture groups exist for course.
-        """
-        group_query = cls.objects.filter(course_id=course_id, type=GroupType.LECTURE)
-        try:
-            return group_query.get()
-        except cls.DoesNotExist:
-            return None
 
     def save(self, *args, **kwargs):
         """Overloaded save method.
